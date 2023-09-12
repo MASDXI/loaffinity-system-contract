@@ -38,7 +38,7 @@ contract SupplyControl is Initializable {
     mapping(uint256 => bytes32) public blockProposals;
 
     modifier onlySystemAddress() {
-        require(msg.sender == address(0));
+        require(msg.sender == systemContract_);
         _;
     }
 
@@ -48,7 +48,7 @@ contract SupplyControl is Initializable {
     ) public initializer  {
         require(!_init,"");
         _init = true;
-        _systemContract = systemContrat_;
+        _systemContract = systemContract_;
         _votePeriod = votePeriod_;
     }
 
