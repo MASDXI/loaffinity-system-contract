@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+import "./abstract/Votable.sol";
 import "./interface/ICommitee.sol";
-import "./Votable.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 contract Commitee is AccessControlEnumerable, ICommittee, Votable {
@@ -13,7 +13,17 @@ contract Commitee is AccessControlEnumerable, ICommittee, Votable {
     bytes32 public constant COMMITEE_ROLE = keccak256("COMMITEE_ROLE");
     bytes32 public constant PROPOSAL_CREATOR_ROLE = keccak256("PROPOSAL_CREATOR_ROLE");
 
+    
+    struct ProposalInfo {
+        address proposer;
+        address[] commitee;
+        uint256 blockNumber;
+    }
+
     bool private _init;
+    address private _systemContract; /// TODO implement system_contract_caller as abstract contract?
+    mapping(bytes32 => ProposalInfo) private _proposals; 
+    mapping(uint256 => bytes32) public _blockProposals;
 
     /// @notice initialize the contract instead of constructor.
     /// @param committees_ array of committee addresses
@@ -48,6 +58,14 @@ contract Commitee is AccessControlEnumerable, ICommittee, Votable {
 
     function isProposalCreator(address account) public override view returns (bool) {
         return hasRole(PROPOSAL_CREATOR_ROLE, account);
+    }
+
+    function getProposalInfoByProposalId(bytes32 proposalId) public view returns (ProposalInfo memory) {
+        return _getProposal(proposalId);
+    }
+
+    function getProposalInfoByBlockNumber(uint256 blockNumber) public view returns (ProposalInfo memory) {
+        return _getProposal(_blockProposals[blockNumber]);
     }
 
 }

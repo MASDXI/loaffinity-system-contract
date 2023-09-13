@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+import "./abstract/Votable.sol";
 import "./interface/ICommitee.sol";
-import "./Votable.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 contract SupplyControl is Votable {
@@ -33,7 +33,7 @@ contract SupplyControl is Votable {
     event SupplyMintProposalRejected(bytes32 proposalId, address indexed account, uint256 amount, uint256 time);
 
     mapping(bytes32 => ProposalInfo) private _proposals; 
-    mapping(uint256 => bytes32) public blockProposals;
+    mapping(uint256 => bytes32) public _blockProposals;
 
     modifier onlySystemAddress() {
         require(msg.sender == _systemContract);
@@ -61,7 +61,7 @@ contract SupplyControl is Votable {
 
     function _getProposal(bytes32 proposalId) private view returns (ProposalInfo memory) {
         ProposalInfo memory data = _proposals[proposalId];
-        if (data.proposer != address(0)) {
+        if (data != (address(0), address(0), 0, 0)) {
             return data;
         } else {
             revert ProposalNotFound();
@@ -73,7 +73,7 @@ contract SupplyControl is Votable {
     }
 
     function getProposalInfoByBlockNumber(uint256 blockNumber) public view returns (ProposalInfo memory) {
-        return _getProposal(blockProposals[blockNumber]);
+        return _getProposal(_blockProposals[blockNumber]);
     }
 
     function propose(
@@ -87,21 +87,12 @@ contract SupplyControl is Votable {
         require(account != address(0), "");
         require((block.number + votingPeriod()) < blockNumber,"");
 
-        // only one minting could execute in a block so we use it as an ID
-        // uint256 proposalId = uint256(keccak256(abi.encodePacked(_block)));
-
-        // proposal.block = _block;
-        // proposal.amounts = _amounts;
-        // proposal.scriptTypes = _scriptTypes;
-        // proposal.scripts = _scripts;
-        // _proposals[proposalId] = proposal;
-
+        // proposal can be contain more than 1 in a block
         bytes32 proposalId = keccak256(abi.encode(msg.sender, account, amount, blockNumber));
-        blockProposals[blockNumber] = proposalId;
+        _blockProposals[blockNumber] = proposalId;
         _proposals[proposalId] = ProposalInfo({proposer: msg.sender, receipient: account, amount: amount, blockNumber: blockNumber});
 
         _propose(proposalId);
-        emit ProposalCreated(proposalId);
         emit SupplyMintProposalProposed(proposalId, msg.sender, account, amount, blockNumber, block.timestamp);
 
         return proposalId;
@@ -122,7 +113,7 @@ contract SupplyControl is Votable {
     }
 
     function _quorumReached(uint256 proposalId) internal view virtual override returns (bool) {
-        ProposalMeta memory p = proposalMetas[proposalId];
+        ProposalMeta memory p = _proposalMetas[proposalId];
         ProposalVote memory v = _proposalVotes[p.proposalID];
 
         uint256 _quorum = quorum(p.proposedAt);
@@ -143,10 +134,7 @@ contract SupplyControl is Votable {
 
     function _execute(uint256 proposalId) internal virtual override returns (uint256) {
         ProposalDetail memory p = _proposals[proposalId];
-        delete _proposals[proposalId]; // ? delete or not
-        delete blockProposals[p.block]; // ? delete or not
-
-        require(p.block > block.number, "proposal must be added before minting block");
+        require(p.block == block.number, "execute faile");
 
         // Mint storage m = _mints[p.block];
         // m.proposalId = proposalId;

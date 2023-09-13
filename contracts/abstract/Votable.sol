@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "./interface/IVotable.sol";
+import "../interface/IVotable.sol";
 
 abstract contract Votable is IVotable {
     /**
@@ -120,6 +120,7 @@ abstract contract Votable is IVotable {
         proposal.voteEnd = uint64(proposal.voteStart + votingPeriod());
         proposal.proposer = msg.sender;
 
+        emit ProposalCreated(proposalId);
         return proposalId;
     }
 
