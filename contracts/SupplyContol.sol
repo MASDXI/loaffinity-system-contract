@@ -81,11 +81,12 @@ contract SupplyControl is Votable {
         uint256 amount,
         address account
     ) public onlyProposalCreator returns(uint256) {
+        uint256 current = block.number;
         require(_init,"require init");
         require(amount > 0, "");
-        require(block.number < blockNumber, "");
+        require(current < blockNumber, "");
         require(account != address(0), "");
-        require((block.number + votingPeriod()) < blockNumber,"");
+        require((current + votingPeriod()) < blockNumber,"");
 
         // proposal can be contain more than 1 in a block
         bytes32 proposalId = keccak256(abi.encode(msg.sender, account, amount, blockNumber));
