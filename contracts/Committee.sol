@@ -5,7 +5,7 @@ import "./abstracts/Proposal.sol";
 import "./interfaces/ICommittee.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
-contract Commitee is AccessControlEnumerable, ICommittee, Proposal {
+contract Committee is AccessControlEnumerable, ICommittee, Proposal {
 
     bytes32 public constant ROOT_ADMIN_ROLE = keccak256("ROOT_ADMIN_ROLE");
     bytes32 public constant COMMITEE_ROLE = keccak256("COMMITEE_ROLE");
@@ -41,6 +41,7 @@ contract Commitee is AccessControlEnumerable, ICommittee, Proposal {
             _setupRole(COMMITEE_ROLE, committees_[i]);
         }
         _init = true;
+        
     }
 
     function _getProposal(bytes32 proposalId) private view returns (ProposalCommitteeInfo memory) {

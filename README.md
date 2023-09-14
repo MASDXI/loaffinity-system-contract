@@ -1,6 +1,17 @@
-# Sample Hardhat Project
+# Loaffinity System Contract
 
 This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+
+### Prerequisite
+
+```shell
+git clone 
+```
+
+```shell
+cd loaffinity-system-contract/
+yarn install
+```
 
 Try running some of the following tasks:
 
