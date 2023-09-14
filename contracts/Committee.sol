@@ -25,6 +25,8 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
     mapping(bytes32 => ProposalCommitteeInfo) private _committeeProposals; 
     mapping(uint256 => bytes32) public _blockProposals;
 
+    event Initialized();
+
     modifier onlyProposer() {
         require(isProposer(msg.sender),"committee:");
         _;
@@ -33,7 +35,12 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
     /// @notice initialize the contract instead of constructor.
     /// @param committees_ array of committee addresses
     /// @param admin_ root admin address
-    function initialize(address [] calldata committees_, address admin_) external {
+    function initialize(
+        address [] calldata committees_, 
+        address admin_,
+        uint256 voteDelay_,
+        uint256 votePeriod_
+        ) external {
         require(!_init,"committee:");
         uint256 committeeLen = committees_.length;
         _setupRole(ROOT_ADMIN_ROLE, admin_);
@@ -41,12 +48,14 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
             _setupRole(COMMITEE_ROLE, committees_[i]);
         }
         _init = true;
-        
+        _voteDelay = voteDelay_;
+        _votePeriod = votePeriod_;
+        emit Initialized();
     }
 
     function _getProposal(bytes32 proposalId) private view returns (ProposalCommitteeInfo memory) {
         ProposalCommitteeInfo memory data = _committeeProposals[proposalId];
-        require(data.blockNumber != 0,"committee:");
+        require(data.blockNumber != 0, "committee: proposal not exist");
         return data;
     }
 
