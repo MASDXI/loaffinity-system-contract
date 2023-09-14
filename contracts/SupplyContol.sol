@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "./abstract/Votable.sol";
-import "./interface/ICommitee.sol";
+import "./abstracts/Proposal.sol";
+import "./interfaces/ICommittee.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
-contract SupplyControl is Votable {
+contract SupplyControl is Proposal {
     
     error ProposalNotFound();
 
-    struct ProposalInfo {
+    struct ProposalSupplyInfo {
         address proposer;
         address recipient;
         uint256 amount;
@@ -32,7 +32,7 @@ contract SupplyControl is Votable {
     event SupplyMintProposalExecuted(bytes32 proposalId, address indexed account, uint256 amount, uint256 time);
     event SupplyMintProposalRejected(bytes32 proposalId, address indexed account, uint256 amount, uint256 time);
 
-    mapping(bytes32 => ProposalInfo) private _proposals; 
+    mapping(bytes32 => ProposalSupplyInfo) private _supplyProposals; 
     mapping(uint256 => bytes32) public _blockProposals;
 
     modifier onlySystemAddress() {
@@ -40,8 +40,8 @@ contract SupplyControl is Votable {
         _;
     }
 
-    modifier onlyProposalCreator() {
-        require(ICommittee.isProposalCreator(msg.sender));
+    modifier onlyProposer() {
+        require(_commiteeContract.isProposer(msg.sender));
         _;
     }
 
@@ -52,27 +52,24 @@ contract SupplyControl is Votable {
         ICommittee commiteeContractAddress_
     ) external  {
         require(!_init,"");
-        _init = true;
         _systemContract = systemContract_;
         _commiteeContract = commiteeContractAddress_;
         _voteDelay = voteDelay_;
         _votePeriod = votePeriod_;
+        _init = true;
     }
 
-    function _getProposal(bytes32 proposalId) private view returns (ProposalInfo memory) {
-        ProposalInfo memory data = _proposals[proposalId];
-        if (data != (address(0), address(0), 0, 0)) {
-            return data;
-        } else {
-            revert ProposalNotFound();
-        }
+    function _getProposal(bytes32 proposalId) private view returns (ProposalSupplyInfo memory) {
+        ProposalSupplyInfo memory data = _supplyProposals[proposalId];
+        require(data.blockNumber != 0,"supplycontrol:");
+        return data;
     }
 
-    function getProposalInfoByProposalId(bytes32 proposalId) public view returns (ProposalInfo memory) {
+    function getProposalSupplyInfoByProposalId(bytes32 proposalId) public view returns (ProposalSupplyInfo memory) {
         return _getProposal(proposalId);
     }
 
-    function getProposalInfoByBlockNumber(uint256 blockNumber) public view returns (ProposalInfo memory) {
+    function getProposalSupplyInfoByBlockNumber(uint256 blockNumber) public view returns (ProposalSupplyInfo memory) {
         return _getProposal(_blockProposals[blockNumber]);
     }
 
@@ -80,76 +77,39 @@ contract SupplyControl is Votable {
         uint256 blockNumber,
         uint256 amount,
         address account
-    ) public onlyProposalCreator returns(uint256) {
+    ) public onlyProposer returns(uint256) {
         uint256 current = block.number;
-        require(_init,"require init");
-        require(amount > 0, "");
-        require(current < blockNumber, "");
-        require(account != address(0), "");
-        require((current + votingPeriod()) < blockNumber,"");
+        require(_init,"supplycontrol:require init");
+        require(amount > 0, "supplycontrol:");
+        require(current < blockNumber, "supplycontrol:");
+        require(account != address(0), "supplycontrol:");
+        require((current + votingPeriod()) < blockNumber,"supplycontrol:");
 
         // proposal can be contain more than 1 in a block
         bytes32 proposalId = keccak256(abi.encode(msg.sender, account, amount, blockNumber));
-        _blockProposals[blockNumber] = proposalId;
-        _proposals[proposalId] = ProposalInfo({proposer: msg.sender, receipient: account, amount: amount, blockNumber: blockNumber});
 
-        _propose(proposalId);
+        _blockProposals[blockNumber] = proposalId;
+        _supplyProposals[proposalId].proposer = msg.sender;
+        _supplyProposals[proposalId].recipient = account;
+        _supplyProposals[proposalId].amount = amount;
+        _supplyProposals[proposalId].blockNumber = blockNumber;
+
+        _proposal(proposalId, uint16(_commiteeContract.getCommitteeCount()));
         emit SupplyMintProposalProposed(proposalId, msg.sender, account, amount, blockNumber, block.timestamp);
 
-        return proposalId;
+        return blockNumber;
     }
 
-    function votingDeley() public view virtual override returns(uint256) {
+    function votingDeley() public view override returns(uint256) {
         return _voteDelay;
     }
 
-    function votingPeriod() public view virtual override returns(uint256) {
+    function votingPeriod() public view override returns(uint256) {
         return _votePeriod;
     }
 
-    function quorum(uint256 timepoint) public view virtual override returns (uint256) {
-        // supper majority for supply control
-        uint256 total = getManager().getTotalAdminOrGov(timepoint);
-        return total * 2 / 3 + (total % 3 == 0 ? 0 : 1);
-    }
-
-    function _quorumReached(uint256 proposalId) internal view virtual override returns (bool) {
-        ProposalMeta memory p = _proposalMetas[proposalId];
-        ProposalVote memory v = _proposalVotes[p.proposalID];
-
-        uint256 _quorum = quorum(p.proposedAt);
-        uint256 _total = getManager().getTotalAdminOrGov(p.proposedAt);
-
-        return v.forVotes >= _quorum || (v.abstainVotes + v.againstVotes) > (_total - _quorum);
-    }
-
-    function _voteSucceeded(uint256 proposalId) internal view virtual override returns (bool) {
-        ProposalMeta memory p = proposalMetas[proposalId];
-        ProposalVote memory v = _proposalVotes[proposalId];
-
-        // require supper majority for evaluate as success
-        uint256 total = getManager().getTotalAdminOrGov(p.proposedAt);
-
-        return v.forVotes >= total * 2 / 3 + (total % 3 == 0 ? 0 : 1);
-    }
-
-    function _execute(uint256 proposalId) internal virtual override returns (uint256) {
-        ProposalDetail memory p = _proposals[proposalId];
-        require(p.block == block.number, "execute faile");
-
-        // Mint storage m = _mints[p.block];
-        // m.proposalId = proposalId;
-        // m.amounts = p.amounts;
-        // m.scriptTypes = p.scriptTypes;
-        // m.scripts = p.scripts;
-
-        // emit SupplyMintProposalExecuted(p.block, p.amounts, p.scriptTypes, p.scripts);
-
-        return proposalId;
-    }
-
-    function execute(uint256 proposalId) public override onlySystemAddress returns (uint256) {
-        super.execute(proposalId);
-        return proposalId;
+    function execute(uint256 blockNumber) public override returns (uint256) {
+        _execute(_blockProposals[blockNumber]);
+        return blockNumber;
     }
 }
