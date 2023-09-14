@@ -61,14 +61,14 @@ abstract contract Proposal is IProposal {
         if (_proposals[proposalId].accept >= _proposals[proposalId].nVoter / 2 + 1) {
             _pass[proposalId] = true;
             _proposals[proposalId].status = ProposalStatus.EXECUTE;
-            emit LogPassProposal(proposalId, block.timestamp);
+            emit LogProposal(proposalId, block.timestamp, ProposalStatus.EXECUTE);
             return true;
         }
 
         if (_proposals[proposalId].reject >= _proposals[proposalId].nVoter / 2 + 1) {
             _pass[proposalId] = false;
             _proposals[proposalId].status = ProposalStatus.REJECT;
-            emit LogRejectProposal(proposalId, block.timestamp);
+            emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
             return true;
         }
 

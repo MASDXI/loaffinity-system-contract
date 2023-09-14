@@ -102,9 +102,14 @@ contract Commitee is AccessControlEnumerable, ICommittee, Proposal {
     }
 
     function execute(uint256 blockNumber) external override returns (uint256) {
+        ProposalCommitteeInfo memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
         _execute(_blockProposals[blockNumber]);
-        // _grantRole(COMMITEE_ROLE, account);
-        // _revokeRole(COMMITEE_ROLE, account);
+        if (data.proposeType == ProposalType.ADD) {
+            _grantRole(COMMITEE_ROLE, data.commitee);
+        }
+        if (data.proposeType == ProposalType.REMOVE) {
+            _revokeRole(COMMITEE_ROLE, data.commitee);
+        }
         return blockNumber;
     }
 

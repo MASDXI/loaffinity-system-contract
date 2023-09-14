@@ -6,14 +6,15 @@ import "./interfaces/ICommittee.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 contract SupplyControl is Proposal {
-    
-    error ProposalNotFound();
+
+    enum ProposalType { SUB, ADD }
 
     struct ProposalSupplyInfo {
         address proposer;
         address recipient;
         uint256 amount;
         uint256 blockNumber;
+        ProposalType proposeType;
     }
 
     bool private _init;
@@ -76,7 +77,8 @@ contract SupplyControl is Proposal {
     function propose(
         uint256 blockNumber,
         uint256 amount,
-        address account
+        address account,
+        ProposalType proposeType
     ) public onlyProposer returns(uint256) {
         uint256 current = block.number;
         require(_init,"supplycontrol:require init");
@@ -84,8 +86,8 @@ contract SupplyControl is Proposal {
         require(current < blockNumber, "supplycontrol:");
         require(account != address(0), "supplycontrol:");
         require((current + votingPeriod()) < blockNumber,"supplycontrol:");
+        require(_blockProposals[blockNumber] != 0,"supplycontrol:");
 
-        // proposal can be contain more than 1 in a block
         bytes32 proposalId = keccak256(abi.encode(msg.sender, account, amount, blockNumber));
 
         _blockProposals[blockNumber] = proposalId;
@@ -93,6 +95,7 @@ contract SupplyControl is Proposal {
         _supplyProposals[proposalId].recipient = account;
         _supplyProposals[proposalId].amount = amount;
         _supplyProposals[proposalId].blockNumber = blockNumber;
+        _supplyProposals[proposalId].proposeType = proposeType;
 
         _proposal(proposalId, uint16(_commiteeContract.getCommitteeCount()));
         emit SupplyMintProposalProposed(proposalId, msg.sender, account, amount, blockNumber, block.timestamp);

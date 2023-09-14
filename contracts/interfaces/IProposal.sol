@@ -4,7 +4,7 @@ pragma solidity 0.8.17;
 interface IProposal {
 
     enum ProposalStatus { PENDING, EXECUTE, REJECT }
-    
+
     struct ProposalInfo {
         address proposer;
         uint256 createTime;
@@ -22,31 +22,24 @@ interface IProposal {
         bool auth;
     }
 
-
     event LogCreateProposal(
         bytes32 indexed proposalId,
         address indexed proposer,
-        uint256 time
+        uint256 timestamp
     );
 
     event LogVote(
         bytes32 indexed proposalId,
         address indexed voter,
         bool auth,
-        uint256 time
+        uint256 timestamp
     );
 
-    event LogPassProposal(
+    event LogProposal(
         bytes32 indexed proposalId,
-        uint256 time
+        uint256 timestamp,
+        ProposalStatus indexed status
     );
-
-    event LogRejectProposal(
-        bytes32 indexed proposalId,
-        uint256 time
-    );
-
-    event LogSetUnpassed(address indexed val, bytes32 proposalId, uint256 time);
 
     function isProposalPassed(bytes32 proposalId) external view returns(bool);
     function execute(uint256 proposalId) external returns (uint256);
