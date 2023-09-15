@@ -254,6 +254,12 @@ describe("Committee", function () {
       await expect(committee.connect(systemAddress).execute(300)).to.be.revertedWith("committee: proposal not exist");
     });
 
+    it("function: execute() fail not system address", async function () {
+      const { committee, committee1, committee2, admin, proposer1, systemAddress} = await loadFixture(deployCommitteeFixture);
+      await committee.connect(systemAddress).initialize([committee1.address], admin.address, 0, 240);
+      await expect(committee.connect(admin).execute(300)).to.be.revertedWith("committee: onlySystemAddress can call");
+    });
+
     it("function: execute() success", async function () {
       const { committee, committee1, committee2, admin, proposer1, systemAddress, otherAccount} = await loadFixture(deployCommitteeFixture);
       const proposalId = "0x6d6fa43b66cd017595511990ce9c1237df71e4aed1c912277664a5a492a0821a"
@@ -288,8 +294,5 @@ describe("Committee", function () {
       expect(await committee.isCommittee(committee2.address)).to.equal(false);
       expect(await committee.connect(systemAddress).blockProposal(300)).to.equal(proposalId)
     });
-
-    //committee: propose remove not exist commitee
-    //committee: propose add existing committee
   });
 });
