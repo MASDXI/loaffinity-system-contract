@@ -36,7 +36,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
     }
 
     modifier onlySystemAddress() {
-        require(msg.sender == _systemContract,"committee: onlyAdmin can call");
+        require(msg.sender == _systemContract,"committee: onlySystemAddress can call");
         _;
     }
 
@@ -49,7 +49,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
         uint256 voteDelay_,
         uint256 votePeriod_
         ) external onlySystemAddress {
-        require(!_init,"committee:");
+        require(!_init,"committee: already init");
         uint256 committeeLen = committees_.length;
         _setupRole(ROOT_ADMIN_ROLE, admin_);
         _setupRole(PROPOSER_ROLE, admin_);
@@ -135,11 +135,11 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
 
     function execute(uint256 blockNumber) external override returns (uint256) {
         ProposalCommitteeInfo memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
-        _execute(blockProposal[blockNumber]);
-        if (data.proposeType == ProposalType.ADD) {
+        (bool callback) = _execute(blockProposal[blockNumber]);
+        if (callback && data.proposeType == ProposalType.ADD) {
             _grantRole(COMMITEE_ROLE, data.commitee);
         }
-        if (data.proposeType == ProposalType.REMOVE) {
+        if (callback && data.proposeType == ProposalType.REMOVE) {
             _revokeRole(COMMITEE_ROLE, data.commitee);
         }
         return blockNumber;
