@@ -11,8 +11,6 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
     bytes32 public constant COMMITEE_ROLE = keccak256("COMMITEE_ROLE");
     bytes32 public constant PROPOSER_ROLE = keccak256("PROPOSER_ROLE");
 
-    enum ProposalType { REMOVE, ADD }
-
     struct ProposalCommitteeInfo {
         address proposer;
         address commitee;
@@ -21,14 +19,24 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
     }
 
     bool private _init;
-    address private _systemContract; /// TODO implement system_contract_caller as abstract contract?
+    address private constant _systemContract = 0x0000000000000000000000000000000000000F69;
     mapping(bytes32 => ProposalCommitteeInfo) private _committeeProposals; 
-    mapping(uint256 => bytes32) public _blockProposals;
+    mapping(uint256 => bytes32) public blockProposal;
 
     event Initialized();
 
     modifier onlyProposer() {
-        require(isProposer(msg.sender),"committee:");
+        require(isProposer(msg.sender),"committee: onlyProposer can call");
+        _;
+    }
+
+    modifier onlyAdmin() {
+        require(hasRole(ROOT_ADMIN_ROLE, msg.sender),"committee: onlyAdmin can call");
+        _;
+    }
+
+    modifier onlySystemAddress() {
+        require(msg.sender == _systemContract,"committee: onlyAdmin can call");
         _;
     }
 
@@ -40,10 +48,11 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
         address admin_,
         uint256 voteDelay_,
         uint256 votePeriod_
-        ) external {
+        ) external onlySystemAddress {
         require(!_init,"committee:");
         uint256 committeeLen = committees_.length;
         _setupRole(ROOT_ADMIN_ROLE, admin_);
+        _setupRole(PROPOSER_ROLE, admin_);
         for (uint256 i = 0; i < committeeLen; ++i) {
             _setupRole(COMMITEE_ROLE, committees_[i]);
         }
@@ -63,28 +72,41 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
         uint256 blockNumber,
         address account,
         ProposalType proposeType
-    ) public onlyProposer returns(uint256) {
+    ) public onlyProposer returns(bool) {
         uint256 current = block.number;
-        require(_init,"committee:");
-        require(current < blockNumber, "committee:");
-        require(account != address(0), "committee:");
-        require((current + votingPeriod()) < blockNumber,"committee:");
-        require(proposeType != ProposalType.ADD && isCommittee(account), "committee: propose add existing committee");
-        require(proposeType != ProposalType.REMOVE && !isCommittee(account), "committee: propose remove not exist commitee");
+        require(current < blockNumber, "committee: propose past block");
+        require(account != address(0), "committee: propose zero address");
+        require((current + votingPeriod()) < blockNumber,"committee: invalid blocknumber");
+        if (proposeType == ProposalType.ADD) {
+            require(!isCommittee(account), "committee: propose add existing committee");
+        }
+        if (proposeType == ProposalType.REMOVE) {
+            require(isCommittee(account), "committee: propose remove not exist commitee");
+        }
 
         // proposal can be contain more than 1 in a block
         bytes32 proposalId = keccak256(abi.encode(msg.sender, account, proposeType, blockNumber));
 
-        _blockProposals[blockNumber] = proposalId;
+        blockProposal[blockNumber] = proposalId;
         _committeeProposals[proposalId].proposer = msg.sender;
         _committeeProposals[proposalId].commitee = account;
         _committeeProposals[proposalId].blockNumber = blockNumber;
         _committeeProposals[proposalId].proposeType = proposeType;
         
         _proposal(proposalId, uint16(getCommitteeCount()));
-        // emit SupplyMintProposalProposed(proposalId, msg.sender, account, proposeType, blockNumber, block.timestamp);
+        emit CommitteeProposalProposed(proposalId, msg.sender, account, proposeType, blockNumber, block.timestamp);
 
-        return blockNumber;
+        return true;
+    }
+
+    function grantProposer(address account) public onlyAdmin {
+        require(!isProposer(account),"committee: grant exist proposer address");
+        _grantRole(PROPOSER_ROLE, account);
+    }
+
+    function revokeProposer(address account) public onlyAdmin {
+        require(isProposer(account),"committee: revoke non proposer address");
+        _revokeRole(PROPOSER_ROLE, account);
     }
 
     function getProposalCommitteeInfoByProposalId(bytes32 proposalId) public view returns (ProposalCommitteeInfo memory) {
@@ -92,7 +114,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
     }
 
     function getProposalCommitteeInfoByBlockNumber(uint256 blockNumber) public view returns (ProposalCommitteeInfo memory) {
-        return _getProposal(_blockProposals[blockNumber]);
+        return _getProposal(blockProposal[blockNumber]);
     }
 
     function getCommitteeCount() public view returns (uint256) {
@@ -113,7 +135,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
 
     function execute(uint256 blockNumber) external override returns (uint256) {
         ProposalCommitteeInfo memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
-        _execute(_blockProposals[blockNumber]);
+        _execute(blockProposal[blockNumber]);
         if (data.proposeType == ProposalType.ADD) {
             _grantRole(COMMITEE_ROLE, data.commitee);
         }

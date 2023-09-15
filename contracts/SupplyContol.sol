@@ -34,7 +34,7 @@ contract SupplyControl is Proposal {
     event SupplyMintProposalRejected(bytes32 proposalId, address indexed account, uint256 amount, uint256 time);
 
     mapping(bytes32 => ProposalSupplyInfo) private _supplyProposals; 
-    mapping(uint256 => bytes32) public _blockProposals;
+    mapping(uint256 => bytes32) public blockProposal;
 
     modifier onlySystemAddress() {
         require(msg.sender == _systemContract);
@@ -71,7 +71,7 @@ contract SupplyControl is Proposal {
     }
 
     function getProposalSupplyInfoByBlockNumber(uint256 blockNumber) public view returns (ProposalSupplyInfo memory) {
-        return _getProposal(_blockProposals[blockNumber]);
+        return _getProposal(blockProposal[blockNumber]);
     }
 
     function propose(
@@ -86,11 +86,11 @@ contract SupplyControl is Proposal {
         require(current < blockNumber, "supplycontrol:");
         require(account != address(0), "supplycontrol:");
         require((current + votingPeriod()) < blockNumber,"supplycontrol:");
-        require(_blockProposals[blockNumber] != 0,"supplycontrol:");
+        require(blockProposal[blockNumber] != 0,"supplycontrol:");
 
         bytes32 proposalId = keccak256(abi.encode(msg.sender, account, amount, blockNumber));
 
-        _blockProposals[blockNumber] = proposalId;
+        blockProposal[blockNumber] = proposalId;
         _supplyProposals[proposalId].proposer = msg.sender;
         _supplyProposals[proposalId].recipient = account;
         _supplyProposals[proposalId].amount = amount;
@@ -112,7 +112,7 @@ contract SupplyControl is Proposal {
     }
 
     function execute(uint256 blockNumber) public override returns (uint256) {
-        _execute(_blockProposals[blockNumber]);
+        _execute(blockProposal[blockNumber]);
         return blockNumber;
     }
 }
