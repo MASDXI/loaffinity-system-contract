@@ -46,7 +46,7 @@ contract SupplyControl is Proposal {
         _;
     }
 
-    function initialized (
+    function initialize (
         uint256 voteDelay_,
         uint256 votePeriod_,
         address systemContract_,
