@@ -57,8 +57,8 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
             _setupRole(COMMITEE_ROLE, committees_[i]);
         }
         _init = true;
-        _voteDelay = voteDelay_;
-        _votePeriod = votePeriod_;
+        _setDelay(voteDelay_);
+        _setPeriod(votePeriod_);
         emit Initialized();
     }
 
@@ -124,15 +124,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
     function getProposerCount() external view returns (uint256) {
         return getRoleMemberCount(PROPOSER_ROLE);
     }
-
-    function votingDeley() public view virtual override returns(uint256) {
-        return _voteDelay;
-    }
-
-    function votingPeriod() public view virtual override returns(uint256) {
-        return _votePeriod;
-    }
-
+    
     function execute(uint256 blockNumber) external override onlySystemAddress returns (uint256) {
         ProposalCommitteeInfo memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
         (bool callback) = _execute(blockProposal[blockNumber]);

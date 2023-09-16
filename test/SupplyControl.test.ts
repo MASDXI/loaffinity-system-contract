@@ -15,8 +15,6 @@ describe("Supply Control System Contract", function () {
   describe("Unit test", function () {
     it("function: ROOT_ADMIN_ROLE()", async function () {
       const { supplycontrol } = await loadFixture(setSystemContractFixture);
-      console.log("🚀 ~ file: SupplyControl.test.ts:48 ~ supplycontrol:", supplycontrol)
-      // initCommitee;
       expect(await supplycontrol.votingDeley()).to.equal(0);
       expect(await supplycontrol.votingPeriod()).to.equal(0);
     });

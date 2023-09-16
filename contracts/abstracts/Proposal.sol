@@ -5,12 +5,20 @@ import "../interfaces/IProposal.sol";
 
 abstract contract Proposal is IProposal {
 
-    uint256 internal _votePeriod;
-    uint256 internal _voteDelay;
+    uint256 private _votePeriod;
+    uint256 private _voteDelay;
 
     mapping(bytes32 => bool) private _pass;
     mapping(bytes32 => ProposalInfo) private _proposals;
     mapping(address => mapping(bytes32 => VoteInfo)) private _votes;
+
+    function _setPeriod(uint256 period) internal {
+        _votePeriod = period;
+    }
+
+    function _setDelay(uint256 delay) internal {
+        _voteDelay = delay;
+    }
 
     function _proposal(bytes32 proposalId, uint16 nvoter) internal virtual returns (bytes32) {
         uint256 blockTimeCache = block.timestamp;
@@ -75,7 +83,12 @@ abstract contract Proposal is IProposal {
         return false;
     }
 
-    function votingDeley() public virtual view returns (uint256) {}
+    function votingDeley() public view virtual override returns(uint256) {
+        return _voteDelay;
+    }
 
-    function votingPeriod() public virtual view returns (uint256) {}
+    function votingPeriod() public view virtual override returns(uint256) {
+        return _votePeriod;
+    }
+
 }

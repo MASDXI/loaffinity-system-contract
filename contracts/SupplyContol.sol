@@ -55,8 +55,8 @@ contract SupplyControl is Proposal {
         require(!_init,"");
         _systemContract = systemContract_;
         _commiteeContract = commiteeContractAddress_;
-        _voteDelay = voteDelay_;
-        _votePeriod = votePeriod_;
+        _setDelay(voteDelay_);
+        _setPeriod(votePeriod_);
         _init = true;
     }
 
@@ -81,7 +81,6 @@ contract SupplyControl is Proposal {
         ProposalType proposeType
     ) public onlyProposer returns(uint256) {
         uint256 current = block.number;
-        require(_init,"supplycontrol:require init");
         require(amount > 0, "supplycontrol:");
         require(current < blockNumber, "supplycontrol:");
         require(account != address(0), "supplycontrol:");
@@ -101,14 +100,6 @@ contract SupplyControl is Proposal {
         emit SupplyMintProposalProposed(proposalId, msg.sender, account, amount, blockNumber, block.timestamp);
 
         return blockNumber;
-    }
-
-    function votingDeley() public view override returns(uint256) {
-        return _voteDelay;
-    }
-
-    function votingPeriod() public view override returns(uint256) {
-        return _votePeriod;
     }
 
     function execute(uint256 blockNumber) public override returns (uint256) {

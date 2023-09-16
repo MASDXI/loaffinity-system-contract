@@ -12,6 +12,7 @@ interface ICommittee {
         ProposalType indexed proposeType,
         uint256 blockNumber,
         uint256 timestamp);
+
     function isCommittee(address account) external view returns(bool);
     function isProposer(address account) external view returns(bool);
     function getCommitteeCount() external view returns (uint256);
