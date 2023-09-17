@@ -83,6 +83,10 @@ abstract contract Proposal is IProposal {
         return false;
     }
 
+    function execute(uint256 blockNumber) public virtual override returns (uint256) {
+        return blockNumber;
+    }
+
     function votingDeley() public view virtual override returns(uint256) {
         return _voteDelay;
     }

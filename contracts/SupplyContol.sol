@@ -18,20 +18,21 @@ contract SupplyControl is Proposal {
     }
 
     bool private _init;
-    address private _systemContract;
+    address private constant _systemContract = 0x0000000000000000000000000000000000000F69;
     ICommittee private _commiteeContract;
 
     event SupplyMintProposalProposed(
         bytes32 indexed proposalId, 
         address indexed proposer, 
         address indexed recipient, 
+        ProposalType proposalType,
         uint256 amount, 
         uint256 targetBlock, 
         uint256 time);
 
     event SupplyMintVoted(bytes32 indexed proposalId, address indexed voter, bool auth, uint256 time);
-    event SupplyMintProposalExecuted(bytes32 proposalId, address indexed account, uint256 amount, uint256 time);
-    event SupplyMintProposalRejected(bytes32 proposalId, address indexed account, uint256 amount, uint256 time);
+    event SupplyMintProposalExecuted(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
+    event SupplyMintProposalRejected(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
 
     mapping(bytes32 => ProposalSupplyInfo) private _supplyProposals; 
     mapping(uint256 => bytes32) public blockProposal;
@@ -49,11 +50,9 @@ contract SupplyControl is Proposal {
     function initialize (
         uint256 voteDelay_,
         uint256 votePeriod_,
-        address systemContract_,
         ICommittee commiteeContractAddress_
-    ) external  {
-        require(!_init,"");
-        _systemContract = systemContract_;
+    ) external onlySystemAddress {
+        require(!_init,"test");
         _commiteeContract = commiteeContractAddress_;
         _setDelay(voteDelay_);
         _setPeriod(votePeriod_);
@@ -62,7 +61,7 @@ contract SupplyControl is Proposal {
 
     function _getProposal(bytes32 proposalId) private view returns (ProposalSupplyInfo memory) {
         ProposalSupplyInfo memory data = _supplyProposals[proposalId];
-        require(data.blockNumber != 0,"supplycontrol:");
+        require(data.blockNumber != 0,"supplycontrol: proposal not exist");
         return data;
     }
 
@@ -81,11 +80,11 @@ contract SupplyControl is Proposal {
         ProposalType proposeType
     ) public onlyProposer returns(uint256) {
         uint256 current = block.number;
-        require(amount > 0, "supplycontrol:");
-        require(current < blockNumber, "supplycontrol:");
-        require(account != address(0), "supplycontrol:");
-        require((current + votingPeriod()) < blockNumber,"supplycontrol:");
-        require(blockProposal[blockNumber] != 0,"supplycontrol:");
+        require(amount > 0, "supplycontrol: invalid amount");
+        require(current < blockNumber, "supplycontrol: propose past block");
+        require(account != address(0), "supplycontrol: propose zero address");
+        require((current + votingPeriod()) < blockNumber,"supplycontrol: invalid blocknumber");
+        require(blockProposal[blockNumber] == bytes32(0),"supplycontrol: blocknumber has propose");
 
         bytes32 proposalId = keccak256(abi.encode(msg.sender, account, amount, blockNumber));
 
@@ -97,13 +96,24 @@ contract SupplyControl is Proposal {
         _supplyProposals[proposalId].proposeType = proposeType;
 
         _proposal(proposalId, uint16(_commiteeContract.getCommitteeCount()));
-        emit SupplyMintProposalProposed(proposalId, msg.sender, account, amount, blockNumber, block.timestamp);
+        emit SupplyMintProposalProposed(proposalId, msg.sender, account, proposeType, amount, blockNumber, block.timestamp);
 
         return blockNumber;
     }
 
-    function execute(uint256 blockNumber) public override returns (uint256) {
-        _execute(blockProposal[blockNumber]);
+    function execute(uint256 blockNumber) public override onlySystemAddress returns (uint256) {
+        ProposalSupplyInfo memory data = getProposalSupplyInfoByBlockNumber(blockNumber);
+        uint256 timeCache = block.timestamp;
+        (bool callback) = _execute(blockProposal[blockNumber]);
+        if (callback) {
+            if (data.proposeType == ProposalType.ADD) {
+                emit SupplyMintProposalExecuted(blockProposal[blockNumber], ProposalType.ADD, data.recipient, data.amount, timeCache);
+            } else {
+                emit SupplyMintProposalExecuted(blockProposal[blockNumber], ProposalType.SUB, data.recipient, data.amount, timeCache);
+            }
+        } else {
+            emit SupplyMintProposalRejected(blockProposal[blockNumber], data.proposeType, data.recipient, data.amount, timeCache);
+        }
         return blockNumber;
     }
 }

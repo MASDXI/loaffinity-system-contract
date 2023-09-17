@@ -125,7 +125,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
         return getRoleMemberCount(PROPOSER_ROLE);
     }
     
-    function execute(uint256 blockNumber) external override onlySystemAddress returns (uint256) {
+    function execute(uint256 blockNumber) public override onlySystemAddress returns (uint256) {
         ProposalCommitteeInfo memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
         (bool callback) = _execute(blockProposal[blockNumber]);
         if (callback && data.proposeType == ProposalType.ADD) {
