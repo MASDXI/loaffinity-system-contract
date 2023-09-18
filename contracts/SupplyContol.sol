@@ -52,7 +52,7 @@ contract SupplyControl is Proposal {
         uint256 votePeriod_,
         ICommittee commiteeContractAddress_
     ) external onlySystemAddress {
-        require(!_init,"test");
+        require(!_init,"supplycontrol: already init");
         _commiteeContract = commiteeContractAddress_;
         _setDelay(voteDelay_);
         _setPeriod(votePeriod_);

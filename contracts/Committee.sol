@@ -44,10 +44,10 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
     /// @param committees_ array of committee addresses
     /// @param admin_ root admin address
     function initialize(
-        address [] calldata committees_, 
-        address admin_,
         uint256 voteDelay_,
-        uint256 votePeriod_
+        uint256 votePeriod_,
+        address [] calldata committees_, 
+        address admin_
         ) external onlySystemAddress {
         require(!_init,"committee: already init");
         uint256 committeeLen = committees_.length;
