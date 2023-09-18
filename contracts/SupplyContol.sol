@@ -2,10 +2,11 @@
 pragma solidity 0.8.17;
 
 import "./abstracts/Proposal.sol";
+import "./abstracts/SystemAddress.sol";
 import "./interfaces/ICommittee.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
-contract SupplyControl is Proposal {
+contract SupplyControl is Proposal, SystemCaller {
 
     enum ProposalType { SUB, ADD }
 
@@ -16,10 +17,6 @@ contract SupplyControl is Proposal {
         uint256 blockNumber;
         ProposalType proposeType;
     }
-
-    bool private _init;
-    address private constant _systemContract = 0x0000000000000000000000000000000000000F69;
-    ICommittee private _commiteeContract;
 
     event SupplyMintProposalProposed(
         bytes32 indexed proposalId, 
@@ -34,16 +31,18 @@ contract SupplyControl is Proposal {
     event SupplyMintProposalExecuted(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
     event SupplyMintProposalRejected(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
 
+    bool private _init;
+    ICommittee private _commiteeContract;
     mapping(bytes32 => ProposalSupplyInfo) private _supplyProposals; 
     mapping(uint256 => bytes32) public blockProposal;
 
-    modifier onlySystemAddress() {
-        require(msg.sender == _systemContract);
+    modifier onlyProposer() {
+        require(_commiteeContract.isProposer(msg.sender));
         _;
     }
 
-    modifier onlyProposer() {
-        require(_commiteeContract.isProposer(msg.sender));
+    modifier onlyCommittee() {
+        require(_commiteeContract.isCommittee(msg.sender));
         _;
     }
 
@@ -115,5 +114,10 @@ contract SupplyControl is Proposal {
             emit SupplyMintProposalRejected(blockProposal[blockNumber], data.proposeType, data.recipient, data.amount, timeCache);
         }
         return blockNumber;
+    }
+
+    function vote(bytes32 proposalId, bool auth) external override onlyCommittee returns (bool) {
+        _vote(proposalId, auth);
+        return true;
     }
 }

@@ -40,7 +40,7 @@ describe("Committee System Contract", function () {
 
     it("function: intialized() fail", async function () {
       const { committee, committee1, admin} = await loadFixture(setSystemContractFixture);
-      await expect(committee.connect(admin).initialize(0, 240, [committee1.address], admin.address)).to.be.revertedWith("committee: onlySystemAddress can call")
+      await expect(committee.connect(admin).initialize(0, 240, [committee1.address], admin.address)).to.be.revertedWith("systemcaller: onlySystemAddress can call")
     });
 
     it("function: IsCommittee()", async function () {
@@ -246,7 +246,7 @@ describe("Committee System Contract", function () {
     it("function: execute() fail not system address", async function () {
       const { committee, committee1, committee2, admin, proposer1, systemCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(systemCallerSigner).initialize(0, 240, [committee1.address], admin.address);
-      await expect(committee.connect(admin).execute(300)).to.be.revertedWith("committee: onlySystemAddress can call");
+      await expect(committee.connect(admin).execute(300)).to.be.revertedWith("systemcaller: onlySystemAddress can call");
     });
 
     it("function: execute() success", async function () {

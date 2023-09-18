@@ -2,10 +2,11 @@
 pragma solidity 0.8.17;
 
 import "./abstracts/Proposal.sol";
+import "./abstracts/SystemAddress.sol";
 import "./interfaces/ICommittee.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
-contract Committee is AccessControlEnumerable, ICommittee, Proposal {
+contract Committee is AccessControlEnumerable, ICommittee, Proposal, SystemCaller {
 
     bytes32 public constant ROOT_ADMIN_ROLE = keccak256("ROOT_ADMIN_ROLE");
     bytes32 public constant COMMITEE_ROLE = keccak256("COMMITEE_ROLE");
@@ -19,24 +20,23 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
     }
 
     bool private _init;
-    address private constant _systemContract = 0x0000000000000000000000000000000000000F69;
     mapping(bytes32 => ProposalCommitteeInfo) private _committeeProposals; 
     mapping(uint256 => bytes32) public blockProposal;
 
     event Initialized();
-
-    modifier onlyProposer() {
-        require(isProposer(msg.sender),"committee: onlyProposer can call");
-        _;
-    }
 
     modifier onlyAdmin() {
         require(hasRole(ROOT_ADMIN_ROLE, msg.sender),"committee: onlyAdmin can call");
         _;
     }
 
-    modifier onlySystemAddress() {
-        require(msg.sender == _systemContract,"committee: onlySystemAddress can call");
+    modifier onlyCommittee() {
+        require(hasRole(COMMITEE_ROLE, msg.sender),"committee: onlyCommittee can call");
+        _;
+    }
+
+    modifier onlyProposer() {
+        require(isProposer(msg.sender),"committee: onlyProposer can call");
         _;
     }
 
@@ -66,6 +66,30 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
         ProposalCommitteeInfo memory data = _committeeProposals[proposalId];
         require(data.blockNumber != 0, "committee: proposal not exist");
         return data;
+    }
+
+    function getProposalCommitteeInfoByProposalId(bytes32 proposalId) public view returns (ProposalCommitteeInfo memory) {
+        return _getProposal(proposalId);
+    }
+
+    function getProposalCommitteeInfoByBlockNumber(uint256 blockNumber) public view returns (ProposalCommitteeInfo memory) {
+        return _getProposal(blockProposal[blockNumber]);
+    }
+
+    function getCommitteeCount() public view returns (uint256) {
+        return getRoleMemberCount(COMMITEE_ROLE);
+    }
+
+    function getProposerCount() external view returns (uint256) {
+        return getRoleMemberCount(PROPOSER_ROLE);
+    }
+
+    function isCommittee(address account) public override view returns (bool) {
+        return hasRole(COMMITEE_ROLE, account);
+    }
+
+    function isProposer(address account) public override view returns (bool) {
+        return hasRole(PROPOSER_ROLE, account);
     }
 
     function propose(
@@ -108,22 +132,6 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
         require(isProposer(account),"committee: revoke non proposer address");
         _revokeRole(PROPOSER_ROLE, account);
     }
-
-    function getProposalCommitteeInfoByProposalId(bytes32 proposalId) public view returns (ProposalCommitteeInfo memory) {
-        return _getProposal(proposalId);
-    }
-
-    function getProposalCommitteeInfoByBlockNumber(uint256 blockNumber) public view returns (ProposalCommitteeInfo memory) {
-        return _getProposal(blockProposal[blockNumber]);
-    }
-
-    function getCommitteeCount() public view returns (uint256) {
-        return getRoleMemberCount(COMMITEE_ROLE);
-    }
-
-    function getProposerCount() external view returns (uint256) {
-        return getRoleMemberCount(PROPOSER_ROLE);
-    }
     
     function execute(uint256 blockNumber) public override onlySystemAddress returns (uint256) {
         ProposalCommitteeInfo memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
@@ -137,11 +145,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal {
         return blockNumber;
     }
 
-    function isCommittee(address account) public override view returns (bool) {
-        return hasRole(COMMITEE_ROLE, account);
-    }
-
-    function isProposer(address account) public override view returns (bool) {
-        return hasRole(PROPOSER_ROLE, account);
+    function vote(bytes32 proposalId, bool auth) external override onlyCommittee returns (bool) {
+        _vote(proposalId, auth);
     }
 }

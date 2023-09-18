@@ -43,7 +43,7 @@ abstract contract Proposal is IProposal {
         return _pass[proposalId];
     }
 
-    function vote(bytes32 proposalId, bool auth) external virtual returns (bool) {
+    function _vote(bytes32 proposalId, bool auth) internal virtual {
         require(_proposals[proposalId].createTime != 0, "proposal: proposalId not exist");
         require(_votes[msg.sender][proposalId].voteTime == 0, "proposal: not allow to vote twice");
         require(block.number > _proposals[proposalId].startBlock, "proposal: proposal not start");
@@ -60,7 +60,6 @@ abstract contract Proposal is IProposal {
         }
         
         emit LogVote(proposalId, msg.sender, auth, block.timestamp);
-        return true;
     }
 
     function _execute(bytes32 proposalId) internal virtual returns (bool) {
