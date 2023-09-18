@@ -5,6 +5,7 @@ coverage
 coverage.json
 typechain
 typechain-types
+build
 
 # Hardhat files
 cache
@@ -12,4 +13,3 @@ artifacts
 
 # yarn
 yarn-error.log
-

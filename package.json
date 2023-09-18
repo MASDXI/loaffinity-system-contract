@@ -4,9 +4,11 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "clean": "npx hardhat clean && rm -rf build",
     "compile": "npx hardhat compile",
     "coverage": "npx hardhat coverage",
-    "build": "npx hardhat clean && npx hardhat compile && npx hardhat run scripts/genbin.ts",
+    "build": "yarn clean && yarn compile && yarn test && npx hardhat run scripts/build.ts",
+    "size": "npx hardhat size-contracts",
     "test": "npx hardhat test"
   },
   "dependencies": {
