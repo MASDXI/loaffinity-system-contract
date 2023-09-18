@@ -7,6 +7,9 @@ abstract contract Proposal is IProposal {
 
     uint256 private _votePeriod;
     uint256 private _voteDelay;
+    uint8 private constant MAX_THRESHOLD = 100;
+    uint8 private constant MIN_THERSHOLD = 50;
+    uint8 private _threshold;
 
     mapping(bytes32 => bool) private _pass;
     mapping(bytes32 => ProposalInfo) private _proposals;
@@ -18,6 +21,12 @@ abstract contract Proposal is IProposal {
 
     function _setDelay(uint256 delay) internal {
         _voteDelay = delay;
+    }
+
+    function _setThreshold(uint8 percentage) internal {
+        require(MAX_THRESHOLD <= 100,"proposal: greater than max threshold");
+        require(MIN_THERSHOLD >= 50,"proposal: less than min threshold");
+        _threshold = percentage;
     }
 
     function _proposal(bytes32 proposalId, uint16 nvoter) internal virtual returns (bytes32) {
@@ -65,14 +74,14 @@ abstract contract Proposal is IProposal {
     function _execute(bytes32 proposalId) internal virtual returns (bool) {
         require(_proposals[proposalId].status == ProposalStatus.PENDING, "proposal: proposal not pending");
         require(!_pass[proposalId], "proposal: proposal was passed");
-        if (_proposals[proposalId].accept >= _proposals[proposalId].nVoter / 2 + 1) {
+        if (_proposals[proposalId].accept >= (_proposals[proposalId].nVoter * uint256(threshold())) / 100) {
             _pass[proposalId] = true;
             _proposals[proposalId].status = ProposalStatus.EXECUTE;
             emit LogProposal(proposalId, block.timestamp, ProposalStatus.EXECUTE);
             return true;
         }
 
-        if (_proposals[proposalId].reject >= _proposals[proposalId].nVoter / 2 + 1) {
+        if (_proposals[proposalId].reject >= (_proposals[proposalId].nVoter * uint256(threshold())) / 100) {
             _pass[proposalId] = false;
             _proposals[proposalId].status = ProposalStatus.REJECT;
             emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
@@ -84,6 +93,10 @@ abstract contract Proposal is IProposal {
 
     function execute(uint256 blockNumber) public virtual override returns (uint256) {
         return blockNumber;
+    }
+
+    function threshold() public view override returns (uint8) {
+        return _threshold;
     }
 
     function votingDeley() public view virtual override returns(uint256) {

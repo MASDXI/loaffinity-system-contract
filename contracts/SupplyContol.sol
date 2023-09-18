@@ -55,6 +55,7 @@ contract SupplyControl is Proposal, SystemCaller {
         _commiteeContract = commiteeContractAddress_;
         _setDelay(voteDelay_);
         _setPeriod(votePeriod_);
+        _setThreshold(75);
         _init = true;
     }
 
@@ -116,8 +117,7 @@ contract SupplyControl is Proposal, SystemCaller {
         return blockNumber;
     }
 
-    function vote(bytes32 proposalId, bool auth) external override onlyCommittee returns (bool) {
+    function vote(bytes32 proposalId, bool auth) external override onlyCommittee {
         _vote(proposalId, auth);
-        return true;
     }
 }

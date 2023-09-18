@@ -59,6 +59,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, SystemCalle
         _init = true;
         _setDelay(voteDelay_);
         _setPeriod(votePeriod_);
+        _setThreshold(75);
         emit Initialized();
     }
 
@@ -145,7 +146,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, SystemCalle
         return blockNumber;
     }
 
-    function vote(bytes32 proposalId, bool auth) external override onlyCommittee returns (bool) {
+    function vote(bytes32 proposalId, bool auth) external override onlyCommittee {
         _vote(proposalId, auth);
     }
 }

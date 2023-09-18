@@ -1,10 +1,12 @@
 // import { ethers } from "hardhat";
-import { deployedBytecode as CommitteeBin } from "../artifacts/contracts/Committee.sol/Committee.json"
-import { deployedBytecode as SupplyControlBin } from "../artifacts/contracts/SupplyContol.sol/SupplyControl.json"
+import committeeAritifact from "../artifacts/contracts/Committee.sol/Committee.json"
+import supplyControlArtifact from "../artifacts/contracts/SupplyContol.sol/SupplyControl.json"
 
 async function main() {
-  console.log("CommitteeBin:", CommitteeBin)
-  console.log("SupplyControlBin:", SupplyControlBin)
+  console.log("CommitteeBin:", committeeAritifact.abi)
+  console.log("CommitteeBin:", committeeAritifact.deployedBytecode)
+  console.log("SupplyControlBin:", supplyControlArtifact.abi)
+  console.log("SupplyControlBin:", supplyControlArtifact.deployedBytecode)
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -223,18 +223,18 @@ describe("Committee System Contract", function () {
     });
 
     it("function: execute() fail", async function () {
-      const { committee, committee1, committee2, admin, proposer1, systemCallerSigner} = await loadFixture(setSystemContractFixture);
-      const proposalId = "0x05bff83ca32a69707094163eca3174eb2ae9a7a1394ce6c79b690e4c7256e1bb"
+      const { committee, committee1, committee2, committee3, admin, proposer1, systemCallerSigner} = await loadFixture(setSystemContractFixture);
+      const proposalId = "0x26df81e4aebbec78c7825df3fac06a912b2f56b1fa39d84a6ddbed3b06069088"
       await time.setNextBlockTimestamp(10953791915);
-      await committee.connect(systemCallerSigner).initialize(0, 240, [committee1.address], admin.address);
+      await committee.connect(systemCallerSigner).initialize(0, 240, [committee1.address, committee2.address], admin.address);
       await time.setNextBlockTimestamp(10953791920);
       await committee.connect(admin).grantProposer(proposer1.address);
       await time.setNextBlockTimestamp(10953791925);
-      await expect(committee.connect(proposer1).propose(300, committee2.address, 1))
+      await expect(committee.connect(proposer1).propose(300, committee3.address, 1))
         .to.emit(committee,"CommitteeProposalProposed")
-        .withArgs(proposalId,proposer1.address,committee2.address,1,300,10953791925);
+        .withArgs(proposalId,proposer1.address,committee3.address,1,300,10953791925);
       expect(await committee.connect(systemCallerSigner).execute(300));
-      expect(await committee.isCommittee(committee2.address)).to.equal(false);
+      expect(await committee.isCommittee(committee3.address)).to.equal(false);
     });
 
     it("function: execute() fail not exist", async function () {
