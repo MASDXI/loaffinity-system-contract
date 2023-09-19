@@ -21,7 +21,7 @@ cd loaffinity-system-contract/
 yarn install
 ```
 
-### Command
+### Command for development
 
 Try running some of the following tasks:
 
@@ -34,6 +34,19 @@ yarn coverage
 yarn size
 yarn test
 ```
+### Script for interact with system contract
+
+``` shell
+npx hardhat propose_committee --account "<address>" --proposaltype "0 or 1:number" --blocknumber "<blocknumber>" --network "<config_network>"
+npx hardhat propose_supply --account "<address>" --amount "<amount>" --proposaltype "0 or 1:number" --blocknumber "<blocknumber>" --network "<config_network>"
+npx hardhat grant_proposer --account "<address>" --action "0 or 1:number" --network "<config_network>"
+npx hardhat vote_committee --account "<address>" --auth "true or false :boolean" --network "<config_network>"
+npx hardhat vote_supply_control --proposal "<proposalId>" --auth "true or false :boolean" --network "config_network>"
+
+npx hardhat propose_committee --account "0x9784e7348e2A4EbDC059e0BCC575D874d96ce88c" --proposaltype 1 --blocknumber 50 --network localhost
+npx hardhat propose_supply --account "0x9784e7348e2A4EbDC059e0BCC575D874d96ce88c" --amount "100000000000000000" --proposaltype 1 --blocknumber 50 --network localhost
+```
+
 ### Building System Contract
 1. Copy deployedBytecode output after run `yarn build` to consensus/clique/system_contract.go  
 2. Copy ABI output after run `yarn build` to consensus/clique/abi.go

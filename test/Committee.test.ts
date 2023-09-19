@@ -171,6 +171,8 @@ describe("Committee System Contract", function () {
       await expect(committee.connect(proposer1).propose(300, committee1.address, 0))
         .to.emit(committee,"CommitteeProposalProposed")
         .withArgs(proposalId,proposer1.address,committee1.address,0,300,10953791925);
+      const object = await committee.getProposalCommitteeInfoByBlockNumber(300);
+      console.log("🚀 ~ file: Committee.test.ts:175 ~ object:", object)
       const ret = await committee.getProposalCommitteeInfoByProposalId(proposalId);
       expect(ret.proposer).to.equal(proposer1.address);
       expect(ret.commitee).to.be.equal(committee1.address);

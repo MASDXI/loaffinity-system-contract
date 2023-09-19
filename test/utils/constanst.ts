@@ -1,5 +1,4 @@
-import { BigNumberish } from "ethers"
-import { ethers } from "hardhat"
+import { ethers } from "ethers"
 import { deployedBytecode as SupplyControlBin } from "../../artifacts/contracts/SupplyContol.sol/SupplyControl.json"
 import { deployedBytecode as CommitteeBin } from "../../artifacts/contracts/Committee.sol/Committee.json"
 
