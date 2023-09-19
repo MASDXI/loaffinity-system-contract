@@ -2,6 +2,7 @@ import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-contract-sizer";
 import "hardhat-gas-reporter";
+import 'dotenv/config'
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -14,11 +15,28 @@ const config: HardhatUserConfig = {
     },
   },
   gasReporter: {
-    enabled: true
+    enabled: true,
   },
   mocha: {
     timeout: 200000,
     slow: 0,
+  },
+  networks: {
+    mainnet: {
+      url: process.env.MAINNET_URL,
+      accounts:
+        process.env.PRIVATE_KEY_PROD !== undefined ? [process.env.PRIVATE_KEY_PROD] : [],
+    },
+    testnet: {
+      url: process.env.TESTNET_URL,
+      accounts:
+        process.env.PRIVATE_KEY_DEV !== undefined ? [process.env.PRIVATE_KEY_DEV] : [],
+    },
+    local: {
+      url: "http://localhost:8545",
+      accounts:
+        process.env.PRIVATE_KEY_DEV !== undefined ? [process.env.PRIVATE_KEY_DEV] : [],
+    },
   },
 };
 
