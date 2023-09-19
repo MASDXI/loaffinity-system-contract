@@ -84,3 +84,37 @@ task("propose_supply", "propose new supply proposal")
         console.error(err)
     }
   })
+
+task("isproposer", "propose new committee proposal")
+  .addParam("account", "destination address")
+  .setAction(async (args, hre) => {
+    const committee = await hre.ethers.getContractAt("Committee",constants.COMMITTEE_CONTRACT_ADDRESS)
+    const account = String(args.account)
+    try {
+        const tx = await committee.isProposer(account);
+        console.log(tx)
+    } catch (err) {
+        console.error(err)
+    }
+  })
+
+  task("getproposal", "propose new committee proposal")
+  .addParam("block", "destination address")
+  .setAction(async (args, hre) => {
+    const committee = await hre.ethers.getContractAt("SupplyControl",constants.SUPPLY_CONTRACT_ADDRESS)
+    const block = BigInt(args.block)
+    try {
+        const tx = await committee.getProposalSupplyInfoByBlockNumber(block);
+        console.log(tx)
+    } catch (err) {
+        console.error(err)
+    }
+  })
+
+task("accounts", "Prints the list of accounts", async (args, hre) => {
+    const accounts = await hre.ethers.getSigners();
+  
+    for (const account of accounts) {
+      console.log("address :", account.address);
+    }
+});
