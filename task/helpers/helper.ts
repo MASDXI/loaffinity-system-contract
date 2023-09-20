@@ -9,8 +9,8 @@ export const loadCommitteContract = async (hre: HardhatRuntimeEnvironment) => {
 }
 
 export const loadSupplyControlContract = async (hre: HardhatRuntimeEnvironment) => {
-    return await hre.ethers.getContractAt("SupplyControl", process.env.COMMITEE_CONTRACT_ADDRESS ? 
-    process.env.COMMITEE_CONTRACT_ADDRESS:"0x0000000000000000000000000000000000000070")
+    return await hre.ethers.getContractAt("SupplyControl", process.env.SUPPLY_CONTROL_CONTRACT_ADDRESS ? 
+    process.env.SUPPLY_CONTROL_CONTRACT_ADDRESS:"0x0000000000000000000000000000000000000070")
 }
 
 export const getProposerSigner = async (account: SignerWithAddress) => {

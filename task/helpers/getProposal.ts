@@ -1,5 +1,6 @@
 import { task } from "hardhat/config"
 import { loadSupplyControlContract, loadCommitteContract } from "./helper"
+import { BytesLike } from "ethers"
 
 task("get_proposal_id_by_blocknumber", "get proposal id by given blocknumber")
   .addParam("block", "destination address")
@@ -11,12 +12,12 @@ task("get_proposal_id_by_blocknumber", "get proposal id by given blocknumber")
     switch (contract) {
       case 0:
         const committee = await loadCommitteContract(hre)
-        ret = await committee.getProposalCommitteeInfoByBlockNumber(block)
+        ret = await committee.blockProposal(block)
         console.log(ret)
         break;
       case 1:
         const supplycontrol = await loadSupplyControlContract(hre)
-        ret = await supplycontrol.getProposalSupplyInfoByBlockNumber(block)
+        ret = await supplycontrol.blockProposal(block)
         console.log(ret)
         break;
       default:
@@ -29,18 +30,39 @@ task("get_proposal_by_proposalid", "get proposal by given proposal id")
   .addParam("proposalid", "destination address")
   .addParam("contract","0:committe 1:supply")
   .setAction(async (args, hre) => {
-    const proposalid = String(args.block)
+    const proposalid: BytesLike = (args.block)
     const contract = Number(args.contract)
     let ret
     switch (contract) {
       case 0:
-        const committe = await loadSupplyControlContract(hre)
-        ret = await committe.getProposalSupplyInfoByProposalId(proposalid);
+        const committe = await loadCommitteContract(hre)
+        ret = await committe.getProposalCommitteeInfoByProposalId(proposalid);
         console.log(ret)
         break;
       case 1:
         const supplycontrol = await loadSupplyControlContract(hre)
         ret = await supplycontrol.getProposalSupplyInfoByProposalId(proposalid);
+        console.log(ret)
+        break;
+    }
+  })
+
+  task("is_proposal_pass", "get proposal by given proposal id")
+  .addParam("proposalid", "destination address")
+  .addParam("contract","0:committe 1:supply")
+  .setAction(async (args, hre) => {
+    const proposalid: BytesLike = (args.proposalid)
+    const contract = Number(args.contract)
+    let ret
+    switch (contract) {
+      case 0:
+        const committe = await loadCommitteContract(hre)
+        ret = await committe.isProposalPassed(proposalid);
+        console.log(ret)
+        break;
+      case 1:
+        const supplycontrol = await loadSupplyControlContract(hre)
+        ret = await supplycontrol.isProposalPassed(proposalid);
         console.log(ret)
         break;
     }
@@ -66,3 +88,4 @@ task("get_proposal_by_blocknumber", "get proposal by given blocknumber")
         break;
     }
   })
+
