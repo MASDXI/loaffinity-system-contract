@@ -1,12 +1,11 @@
-import { HardhatUserConfig, task } from "hardhat/config"
-import { constants } from "../test/utils/constanst";
+import { task } from "hardhat/config"
 import { ethers } from "ethers";
 
 task("grant_proposer", "propose new committee proposal")
   .addParam("account", "destination address")
   .addParam("action", "revoke:0, grant:1")
   .setAction(async (args, hre) => {
-    const committee = await hre.ethers.getContractAt("Committee",constants.COMMITTEE_CONTRACT_ADDRESS)
+    const committee = await hre.ethers.getContractAt("Committee", "0x0000000000000000000000000000000000000069")
     const account = String(args.account)
     const action = Number(args.action)
     switch(action) { 
@@ -44,7 +43,7 @@ task("propose_committee", "propose new committee proposal")
   .addParam("proposaltype", "remove:0, add:1")
   .addParam("blocknumber", "target block to execute")
   .setAction(async (args, hre) => {
-    const committee = await hre.ethers.getContractAt("Committee",constants.COMMITTEE_CONTRACT_ADDRESS)
+    const committee = await hre.ethers.getContractAt("Committee", "0x0000000000000000000000000000000000000069")
     const account = String(args.account)
     const proposalType = Number(args.proposaltype) // TODO validation input
     const blockTarget = BigInt(args.blocknumber)
@@ -66,7 +65,7 @@ task("propose_supply", "propose new supply proposal")
   .addParam("proposaltype", "burn:0, mint:1")
   .addParam("blocknumber", "target block to execute")
   .setAction(async (args, hre) => {
-    const supplycontrol = await hre.ethers.getContractAt("SupplyControl",constants.SUPPLY_CONTRACT_ADDRESS)
+    const supplycontrol = await hre.ethers.getContractAt("SupplyControl", "0x0000000000000000000000000000000000000070")
     const signers = await hre.ethers.getSigners();
     const account = String(args.account)
     const amount = String(args.amount)
@@ -77,9 +76,8 @@ task("propose_supply", "propose new supply proposal")
     try {
         const tx = await supplycontrol.connect(signers[0]).propose(blockTarget,  ethers.parseEther(amount), account, proposalType);
         await tx.wait()
-        // const { blockNumber, blockHash, hash } = await tx.getTransaction()
-        console.log(`TransactionResponse`)
-        console.log(await tx.getTransaction())
+        const { blockNumber, blockHash, hash } = await tx.getTransaction()
+        console.log(`blockNumber: ${blockNumber}\nblockHash: ${blockHash}\nhash: ${hash}`)
     } catch (err) {
         console.error(err)
     }
@@ -88,7 +86,7 @@ task("propose_supply", "propose new supply proposal")
 task("isproposer", "propose new committee proposal")
   .addParam("account", "destination address")
   .setAction(async (args, hre) => {
-    const committee = await hre.ethers.getContractAt("Committee",constants.COMMITTEE_CONTRACT_ADDRESS)
+    const committee = await hre.ethers.getContractAt("Committee", "0x0000000000000000000000000000000000000069")
     const account = String(args.account)
     try {
         const tx = await committee.isProposer(account);
@@ -96,12 +94,12 @@ task("isproposer", "propose new committee proposal")
     } catch (err) {
         console.error(err)
     }
-  })
+})
 
-  task("getproposal", "propose new committee proposal")
+task("getproposal", "propose new committee proposal")
   .addParam("block", "destination address")
   .setAction(async (args, hre) => {
-    const committee = await hre.ethers.getContractAt("SupplyControl",constants.SUPPLY_CONTRACT_ADDRESS)
+    const committee = await hre.ethers.getContractAt("SupplyControl", "0x0000000000000000000000000000000000000070")
     const block = BigInt(args.block)
     try {
         const tx = await committee.getProposalSupplyInfoByBlockNumber(block);
