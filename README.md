@@ -40,11 +40,16 @@ yarn test
 npx hardhat propose_committee --account "<address>" --proposaltype "0 or 1:number" --blocknumber "<blocknumber>" --network "<config_network>"
 npx hardhat propose_supply --account "<address>" --amount "<amount>" --proposaltype "0 or 1:number" --blocknumber "<blocknumber>" --network "<config_network>"
 npx hardhat grant_proposer --account "<address>" --action "0 or 1:number" --network "<config_network>"
-npx hardhat vote_committee --account "<address>" --auth "true or false :boolean" --network "<config_network>"
-npx hardhat vote_supply_control --proposal "<proposalId>" --auth "true or false :boolean" --network "config_network>"
+npx hardhat is_committee --account "<address>" --network "<config_network>"
+npx hardhat is_proposer --account "<address>" --network "<config_network>"
+npx hardhat vote --proposalid "<bytes32string>" --auth "true or false :boolean" --contract "0 or 1:number" --network "<config_network>"
+npx hardhat get_proposal_id_by_blocknumber --block "<blocknumber>" --contract "0 or 1:number" --network "<config_network>"
+npx hardhat get_proposal_by_blocknumber --block "<blocknumber>" --contract "0 or 1:number" --network "<config_network>"
+npx hardhat get_proposal_by_proposalid --proposalid "<bytes32string>" --contract "0 or 1:number" --network "<config_network>"
 
-npx hardhat propose_committee --account "0x9784e7348e2A4EbDC059e0BCC575D874d96ce88c" --proposaltype 1 --blocknumber 50 --network localhost
-npx hardhat propose_supply --account "0x9784e7348e2A4EbDC059e0BCC575D874d96ce88c" --amount "100000000000000000" --proposaltype 1 --blocknumber 50 --network local
+# Example
+npx hardhat propose_committee --account "0x9784e7348e2A4EbDC059e0BCC575D874d96ce88c" --proposaltype 1 --blocknumber 50 --network local
+npx hardhat propose_supply --account "0x9784e7348e2A4EbDC059e0BCC575D874d96ce88c" --amount "100000000000000000" --proposaltype 1 --blocknumber 250 --network local
 ```
 
 ### Building System Contract

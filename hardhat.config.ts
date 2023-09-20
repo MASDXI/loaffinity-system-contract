@@ -3,8 +3,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-contract-sizer";
 import "hardhat-gas-reporter";
 import 'dotenv/config'
-import "./task/propose"
-import "./task/vote"
+import "./task/index"
 
 const config: HardhatUserConfig = {
   solidity: {
