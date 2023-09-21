@@ -57,6 +57,7 @@ npx hardhat propose_supply --account "0x9784e7348e2A4EbDC059e0BCC575D874d96ce88c
 2. Copy ABI output after run `yarn build` to consensus/clique/abi.go
 
 ### Noted Issue
+- Current System Contract Call implementation tx are contain in block and can't trace the event
 - Not have MIN,MAX committee size
 - Not have MIN,MAX proposer size
 - Single Root admin for add and remove proposer.
