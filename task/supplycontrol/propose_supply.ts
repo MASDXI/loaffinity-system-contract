@@ -2,7 +2,7 @@ import { task } from "hardhat/config"
 import { ethers } from "ethers";
 import { loadSupplyControlContract } from "../helpers/helper"
 
-task("supply_propose_supply", "propose new supply proposal")
+task("propose_supply", "propose new supply proposal")
   .addParam("account", "destination address")
   .addParam("amount", "token new listing price")
   .addParam("proposaltype", "burn:0, mint:1")
