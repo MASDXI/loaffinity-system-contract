@@ -30,9 +30,9 @@ task("get_proposal_by_proposalid", "get proposal by given proposal id")
   .addParam("proposalid", "destination address")
   .addParam("contract","0:committe 1:supply")
   .setAction(async (args, hre) => {
-    const proposalid: BytesLike = (args.block)
+    const proposalid: BytesLike = (args.proposalid)
     const contract = Number(args.contract)
-    let ret
+    let ret: any
     switch (contract) {
       case 0:
         const committe = await loadCommitteContract(hre)

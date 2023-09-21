@@ -46,7 +46,7 @@ npx hardhat vote --proposalid "<bytes32string>" --auth "true or false :boolean" 
 npx hardhat get_proposal_id_by_blocknumber --block "<blocknumber>" --contract "0 or 1:number" --network "<config_network>"
 npx hardhat get_proposal_by_blocknumber --block "<blocknumber>" --contract "0 or 1:number" --network "<config_network>"
 npx hardhat get_proposal_by_proposalid --proposalid "<bytes32string>" --contract "0 or 1:number" --network "<config_network>"
-
+0x57b009ce2ed43ece2fc8f9cedc972782f9f16663c06389009da18e252b5472d2
 # Example
 npx hardhat propose_committee --account "0x9784e7348e2A4EbDC059e0BCC575D874d96ce88c" --proposaltype 1 --blocknumber 50 --network local
 npx hardhat propose_supply --account "0x9784e7348e2A4EbDC059e0BCC575D874d96ce88c" --amount "100000000000000000" --proposaltype 1 --blocknumber 250 --network local
