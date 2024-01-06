@@ -7,9 +7,9 @@ abstract contract Proposal is IProposal {
 
     uint256 private _votePeriod;
     uint256 private _voteDelay;
+    uint8 private _threshold;
     uint8 private constant MAX_THRESHOLD = 100;
     uint8 private constant MIN_THERSHOLD = 50;
-    uint8 private _threshold;
 
     mapping(bytes32 => bool) private _pass;
     mapping(bytes32 => ProposalInfo) private _proposals;
@@ -33,7 +33,6 @@ abstract contract Proposal is IProposal {
         uint256 blockTimeCache = block.timestamp;
         uint256 blockNumberCache = block.number;
         require(_proposals[proposalId].createTime == 0, "proposal: proposalId already exists");
-
         ProposalInfo memory proposal;
         proposal.proposer = msg.sender;
         proposal.nVoter = nvoter;
@@ -91,7 +90,7 @@ abstract contract Proposal is IProposal {
         return false;
     }
 
-    function execute(uint256 blockNumber) public virtual override returns (uint256) {
+    function execute(uint256 blockNumber) public virtual override payable returns (uint256) {
         return blockNumber;
     }
 

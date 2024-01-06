@@ -2,15 +2,16 @@
 pragma solidity 0.8.17;
 
 import "./abstracts/Proposal.sol";
-import "./abstracts/SystemAddress.sol";
+import "./abstracts/Initializer.sol";
 import "./interfaces/ICommittee.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
-contract Committee is AccessControlEnumerable, ICommittee, Proposal, SystemCaller {
+contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer {
 
     bytes32 public constant ROOT_ADMIN_ROLE = keccak256("ROOT_ADMIN_ROLE");
-    bytes32 public constant COMMITEE_ROLE = keccak256("COMMITEE_ROLE");
+    bytes32 public constant CONSORTIUM_COMMITEE_ROLE = keccak256("CONSORTIUM_COMMITEE_ROLE");
     bytes32 public constant PROPOSER_ROLE = keccak256("PROPOSER_ROLE");
+    bytes32 public constant EXECUTOR_AGENT_ROLE = keccak256("EXECUTOR_AGENT_ROLE");
 
     struct ProposalCommitteeInfo {
         address proposer;
@@ -20,6 +21,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, SystemCalle
     }
 
     bool private _init;
+
     mapping(bytes32 => ProposalCommitteeInfo) private _committeeProposals; 
     mapping(uint256 => bytes32) public blockProposal;
 
@@ -31,7 +33,12 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, SystemCalle
     }
 
     modifier onlyCommittee() {
-        require(hasRole(COMMITEE_ROLE, msg.sender),"committee: onlyCommittee can call");
+        require(isCommittee(msg.sender),"committee: onlyCommittee can call");
+        _;
+    }
+
+    modifier onlyAgent() {
+        require(isAgent(msg.sender),"committee: onlyAgent can call");
         _;
     }
 
@@ -48,13 +55,13 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, SystemCalle
         uint256 votePeriod_,
         address [] calldata committees_, 
         address admin_
-        ) external onlySystemAddress {
+        ) external onlyInitializer {
         require(!_init,"committee: already init");
         uint256 committeeLen = committees_.length;
         _setupRole(ROOT_ADMIN_ROLE, admin_);
         _setupRole(PROPOSER_ROLE, admin_);
         for (uint256 i = 0; i < committeeLen; ++i) {
-            _setupRole(COMMITEE_ROLE, committees_[i]);
+            _setupRole(CONSORTIUM_COMMITEE_ROLE, committees_[i]);
         }
         _init = true;
         _setDelay(voteDelay_);
@@ -78,7 +85,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, SystemCalle
     }
 
     function getCommitteeCount() public view returns (uint256) {
-        return getRoleMemberCount(COMMITEE_ROLE);
+        return getRoleMemberCount(CONSORTIUM_COMMITEE_ROLE);
     }
 
     function getProposerCount() external view returns (uint256) {
@@ -86,10 +93,14 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, SystemCalle
     }
 
     function isCommittee(address account) public override view returns (bool) {
-        return hasRole(COMMITEE_ROLE, account);
+        return hasRole(CONSORTIUM_COMMITEE_ROLE, account);
     }
 
     function isProposer(address account) public override view returns (bool) {
+        return hasRole(PROPOSER_ROLE, account);
+    }
+
+    function isAgent(address account) public override view returns (bool) {
         return hasRole(PROPOSER_ROLE, account);
     }
 
@@ -109,7 +120,6 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, SystemCalle
             require(isCommittee(account), "committee: propose remove not exist commitee");
         }
 
-        // proposal can be contain more than 1 in a block
         bytes32 proposalId = keccak256(abi.encode(msg.sender, account, proposeType, blockNumber));
 
         blockProposal[blockNumber] = proposalId;
@@ -134,14 +144,14 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, SystemCalle
         _revokeRole(PROPOSER_ROLE, account);
     }
     
-    function execute(uint256 blockNumber) public override onlySystemAddress returns (uint256) {
+    function execute(uint256 blockNumber) public override payable onlyAgent returns (uint256) {
         ProposalCommitteeInfo memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
         (bool callback) = _execute(blockProposal[blockNumber]);
         if (callback && data.proposeType == ProposalType.ADD) {
-            _grantRole(COMMITEE_ROLE, data.commitee);
+            _grantRole(CONSORTIUM_COMMITEE_ROLE, data.commitee);
         }
         if (callback && data.proposeType == ProposalType.REMOVE) {
-            _revokeRole(COMMITEE_ROLE, data.commitee);
+            _revokeRole(CONSORTIUM_COMMITEE_ROLE, data.commitee);
         }
         return blockNumber;
     }

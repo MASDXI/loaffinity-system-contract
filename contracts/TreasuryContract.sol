@@ -2,13 +2,13 @@
 pragma solidity 0.8.17;
 
 import "./abstracts/Proposal.sol";
-import "./abstracts/SystemAddress.sol";
+import "./abstracts/Initializer.sol";
 import "./interfaces/ICommittee.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
-contract SupplyControl is Proposal, SystemCaller {
+contract TreasuryContract is Proposal, Initializer {
 
-    enum ProposalType { SUB, ADD }
+    enum ProposalType { LOCKED, RELEASED }
 
     struct ProposalSupplyInfo {
         address proposer;
@@ -18,7 +18,7 @@ contract SupplyControl is Proposal, SystemCaller {
         ProposalType proposeType;
     }
 
-    event SupplyMintProposalProposed(
+    event TreasuryProposalProposed(
         bytes32 indexed proposalId, 
         address indexed proposer, 
         address indexed recipient, 
@@ -27,14 +27,18 @@ contract SupplyControl is Proposal, SystemCaller {
         uint256 targetBlock, 
         uint256 time);
 
-    event SupplyMintVoted(bytes32 indexed proposalId, address indexed voter, bool auth, uint256 time);
-    event SupplyMintProposalExecuted(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
-    event SupplyMintProposalRejected(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
+    event TreasuryVoted(bytes32 indexed proposalId, address indexed voter, bool auth, uint256 time);
+    event TreasuryProposalExecuted(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
+    event TreasuryProposalRejected(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
 
     bool private _init;
+    uint256 private _lockedBalance;
     ICommittee private _commiteeContract;
     mapping(bytes32 => ProposalSupplyInfo) private _supplyProposals; 
     mapping(uint256 => bytes32) public blockProposal;
+
+    // handle receive Ether
+    receive() external payable {}
 
     modifier onlyProposer() {
         require(_commiteeContract.isProposer(msg.sender));
@@ -46,12 +50,17 @@ contract SupplyControl is Proposal, SystemCaller {
         _;
     }
 
+    modifier onlyAgent() {
+        require(_commiteeContract.isAgent(msg.sender));
+        _;
+    }
+
     function initialize (
         uint256 voteDelay_,
         uint256 votePeriod_,
         ICommittee commiteeContractAddress_
-    ) external onlySystemAddress {
-        require(!_init,"supplycontrol: already init");
+    ) external onlyInitializer {
+        require(!_init,"treasury: already init");
         _commiteeContract = commiteeContractAddress_;
         _setDelay(voteDelay_);
         _setPeriod(votePeriod_);
@@ -61,7 +70,7 @@ contract SupplyControl is Proposal, SystemCaller {
 
     function _getProposal(bytes32 proposalId) private view returns (ProposalSupplyInfo memory) {
         ProposalSupplyInfo memory data = _supplyProposals[proposalId];
-        require(data.blockNumber != 0,"supplycontrol: proposal not exist");
+        require(data.blockNumber != 0,"treasury: proposal not exist");
         return data;
     }
 
@@ -73,6 +82,14 @@ contract SupplyControl is Proposal, SystemCaller {
         return _getProposal(blockProposal[blockNumber]);
     }
 
+    function getAvailableBalance() public view returns (uint256){
+        return address(this).balance - _lockedBalance;
+    }
+
+    function getLockBalance() public view returns (uint256){
+        return _lockedBalance;
+    }
+
     function propose(
         uint256 blockNumber,
         uint256 amount,
@@ -80,11 +97,18 @@ contract SupplyControl is Proposal, SystemCaller {
         ProposalType proposeType
     ) public onlyProposer returns(uint256) {
         uint256 current = block.number;
-        require(amount > 0, "supplycontrol: invalid amount");
-        require(current < blockNumber, "supplycontrol: propose past block");
-        require(account != address(0), "supplycontrol: propose zero address");
-        require((current + votingPeriod()) < blockNumber,"supplycontrol: invalid blocknumber");
-        require(blockProposal[blockNumber] == bytes32(0),"supplycontrol: blocknumber has propose");
+        require(amount > 0, "treasury: invalid amount");
+        require(amount <= getAvailableBalance(),"treasury: amount exceed");
+        require(current < blockNumber, "treasury: propose past block");
+        if (proposeType == ProposalType.RELEASED) {
+            require(account != address(0), "treasury: propose released to zero address");
+        } else {
+            require(account == address(0), "treasury: propose locked to non-zero address");
+        }
+        require((current + votingPeriod()) < blockNumber,"treasury: invalid blocknumber");
+        require(blockProposal[blockNumber] == bytes32(0),"treasury: blocknumber has propose");
+
+        _lockedBalance += amount;
 
         bytes32 proposalId = keccak256(abi.encode(msg.sender, account, amount, blockNumber));
 
@@ -96,24 +120,27 @@ contract SupplyControl is Proposal, SystemCaller {
         _supplyProposals[proposalId].proposeType = proposeType;
 
         _proposal(proposalId, uint16(_commiteeContract.getCommitteeCount()));
-        emit SupplyMintProposalProposed(proposalId, msg.sender, account, proposeType, amount, blockNumber, block.timestamp);
+        emit TreasuryProposalProposed(proposalId, msg.sender, account, proposeType, amount, blockNumber, block.timestamp);
 
         return blockNumber;
     }
 
-    function execute(uint256 blockNumber) public override onlySystemAddress returns (uint256) {
+    function execute(uint256 blockNumber) public override payable onlyAgent returns (uint256) {
         ProposalSupplyInfo memory data = getProposalSupplyInfoByBlockNumber(blockNumber);
         uint256 timeCache = block.timestamp;
         (bool callback) = _execute(blockProposal[blockNumber]);
         if (callback) {
-            if (data.proposeType == ProposalType.ADD) {
-                emit SupplyMintProposalExecuted(blockProposal[blockNumber], ProposalType.ADD, data.recipient, data.amount, timeCache);
+            if (data.proposeType == ProposalType.RELEASED) {
+                payable(data.recipient).transfer(data.amount);
+                emit TreasuryProposalExecuted(blockProposal[blockNumber], ProposalType.RELEASED, data.recipient, data.amount, timeCache);
             } else {
-                emit SupplyMintProposalExecuted(blockProposal[blockNumber], ProposalType.SUB, data.recipient, data.amount, timeCache);
+                payable(address(0)).transfer(data.amount);
+                emit TreasuryProposalExecuted(blockProposal[blockNumber], ProposalType.LOCKED, data.recipient, data.amount, timeCache);
             }
         } else {
-            emit SupplyMintProposalRejected(blockProposal[blockNumber], data.proposeType, data.recipient, data.amount, timeCache);
+            emit TreasuryProposalRejected(blockProposal[blockNumber], data.proposeType, data.recipient, data.amount, timeCache);
         }
+        _lockedBalance -= data.amount;
         return blockNumber;
     }
 

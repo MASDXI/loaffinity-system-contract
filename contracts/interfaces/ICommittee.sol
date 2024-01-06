@@ -13,6 +13,7 @@ interface ICommittee {
         uint256 blockNumber,
         uint256 timestamp);
 
+    function isAgent(address account) external view returns(bool);
     function isCommittee(address account) external view returns(bool);
     function isProposer(address account) external view returns(bool);
     function getCommitteeCount() external view returns (uint256);
