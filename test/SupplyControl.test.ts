@@ -22,13 +22,13 @@ describe("Supply Control System Contract", function () {
 
     it("function: propose", async function () {
       let timestamp = 10953791915;
-      const { supplycontrol, committee, systemCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
+      const { supplycontrol, committee, initializerCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
       await time.setNextBlockTimestamp(timestamp);
-      await committee.connect(systemCallerSigner).initialize(0, 240, [committee1.address], admin.address);
+      await committee.connect(initializerCallerSigner).initialize(0, 240, [committee1.address], admin.address);
       await time.setNextBlockTimestamp(timestamp+5);
       await committee.connect(admin).grantProposer(proposer1.address);
       await time.setNextBlockTimestamp(timestamp+10);
-      await supplycontrol.connect(systemCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
+      await supplycontrol.connect(initializerCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
       await time.setNextBlockTimestamp(timestamp+15);
       await expect(supplycontrol.connect(proposer1).propose(300, constants.ONE_TRILLION_TOKEN, committee1.address, 0))
         .to.emit(supplycontrol,"SupplyMintProposalProposed")
@@ -42,60 +42,60 @@ describe("Supply Control System Contract", function () {
     });
 
     it("function: propose", async function () {
-      const { supplycontrol, committee, systemCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
-      await committee.connect(systemCallerSigner).initialize(0, 240, [committee1.address], admin.address);
+      const { supplycontrol, committee, initializerCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
+      await committee.connect(initializerCallerSigner).initialize(0, 240, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address);
-      await supplycontrol.connect(systemCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
-      await expect(supplycontrol.connect(proposer1).propose(0, constants.ONE_TRILLION_TOKEN, committee1.address, 0)).to.be.revertedWith("supplycontrol: propose past block")
+      await supplycontrol.connect(initializerCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
+      await expect(supplycontrol.connect(proposer1).propose(0, constants.ONE_TRILLION_TOKEN, committee1.address, 0)).to.be.revertedWith("treasury: propose past block")
     });
 
     it("function: propose", async function () {
-      const { supplycontrol, committee, systemCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
-      await committee.connect(systemCallerSigner).initialize(0, 240, [committee1.address], admin.address);
+      const { supplycontrol, committee, initializerCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
+      await committee.connect(initializerCallerSigner).initialize(0, 240, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address);
-      await supplycontrol.connect(systemCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
-      await expect(supplycontrol.connect(proposer1).propose(100, constants.ONE_TRILLION_TOKEN, committee1.address, 0)).to.be.revertedWith("supplycontrol: invalid blocknumber")
+      await supplycontrol.connect(initializerCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
+      await expect(supplycontrol.connect(proposer1).propose(100, constants.ONE_TRILLION_TOKEN, committee1.address, 0)).to.be.revertedWith("treasury: invalid blocknumber")
     });
 
     it("function: propose", async function () {
-      const { supplycontrol, committee, systemCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
-      await committee.connect(systemCallerSigner).initialize(0, 240, [committee1.address], admin.address);
+      const { supplycontrol, committee, initializerCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
+      await committee.connect(initializerCallerSigner).initialize(0, 240, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address);
-      await supplycontrol.connect(systemCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
-      await expect(supplycontrol.connect(proposer1).propose(300, constants.ZERO_TOKEN, committee1.address, 0)).to.be.revertedWith("supplycontrol: invalid amount")
+      await supplycontrol.connect(initializerCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
+      await expect(supplycontrol.connect(proposer1).propose(300, constants.ZERO_TOKEN, committee1.address, 0)).to.be.revertedWith("treasury: invalid amount")
     });
 
     it("function: propose", async function () {
-      const { supplycontrol, committee, systemCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
-      await committee.connect(systemCallerSigner).initialize(0, 240, [committee1.address], admin.address);
+      const { supplycontrol, committee, initializerCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
+      await committee.connect(initializerCallerSigner).initialize(0, 240, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address);
-      await supplycontrol.connect(systemCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
+      await supplycontrol.connect(initializerCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
       await supplycontrol.connect(proposer1).propose(300, constants.ONE_MILLION_TOKEN, committee1.address, 0)
-      await expect(supplycontrol.connect(proposer1).propose(300, constants.ONE_MILLION_TOKEN, committee1.address, 0)).to.be.revertedWith("supplycontrol: blocknumber has propose")
+      await expect(supplycontrol.connect(proposer1).propose(300, constants.ONE_MILLION_TOKEN, committee1.address, 0)).to.be.revertedWith("treasury: blocknumber has propose")
     });
 
     it("function: propose", async function () {
-      const { supplycontrol, committee, systemCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
-      await committee.connect(systemCallerSigner).initialize(0, 240, [committee1.address], admin.address);
+      const { supplycontrol, committee, initializerCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
+      await committee.connect(initializerCallerSigner).initialize(0, 240, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address);
-      await supplycontrol.connect(systemCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
-      await expect(supplycontrol.connect(proposer1).propose(300, constants.ONE_MILLION_TOKEN,ZeroAddress, 0)).to.be.revertedWith("supplycontrol: propose zero address")
+      await supplycontrol.connect(initializerCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
+      await expect(supplycontrol.connect(proposer1).propose(300, constants.ONE_MILLION_TOKEN,ZeroAddress, 0)).to.be.revertedWith("treasury: propose zero address")
     });
 
     it("function: getProposalSupplyInfoByProposalId", async function () {
-      const { supplycontrol, committee, systemCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
-      await committee.connect(systemCallerSigner).initialize(0, 240, [committee1.address], admin.address);
+      const { supplycontrol, committee, initializerCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
+      await committee.connect(initializerCallerSigner).initialize(0, 240, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address);
-      await supplycontrol.connect(systemCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
-      await expect(supplycontrol.connect(proposer1).getProposalSupplyInfoByProposalId(ZeroHash)).to.be.revertedWith("supplycontrol: proposal not exist")
+      await supplycontrol.connect(initializerCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
+      await expect(supplycontrol.connect(proposer1).getProposalSupplyInfoByProposalId(ZeroHash)).to.be.revertedWith("treasury: proposal not exist")
     });
 
     it("function: getProposalSupplyInfoByProposalId", async function () {
-      const { supplycontrol, committee, systemCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
-      await committee.connect(systemCallerSigner).initialize(0, 240, [committee1.address], admin.address);
+      const { supplycontrol, committee, initializerCallerSigner, committee1, admin, proposer1} = await loadFixture(setSystemContractFixture);
+      await committee.connect(initializerCallerSigner).initialize(0, 240, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address);
-      await supplycontrol.connect(systemCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
-      await expect(supplycontrol.connect(proposer1).getProposalSupplyInfoByBlockNumber(0)).to.be.revertedWith("supplycontrol: proposal not exist")
+      await supplycontrol.connect(initializerCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
+      await expect(supplycontrol.connect(proposer1).getProposalSupplyInfoByBlockNumber(0)).to.be.revertedWith("treasury: proposal not exist")
     });
 
     

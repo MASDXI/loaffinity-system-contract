@@ -134,6 +134,16 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         return true;
     }
 
+    function grantAgent(address account) public onlyAdmin {
+        require(!isAgent(account),"committee: grant exist agent address");
+        _grantRole(EXECUTOR_AGENT_ROLE, account);
+    }
+
+    function revokeAgent(address account) public onlyAdmin {
+        require(isAgent(account),"committee: revoke non agent address");
+        _revokeRole(EXECUTOR_AGENT_ROLE, account);
+    }
+
     function grantProposer(address account) public onlyAdmin {
         require(!isProposer(account),"committee: grant exist proposer address");
         _grantRole(PROPOSER_ROLE, account);

@@ -1,9 +1,9 @@
 import { ethers } from "ethers"
-import { deployedBytecode as SupplyControlBin } from "../../artifacts/contracts/SupplyContol.sol/SupplyControl.json"
+import { deployedBytecode as SupplyControlBin } from "../../artifacts/contracts/TreasuryContract.sol/TreasuryContract.json"
 import { deployedBytecode as CommitteeBin } from "../../artifacts/contracts/Committee.sol/Committee.json"
 
 const constants = { 
-    "SYSTEM_CALLER": "0x0000000000000000000000000000000000000080",
+    "INITIALIZER_ADDRESS": "0x0000000000000000000000000000000000000080",
     "COMMITTEE_CONTRACT_ADDRESS": "0x0000000000000000000000000000000000000069",
     "SUPPLY_CONTRACT_ADDRESS": "0x0000000000000000000000000000000000000070",
     "ONE_TRILLION_TOKEN": ethers.parseEther("1000000000000"),
@@ -15,9 +15,10 @@ const constants = {
     "VOTE_TYPE_ADD": 1,
     "VOTE_AGREE": true,
     "VOTE_DIAGREE": false,
+    "AGENT_ROLE": "",
     "ROOT_ADMIN_ROLE": "0x77ccc78fff97648b6361d5a6f0bd0a9f7c43fd29c1369941d3474c71311418fc",
     "PROPOSER_ROLE": "0xb09aa5aeb3702cfd50b6b62bc4532604938f21248a27a1d5ca736082b6819cc1",
-    "COMMITEE_ROLE": "0x08da096d11689a7c6ed04f3885d9296d355e262ee0f570fe692a8d9ec7ebd3c4",
+    "CONSORTIUM_COMMITEE_ROLE": "0x25a12cb23baa24013defe8906042396d313a59c84c79d8f5342b90fd1189a0c4",
     "SUPPLY_CONTRACT_BIN": SupplyControlBin,
     "COMMITEE_CONTRACT_BIN": CommitteeBin,
 }
