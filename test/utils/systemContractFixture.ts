@@ -7,7 +7,7 @@ import {
   } from "@nomicfoundation/hardhat-toolbox/network-helpers";
   import { expect } from "chai";
   import { ethers } from "hardhat";
-  import { constants } from "../utils/constanst"
+  import { constants } from "./constants"
 
  export async function setSystemContractFixture() {
     // Contracts are deployed using the first signer/account by default

@@ -10,7 +10,7 @@ This project demonstrates a basic Hardhat use case. It comes with a sample contr
 ### Setup Repository
 
 ```shell
-git clone 
+git clone <repository>
 ```
 
 ```shell
@@ -53,16 +53,17 @@ npx hardhat propose_supply --account "0x9784e7348e2A4EbDC059e0BCC575D874d96ce88c
 ```
 
 ### Building System Contract
-1. Copy deployedBytecode output after run `yarn build` to consensus/clique/system_contract.go  
-2. Copy ABI output after run `yarn build` to consensus/clique/abi.go
+1. Make sure you have set the value in `.env` file
+2. Using command `yarn compile` to compile smart contract
+3. Copy deployedBytecode output after run `yarn build` to and place to genesis.json
+4. when start the network if wanted to activate the contract you should using hardtask activate contract from example above
 
 ### Noted Issue
-- Current System Contract Call implementation tx are contain in block and can't trace the event
-- Not have MIN,MAX committee size
-- Not have MIN,MAX proposer size
+- Proposer have majority and right to create proposal by their own, avoid Proposer spamming proposal to future block potentially DoS contract.
 - Single Root admin for add and remove proposer.
-- Proposer can spamming propose to future block.
 - Configuration configuration such as voting delay, voting period, and threshold can't be change after contract initialize.
 - Everyblock can contain only one proposal.
-- For burn supply smart contract can't preventing account to move fund before proposal execute.
-- For proposal that vote not reach to the threshold, off-chain operation should ignore that proposal to preventing execute revert transaction.
+
+### TODO
+- [] refactoring test
+- [] update readme and documentation

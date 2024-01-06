@@ -8,7 +8,7 @@ import {
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { constants } from "./utils/constanst"
+import { constants } from "./utils/constants"
 import { setSystemContractFixture } from "./utils/systemContractFixture"
 import { ZeroAddress, ZeroHash } from "ethers";
 

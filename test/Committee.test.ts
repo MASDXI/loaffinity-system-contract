@@ -7,7 +7,7 @@ import {
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { ethers as eth } from "ethers";
-import { constants } from "./utils/constanst"
+import { constants } from "./utils/constants"
 import { setSystemContractFixture } from "./utils/systemContractFixture"
 
 describe("Committee System Contract", function () {

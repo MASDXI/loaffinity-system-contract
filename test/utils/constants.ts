@@ -3,7 +3,7 @@ import { deployedBytecode as SupplyControlBin } from "../../artifacts/contracts/
 import { deployedBytecode as CommitteeBin } from "../../artifacts/contracts/Committee.sol/Committee.json"
 
 const constants = { 
-    "SYSTEM_CALLER": "0x0000000000000000000000000000000000000F69",
+    "SYSTEM_CALLER": "0x0000000000000000000000000000000000000080",
     "COMMITTEE_CONTRACT_ADDRESS": "0x0000000000000000000000000000000000000069",
     "SUPPLY_CONTRACT_ADDRESS": "0x0000000000000000000000000000000000000070",
     "ONE_TRILLION_TOKEN": ethers.parseEther("1000000000000"),
