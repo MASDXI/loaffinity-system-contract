@@ -12,6 +12,7 @@ import { setSystemContractFixture } from "./utils/systemContractFixture"
 
 describe("Committee System Contract", function () {
   describe("Unit test", function () {
+    // ROLE
     it("function: ROOT_ADMIN_ROLE()", async function () {
       const { committee } = await loadFixture(setSystemContractFixture);
       expect(await committee.ROOT_ADMIN_ROLE()).to.equal(constants.ROOT_ADMIN_ROLE);
@@ -25,6 +26,11 @@ describe("Committee System Contract", function () {
     it("function: PROPOSER_ROLE()", async function () {
       const { committee } = await loadFixture(setSystemContractFixture);
       expect(await committee.PROPOSER_ROLE()).to.equal(constants.PROPOSER_ROLE);
+    });
+
+    it("function: EXECUTOR_AGENT_ROLE()", async function () {
+      const { committee } = await loadFixture(setSystemContractFixture);
+      expect(await committee.EXECUTOR_AGENT_ROLE()).to.equal(constants.EXECUTOR_AGENT_ROLE);
     });
 
     it("function: intialized()", async function () {
