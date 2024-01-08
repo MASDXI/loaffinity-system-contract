@@ -36,20 +36,31 @@ yarn test
 ```
 ### Script for interact with system contract
 
+
+
 ``` shell
-npx hardhat propose_committee --account "<address>" --proposaltype "0 or 1:number" --blocknumber "<blocknumber>" --network "<config_network>"
-npx hardhat propose_supply --account "<address>" --amount "<amount>" --proposaltype "0 or 1:number" --blocknumber "<blocknumber>" --network "<config_network>"
-npx hardhat grant_proposer --account "<address>" --action "0 or 1:number" --network "<config_network>"
-npx hardhat is_committee --account "<address>" --network "<config_network>"
-npx hardhat is_proposer --account "<address>" --network "<config_network>"
-npx hardhat vote --proposalid "<bytes32string>" --auth "true or false :boolean" --contract "0 or 1:number" --network "<config_network>"
-npx hardhat get_proposal_id_by_blocknumber --block "<blocknumber>" --contract "0 or 1:number" --network "<config_network>"
-npx hardhat get_proposal_by_blocknumber --block "<blocknumber>" --contract "0 or 1:number" --network "<config_network>"
-npx hardhat get_proposal_by_proposalid --proposalid "<bytes32string>" --contract "0 or 1:number" --network "<config_network>"
-0x57b009ce2ed43ece2fc8f9cedc972782f9f16663c06389009da18e252b5472d2
-# Example
-npx hardhat propose_committee --account "0x9784e7348e2A4EbDC059e0BCC575D874d96ce88c" --proposaltype 1 --blocknumber 50 --network local
-npx hardhat propose_supply --account "0x9784e7348e2A4EbDC059e0BCC575D874d96ce88c" --amount "100000000000000000" --proposaltype 1 --blocknumber 250 --network local
+# Initialized System Contract
+npx hardhat initialized --network "dev"
+npx hardhat initialized --network "testnet"
+npx hardaht initialized --network "mainnet"
+
+# Proposal Command
+npx hardhat get_proposal_by_blocknumber --help
+npx hardhat get_proposal_by_proposalid --help
+npx hardhat get_proposal_id_by_blocknumber --help
+
+# Propose Command
+npx hardhat propose_committee --help
+npx hardhat propose_supply --help
+
+# Grant Command
+npx hardhat grant_agent --help
+npx hardhat grant_proposer --help
+
+# Role Command
+npx hardhat is_committee --help
+npx hardhat is_proposer --help
+npx hardhat is_agent --help
 ```
 
 ### Building System Contract

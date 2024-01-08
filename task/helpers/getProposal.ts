@@ -27,7 +27,7 @@ task("get_proposal_id_by_blocknumber", "get proposal id by given blocknumber")
   })
 
 task("get_proposal_by_proposalid", "get proposal by given proposal id")
-  .addParam("proposalid", "destination address")
+  .addParam("proposalid", "proposal id example 0x57b009ce2ed43e72782f9f16663c06389009da18e252b5472d2ce2fc8f9cedc9")
   .addParam("contract","0:committe 1:supply")
   .setAction(async (args, hre) => {
     const proposalid: BytesLike = (args.proposalid)

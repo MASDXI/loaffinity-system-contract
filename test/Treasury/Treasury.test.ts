@@ -42,8 +42,8 @@ describe("Supply Control System Contract", function () {
       await expect(supplycontrol.connect(proposer1).propose(300, constants.ONE_TRILLION_TOKEN, committee1.address, constants.VOTE_TYPE_ADD))
         .to.emit(supplycontrol,"TreasuryProposalProposed")
         .withArgs("0x7b191e0665c3a3cc1de00270233ba76d2dcbc880a33689d07061641767a567ba",
-        "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-        "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+        proposer1.address,
+        committee1.address,
         constants.VOTE_TYPE_ADD,
         constants.ONE_TRILLION_TOKEN,
         300,
@@ -114,10 +114,5 @@ describe("Supply Control System Contract", function () {
       await supplycontrol.connect(initializerCallerSigner).initialize(0,240,constants.COMMITTEE_CONTRACT_ADDRESS);
       await expect(supplycontrol.connect(proposer1).getProposalSupplyInfoByBlockNumber(0)).to.be.revertedWith("treasury: proposal not exist")
     });
-
-    
-
-
-    
   });
 });
