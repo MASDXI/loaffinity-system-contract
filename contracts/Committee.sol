@@ -115,10 +115,11 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         require((current + votingPeriod()) < blockNumber,"committee: invalid blocknumber");
         if (proposeType == ProposalType.ADD) {
             require(!isCommittee(account), "committee: propose add existing committee");
-        }
-        if (proposeType == ProposalType.REMOVE) {
+        } else {
             require(isCommittee(account), "committee: propose remove not exist commitee");
         }
+        require((current + votingPeriod()) < blockNumber,"committee: invalid blocknumber");
+        require(blockProposal[blockNumber] == bytes32(0),"committee: blocknumber has propose");
 
         bytes32 proposalId = keccak256(abi.encode(msg.sender, account, proposeType, blockNumber));
 
@@ -157,16 +158,23 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
     function execute(uint256 blockNumber) public override payable onlyAgent returns (uint256) {
         ProposalCommitteeInfo memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
         (bool callback) = _execute(blockProposal[blockNumber]);
-        if (callback && data.proposeType == ProposalType.ADD) {
-            _grantRole(CONSORTIUM_COMMITEE_ROLE, data.commitee);
-        }
-        if (callback && data.proposeType == ProposalType.REMOVE) {
-            _revokeRole(CONSORTIUM_COMMITEE_ROLE, data.commitee);
+        uint256 timeCache = block.timestamp;
+        if (callback) {
+            if (data.proposeType == ProposalType.ADD) {
+                _grantRole(CONSORTIUM_COMMITEE_ROLE, data.commitee);
+                emit CommitteeProposalExecuted(data.proposalId, data.proposalType, data.account, timeCache);
+            } else {
+                _revokeRole(CONSORTIUM_COMMITEE_ROLE, data.commitee);
+                emit CommitteeProposalExecuted(data.proposalId, data.proposalType, data.account, timeCache);
+            }
+        } else {
+            emit CommitteeProposalRejected(data.proposalId, data.proposalType, data.account, timeCache);
         }
         return blockNumber;
     }
 
     function vote(bytes32 proposalId, bool auth) external override onlyCommittee {
         _vote(proposalId, auth);
+        emit CommitteeVoted(proposalId, msg.sender, auth, block.timestamp);
     }
 }

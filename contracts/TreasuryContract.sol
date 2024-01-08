@@ -4,32 +4,10 @@ pragma solidity 0.8.17;
 import "./abstracts/Proposal.sol";
 import "./abstracts/Initializer.sol";
 import "./interfaces/ICommittee.sol";
+import "./interfaces/ITreasury.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
-contract TreasuryContract is Proposal, Initializer {
-
-    enum ProposalType { LOCKED, RELEASED }
-
-    struct ProposalSupplyInfo {
-        address proposer;
-        address recipient;
-        uint256 amount;
-        uint256 blockNumber;
-        ProposalType proposeType;
-    }
-
-    event TreasuryProposalProposed(
-        bytes32 indexed proposalId, 
-        address indexed proposer, 
-        address indexed recipient, 
-        ProposalType proposalType,
-        uint256 amount, 
-        uint256 targetBlock, 
-        uint256 time);
-
-    event TreasuryVoted(bytes32 indexed proposalId, address indexed voter, bool auth, uint256 time);
-    event TreasuryProposalExecuted(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
-    event TreasuryProposalRejected(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
+contract TreasuryContract is ITreasury ,Proposal, Initializer {
 
     bool private _init;
     uint256 private _lockedBalance;
@@ -146,5 +124,6 @@ contract TreasuryContract is Proposal, Initializer {
 
     function vote(bytes32 proposalId, bool auth) external override onlyCommittee {
         _vote(proposalId, auth);
+        emit TreasuryVoted(proposalId, msg.sender, auth, block.timestamp);
     }
 }

@@ -13,6 +13,10 @@ interface ICommittee {
         uint256 blockNumber,
         uint256 timestamp);
 
+    event CommitteeVoted(bytes32 indexed proposalId, address indexed voter, bool auth, uint256 time);
+    event CommitteeProposalExecuted(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 time);
+    event CommitteeProposalRejected(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 time);
+
     function isAgent(address account) external view returns(bool);
     function isCommittee(address account) external view returns(bool);
     function isProposer(address account) external view returns(bool);
