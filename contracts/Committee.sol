@@ -8,24 +8,15 @@ import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer {
 
+    uint16 private constant MAX_FUTURE_BLOCK = type(uint16).max;
+
     bytes32 public constant ROOT_ADMIN_ROLE = keccak256("ROOT_ADMIN_ROLE");
     bytes32 public constant CONSORTIUM_COMMITEE_ROLE = keccak256("CONSORTIUM_COMMITEE_ROLE");
     bytes32 public constant PROPOSER_ROLE = keccak256("PROPOSER_ROLE");
     bytes32 public constant EXECUTOR_AGENT_ROLE = keccak256("EXECUTOR_AGENT_ROLE");
 
-    struct ProposalCommitteeInfo {
-        address proposer;
-        address commitee;
-        uint256 blockNumber;
-        ProposalType proposeType;
-    }
-
-    bool private _init;
-
     mapping(bytes32 => ProposalCommitteeInfo) private _committeeProposals; 
     mapping(uint256 => bytes32) public blockProposal;
-
-    event Initialized();
 
     modifier onlyAdmin() {
         require(hasRole(ROOT_ADMIN_ROLE, msg.sender),"committee: onlyAdmin can call");
@@ -56,18 +47,17 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         address [] calldata committees_, 
         address admin_
         ) external onlyInitializer {
-        require(!_init,"committee: already init");
         uint256 committeeLen = committees_.length;
+        _initialized();
         _setupRole(ROOT_ADMIN_ROLE, admin_);
         _setupRole(PROPOSER_ROLE, admin_);
         for (uint256 i = 0; i < committeeLen; ++i) {
             _setupRole(CONSORTIUM_COMMITEE_ROLE, committees_[i]);
         }
-        _init = true;
-        _setDelay(voteDelay_);
-        _setPeriod(votePeriod_);
-        _setThreshold(75);
-        emit Initialized();
+        _setVoteDelay(voteDelay_);
+        _setVotePeriod(votePeriod_);
+        _setVoteThreshold(75);
+        _setProposePeriod(50);
     }
 
     function _getProposal(bytes32 proposalId) private view returns (ProposalCommitteeInfo memory) {
@@ -120,6 +110,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         }
         require((current + votingPeriod()) < blockNumber,"committee: invalid blocknumber");
         require(blockProposal[blockNumber] == bytes32(0),"committee: blocknumber has propose");
+        require(blockNumber - block.number <= MAX_FUTURE_BLOCK,"committee: block too future");
 
         bytes32 proposalId = keccak256(abi.encode(msg.sender, account, proposeType, blockNumber));
 
@@ -157,18 +148,19 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
     
     function execute(uint256 blockNumber) public override payable onlyAgent returns (uint256) {
         ProposalCommitteeInfo memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
-        (bool callback) = _execute(blockProposal[blockNumber]);
+        bytes32 IdCache = blockProposal[blockNumber];
+        (bool callback) = _execute(IdCache);
         uint256 timeCache = block.timestamp;
         if (callback) {
             if (data.proposeType == ProposalType.ADD) {
                 _grantRole(CONSORTIUM_COMMITEE_ROLE, data.commitee);
-                emit CommitteeProposalExecuted(data.proposalId, data.proposalType, data.account, timeCache);
+                emit CommitteeProposalExecuted(IdCache, ProposalType.ADD, data.proposer, timeCache);
             } else {
                 _revokeRole(CONSORTIUM_COMMITEE_ROLE, data.commitee);
-                emit CommitteeProposalExecuted(data.proposalId, data.proposalType, data.account, timeCache);
+                emit CommitteeProposalExecuted(IdCache, ProposalType.REMOVE, data.proposer, timeCache);
             }
         } else {
-            emit CommitteeProposalRejected(data.proposalId, data.proposalType, data.account, timeCache);
+            emit CommitteeProposalRejected(IdCache, data.proposeType, data.proposer, timeCache);
         }
         return blockNumber;
     }

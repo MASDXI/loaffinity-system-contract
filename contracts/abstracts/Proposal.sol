@@ -7,32 +7,44 @@ abstract contract Proposal is IProposal {
 
     uint256 private _votePeriod;
     uint256 private _voteDelay;
-    uint8 private _threshold;
+    uint8 private _voteThreshold;
+    uint32 private _proposePeriod;
+
+    uint8 private constant MAX_PROPOSAL = type(uint8).max;
     uint8 private constant MAX_THRESHOLD = 100;
     uint8 private constant MIN_THERSHOLD = 50;
 
     mapping(bytes32 => bool) private _pass;
     mapping(bytes32 => ProposalInfo) private _proposals;
     mapping(address => mapping(bytes32 => VoteInfo)) private _votes;
+    mapping(address => uint8) private _counter;
+    mapping(address => uint256) private _latestProposal;
 
-    function _setPeriod(uint256 period) internal {
+    function _setVotePeriod(uint256 period) internal {
         _votePeriod = period;
     }
 
-    function _setDelay(uint256 delay) internal {
+    function _setVoteDelay(uint256 delay) internal {
         _voteDelay = delay;
     }
 
-    function _setThreshold(uint8 percentage) internal {
+    function _setProposePeriod(uint32 period) internal {
+        _proposePeriod = period;
+    }
+
+    function _setVoteThreshold(uint8 percentage) internal {
         require(MAX_THRESHOLD <= 100,"proposal: greater than max threshold");
         require(MIN_THERSHOLD >= 50,"proposal: less than min threshold");
-        _threshold = percentage;
+        _voteThreshold = percentage;
     }
 
     function _proposal(bytes32 proposalId, uint16 nvoter) internal virtual returns (bytes32) {
         uint256 blockTimeCache = block.timestamp;
         uint256 blockNumberCache = block.number;
         require(_proposals[proposalId].createTime == 0, "proposal: proposalId already exists");
+        require(_counter[msg.sender] < MAX_PROPOSAL, "proposal: propose max stack");
+        require(blockNumberCache - _latestProposal[msg.sender] > _proposePeriod, "proposal: propose again later");
+
         ProposalInfo memory proposal;
         proposal.proposer = msg.sender;
         proposal.nVoter = nvoter;
@@ -42,6 +54,8 @@ abstract contract Proposal is IProposal {
         proposal.status = ProposalStatus.PENDING;
 
         _proposals[proposalId] = proposal;
+        _counter[msg.sender]++;
+        _latestProposal[msg.sender] = blockTimeCache;
 
         emit LogCreateProposal(proposalId, msg.sender, blockTimeCache);
         return proposalId;
@@ -73,9 +87,11 @@ abstract contract Proposal is IProposal {
     function _execute(bytes32 proposalId) internal virtual returns (bool) {
         require(_proposals[proposalId].status == ProposalStatus.PENDING, "proposal: proposal not pending");
         require(!_pass[proposalId], "proposal: proposal was passed");
+        address proposerCache = _proposals[proposalId].proposer;
         if (_proposals[proposalId].accept >= (_proposals[proposalId].nVoter * uint256(threshold())) / 100) {
             _pass[proposalId] = true;
             _proposals[proposalId].status = ProposalStatus.EXECUTE;
+            _counter[proposerCache]--;
             emit LogProposal(proposalId, block.timestamp, ProposalStatus.EXECUTE);
             return true;
         }
@@ -83,6 +99,7 @@ abstract contract Proposal is IProposal {
         if (_proposals[proposalId].reject >= (_proposals[proposalId].nVoter * uint256(threshold())) / 100) {
             _pass[proposalId] = false;
             _proposals[proposalId].status = ProposalStatus.REJECT;
+            _counter[proposerCache]--;
             emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
             return true;
         }
@@ -95,7 +112,7 @@ abstract contract Proposal is IProposal {
     }
 
     function threshold() public view override returns (uint8) {
-        return _threshold;
+        return _voteThreshold;
     }
 
     function votingDeley() public view virtual override returns(uint256) {

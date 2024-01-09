@@ -5,6 +5,13 @@ interface ICommittee {
 
     enum ProposalType { REMOVE, ADD }
 
+    struct ProposalCommitteeInfo {
+        address proposer;
+        address commitee;
+        uint256 blockNumber;
+        ProposalType proposeType;
+    }
+
     event CommitteeProposalProposed(
         bytes32 proposalId,
         address indexed proposer,

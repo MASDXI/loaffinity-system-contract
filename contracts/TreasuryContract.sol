@@ -9,8 +9,8 @@ import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 contract TreasuryContract is ITreasury ,Proposal, Initializer {
 
-    bool private _init;
     uint256 private _lockedBalance;
+    uint16 private constant MAX_FUTURE_BLOCK = type(uint16).max;
     ICommittee private _commiteeContract;
     mapping(bytes32 => ProposalSupplyInfo) private _supplyProposals; 
     mapping(uint256 => bytes32) public blockProposal;
@@ -38,12 +38,12 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer {
         uint256 votePeriod_,
         ICommittee commiteeContractAddress_
     ) external onlyInitializer {
-        require(!_init,"treasury: already init");
+        _initialized();
         _commiteeContract = commiteeContractAddress_;
-        _setDelay(voteDelay_);
-        _setPeriod(votePeriod_);
-        _setThreshold(75);
-        _init = true;
+        _setVoteDelay(voteDelay_);
+        _setVotePeriod(votePeriod_);
+        _setVoteThreshold(75);
+        _setProposePeriod(50);
     }
 
     function _getProposal(bytes32 proposalId) private view returns (ProposalSupplyInfo memory) {
@@ -85,6 +85,7 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer {
         }
         require((current + votingPeriod()) < blockNumber,"treasury: invalid blocknumber");
         require(blockProposal[blockNumber] == bytes32(0),"treasury: blocknumber has propose");
+        require(blockNumber - current <= MAX_FUTURE_BLOCK,"treasury: block too future");
 
         _lockedBalance += amount;
 
@@ -105,18 +106,19 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer {
 
     function execute(uint256 blockNumber) public override payable onlyAgent returns (uint256) {
         ProposalSupplyInfo memory data = getProposalSupplyInfoByBlockNumber(blockNumber);
+        bytes32 IdCache = blockProposal[blockNumber];
+        (bool callback) = _execute(IdCache);
         uint256 timeCache = block.timestamp;
-        (bool callback) = _execute(blockProposal[blockNumber]);
         if (callback) {
             if (data.proposeType == ProposalType.RELEASED) {
                 payable(data.recipient).transfer(data.amount);
-                emit TreasuryProposalExecuted(blockProposal[blockNumber], ProposalType.RELEASED, data.recipient, data.amount, timeCache);
+                emit TreasuryProposalExecuted(IdCache, ProposalType.RELEASED, data.recipient, data.amount, timeCache);
             } else {
                 payable(address(0)).transfer(data.amount);
-                emit TreasuryProposalExecuted(blockProposal[blockNumber], ProposalType.LOCKED, data.recipient, data.amount, timeCache);
+                emit TreasuryProposalExecuted(IdCache, ProposalType.LOCKED, data.recipient, data.amount, timeCache);
             }
         } else {
-            emit TreasuryProposalRejected(blockProposal[blockNumber], data.proposeType, data.recipient, data.amount, timeCache);
+            emit TreasuryProposalRejected(IdCache, data.proposeType, data.recipient, data.amount, timeCache);
         }
         _lockedBalance -= data.amount;
         return blockNumber;

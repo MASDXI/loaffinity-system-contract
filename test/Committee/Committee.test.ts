@@ -41,7 +41,7 @@ describe("Committee System Contract", function () {
     it("function: intialized()", async function () {
       const { committee, committee1, admin, otherAccount, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await expect(committee.connect(initializerCallerSigner).initialize(0, 240, [committee1.address], admin.address)).to.emit(committee, "Initialized");
-      await expect(committee.connect(initializerCallerSigner).initialize(0, 240, [committee1.address], admin.address)).to.be.revertedWith("committee: already init")
+      await expect(committee.connect(initializerCallerSigner).initialize(0, 240, [committee1.address], admin.address)).to.be.revertedWith("initializer: already init")
     });
 
     it("function: intialized() fail", async function () {
