@@ -43,7 +43,7 @@ abstract contract Proposal is IProposal {
         uint256 blockNumberCache = block.number;
         require(_proposals[proposalId].createTime == 0, "proposal: proposalId already exists");
         require(_counter[msg.sender] < MAX_PROPOSAL, "proposal: propose max stack");
-        require(blockNumberCache - _latestProposal[msg.sender] > _proposePeriod, "proposal: propose again later");
+        require(blockNumberCache - _latestProposal[msg.sender] >= proposePeriod(), "proposal: propose again later");
 
         ProposalInfo memory proposal;
         proposal.proposer = msg.sender;
@@ -121,6 +121,10 @@ abstract contract Proposal is IProposal {
 
     function votingPeriod() public view virtual override returns(uint256) {
         return _votePeriod;
+    }
+
+    function proposePeriod() public view virtual override return(uint32) {
+        return _proposePeriod;
     }
 
 }
