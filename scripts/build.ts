@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import committeeAritifact from "../artifacts/contracts/Committee.sol/Committee.json"
-import supplyControlArtifact from "../artifacts/contracts/SupplyContol.sol/SupplyControl.json"
+import supplyControlArtifact from "../artifacts/contracts/TreasuryContract.sol/TreasuryContract.json"
 
 async function main() {
   // Write deployedBytecode to a file
