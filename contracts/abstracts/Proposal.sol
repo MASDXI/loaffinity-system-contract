@@ -123,7 +123,7 @@ abstract contract Proposal is IProposal {
         return _votePeriod;
     }
 
-    function proposePeriod() public view virtual override return(uint32) {
+    function proposePeriod() public view virtual override returns(uint32) {
         return _proposePeriod;
     }
 

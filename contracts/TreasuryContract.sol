@@ -36,6 +36,7 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer {
     function initialize (
         uint256 voteDelay_,
         uint256 votePeriod_,
+        uint32 proposePeriod_,
         ICommittee commiteeContractAddress_
     ) external onlyInitializer {
         _initialized();
@@ -43,7 +44,7 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer {
         _setVoteDelay(voteDelay_);
         _setVotePeriod(votePeriod_);
         _setVoteThreshold(75);
-        _setProposePeriod(50);
+        _setProposePeriod(proposePeriod_);
     }
 
     function _getProposal(bytes32 proposalId) private view returns (ProposalSupplyInfo memory) {

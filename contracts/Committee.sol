@@ -44,6 +44,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
     function initialize(
         uint256 voteDelay_,
         uint256 votePeriod_,
+        uint32 proposePeriod_,
         address [] calldata committees_, 
         address admin_
         ) external onlyInitializer {
@@ -57,7 +58,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         _setVoteDelay(voteDelay_);
         _setVotePeriod(votePeriod_);
         _setVoteThreshold(75);
-        _setProposePeriod(50);
+        _setProposePeriod(proposePeriod_);
     }
 
     function _getProposal(bytes32 proposalId) private view returns (ProposalCommitteeInfo memory) {
