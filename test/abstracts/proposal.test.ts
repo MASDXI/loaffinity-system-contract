@@ -113,7 +113,7 @@ describe("Abstract Proposal Contract", function () {
             const deploy = setup(
                 constants.VOTE_DELAY,
                 constants.VOTE_PERIOD,
-                constants.VOTE_THREADSHOLD_ZERO,
+                constants.ZERO,
                 constants.PROPOSE_PERIOD);
             await expect(deploy).to.be.revertedWith("proposal: less than min threshold");
         });
