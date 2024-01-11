@@ -12,7 +12,7 @@ abstract contract Proposal is IProposal {
 
     uint8 private constant MAX_PROPOSAL = type(uint8).max;
     uint8 private constant MAX_THRESHOLD = 100;
-    uint8 private constant MIN_THERSHOLD = 50;
+    uint8 private constant MIN_THRESHOLD = 50;
 
     mapping(bytes32 => bool) private _pass;
     mapping(bytes32 => ProposalInfo) private _proposals;
@@ -33,8 +33,8 @@ abstract contract Proposal is IProposal {
     }
 
     function _setVoteThreshold(uint8 percentage) internal {
-        require(MAX_THRESHOLD <= 100,"proposal: greater than max threshold");
-        require(MIN_THERSHOLD >= 50,"proposal: less than min threshold");
+        require(percentage <= MAX_THRESHOLD,"proposal: greater than max threshold");
+        require(percentage >= MIN_THRESHOLD,"proposal: less than min threshold");
         _voteThreshold = percentage;
     }
 
