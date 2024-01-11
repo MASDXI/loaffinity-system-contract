@@ -7,14 +7,17 @@ contract ProposalMock is Proposal {
 
     mapping(uint256 => bytes32) public blockProposal;
 
-    function propose() public returns(bool) {
-        
-        bytes32 proposalId = keccak256(abi.encode(msg.sender));
+    constructor (uint256 voteDelay_, uint256 votePeriod_, uint8 threshold_, uint32 proposePeriod_) {
+        _setVoteDelay(voteDelay_);
+        _setVotePeriod(votePeriod_);
+        _setVoteThreshold(threshold_);
+        _setProposePeriod(proposePeriod_);
+    }
 
-        blockProposal[block.number] = proposalId;
-        
-        _proposal(proposalId, 1);
-
+    function propose(uint256 blocknumber, uint16 nvote) public returns(bool) {
+        bytes32 proposalId = keccak256(abi.encode(msg.sender,blocknumber));
+        blockProposal[blocknumber] = proposalId;
+        _proposal(proposalId, nvote);
         return true;
     }
     

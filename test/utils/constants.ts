@@ -15,6 +15,7 @@ const constants = {
     "VOTE_PERIOD": 240,
     "VOTE_DELAY_ZERO": 0,
     "VOTE_DELAY": 10,
+    "VOTE_THREADSHOLD": 75,
     "PROPOSE_PERIOD": 50,
     "PROPOSE_PERIOD_ZERO": 0,
     "VOTE_TYPE_REMOVE": 0,
