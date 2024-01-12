@@ -15,7 +15,7 @@ contract ProposalMock is Proposal {
     }
 
     function propose(uint256 blocknumber, uint16 nvote) public returns(bool) {
-        bytes32 proposalId = keccak256(abi.encode(msg.sender,blocknumber));
+        bytes32 proposalId = keccak256(abi.encode(msg.sender, blocknumber));
         blockProposal[blocknumber] = proposalId;
         _proposal(proposalId, nvote);
         return true;

@@ -94,31 +94,28 @@ abstract contract Proposal is IProposal {
         address proposerCache = _proposals[proposalId].proposer;
         uint16 acceptCache = _proposals[proposalId].accept;
         uint16 rejectCache = _proposals[proposalId].reject;
+
+        _counter[proposerCache]--;
+
         if (acceptCache == rejectCache) {
             _proposals[proposalId].status = ProposalStatus.REJECT;
             emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
             return false;
-        }
-
-        if (acceptCache > rejectCache &&
+        } else if (acceptCache > rejectCache &&
             acceptCache >= (_proposals[proposalId].nVoter * uint256(threshold())) / 100) {
             _pass[proposalId] = true;
             _proposals[proposalId].status = ProposalStatus.EXECUTE;
             emit LogProposal(proposalId, block.timestamp, ProposalStatus.EXECUTE);
             return true;
-        }
-
-        if (rejectCache > acceptCache &&
+        } else if (rejectCache > acceptCache &&
             rejectCache >= (_proposals[proposalId].nVoter * uint256(threshold())) / 100) {
-            _pass[proposalId] = false;
             _proposals[proposalId].status = ProposalStatus.REJECT;
             emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
             return true;
+        } else {
+            emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
+            return false;
         }
-
-        _counter[proposerCache]--;
-
-        return false;
     }
 
     function threshold() public view override returns (uint8) {
