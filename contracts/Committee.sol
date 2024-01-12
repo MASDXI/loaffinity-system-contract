@@ -147,7 +147,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         _revokeRole(PROPOSER_ROLE, account);
     }
     
-    function execute(uint256 blockNumber) public override payable onlyAgent returns (uint256) {
+    function execute(uint256 blockNumber) public payable onlyAgent returns (uint256) {
         ProposalCommitteeInfo memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
         bytes32 IdCache = blockProposal[blockNumber];
         (bool callback) = _execute(IdCache);

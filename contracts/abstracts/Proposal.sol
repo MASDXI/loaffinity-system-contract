@@ -21,20 +21,24 @@ abstract contract Proposal is IProposal {
     mapping(address => uint256) private _latestProposal;
 
     function _setVotePeriod(uint256 period) internal {
+        require(votingPeriod() != period,"proposal: this vote period value already set");
         _votePeriod = period;
     }
 
     function _setVoteDelay(uint256 delay) internal {
+        require(votingDeley() != delay,"proposal: this vote delay value already set");
         _voteDelay = delay;
     }
 
     function _setProposePeriod(uint32 period) internal {
+        require(proposePeriod() != period,"proposal: this propose period value already set");
         _proposePeriod = period;
     }
 
     function _setVoteThreshold(uint8 percentage) internal {
         require(percentage <= MAX_THRESHOLD,"proposal: greater than max threshold");
         require(percentage >= MIN_THRESHOLD,"proposal: less than min threshold");
+        require(threshold() != percentage,"proposal: this vote threshold value already set");
         _voteThreshold = percentage;
     }
 
@@ -55,7 +59,7 @@ abstract contract Proposal is IProposal {
 
         _proposals[proposalId] = proposal;
         _counter[msg.sender]++;
-        _latestProposal[msg.sender] = blockTimeCache;
+        _latestProposal[msg.sender] = blockNumberCache;
 
         emit LogCreateProposal(proposalId, msg.sender, blockTimeCache);
         return proposalId;
@@ -86,29 +90,35 @@ abstract contract Proposal is IProposal {
 
     function _execute(bytes32 proposalId) internal virtual returns (bool) {
         require(_proposals[proposalId].status == ProposalStatus.PENDING, "proposal: proposal not pending");
-        require(!_pass[proposalId], "proposal: proposal was passed");
+        require(_proposals[proposalId].endBlock < block.number,"proposal: are in voting period");
         address proposerCache = _proposals[proposalId].proposer;
-        if (_proposals[proposalId].accept >= (_proposals[proposalId].nVoter * uint256(threshold())) / 100) {
+        uint16 acceptCache = _proposals[proposalId].accept;
+        uint16 rejectCache = _proposals[proposalId].reject;
+        if (acceptCache == rejectCache) {
+            _proposals[proposalId].status = ProposalStatus.REJECT;
+            emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
+            return false;
+        }
+
+        if (acceptCache > rejectCache &&
+            acceptCache >= (_proposals[proposalId].nVoter * uint256(threshold())) / 100) {
             _pass[proposalId] = true;
             _proposals[proposalId].status = ProposalStatus.EXECUTE;
-            _counter[proposerCache]--;
             emit LogProposal(proposalId, block.timestamp, ProposalStatus.EXECUTE);
             return true;
         }
 
-        if (_proposals[proposalId].reject >= (_proposals[proposalId].nVoter * uint256(threshold())) / 100) {
+        if (rejectCache > acceptCache &&
+            rejectCache >= (_proposals[proposalId].nVoter * uint256(threshold())) / 100) {
             _pass[proposalId] = false;
             _proposals[proposalId].status = ProposalStatus.REJECT;
-            _counter[proposerCache]--;
             emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
             return true;
         }
 
-        return false;
-    }
+        _counter[proposerCache]--;
 
-    function execute(uint256 blockNumber) public virtual override payable returns (uint256) {
-        return blockNumber;
+        return false;
     }
 
     function threshold() public view override returns (uint8) {

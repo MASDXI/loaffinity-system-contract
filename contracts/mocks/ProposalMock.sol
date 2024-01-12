@@ -21,7 +21,7 @@ contract ProposalMock is Proposal {
         return true;
     }
     
-    function execute(uint256 blockNumber) public override payable returns (uint256) {
+    function execute(uint256 blockNumber) public payable returns (uint256) {
         bytes32 IdCache =  blockProposal[blockNumber];
         _execute(IdCache);
         return blockNumber;
@@ -29,5 +29,21 @@ contract ProposalMock is Proposal {
 
     function vote(bytes32 proposalId, bool auth) external override {
         _vote(proposalId, auth);
+    }
+
+    function setVoteThreshold(uint8 percentage) external {
+        _setVoteThreshold(percentage);
+    }
+
+    function setProposePeriod(uint32 period) external {
+        _setProposePeriod(period);
+    }
+
+    function setVoteDelay(uint256 delay) external {
+        _setVoteDelay(delay);
+    }
+
+    function setVotePeriod(uint256 delay) external {
+        _setVotePeriod(delay);
     }
 }

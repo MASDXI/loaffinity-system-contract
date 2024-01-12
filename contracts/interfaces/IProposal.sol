@@ -42,7 +42,6 @@ interface IProposal {
     );
 
     function isProposalPassed(bytes32 proposalId) external view returns(bool);
-    function execute(uint256 proposalId) external payable returns (uint256);
     function threshold() external returns (uint8);
     function proposePeriod() external returns (uint32);
     function vote(bytes32 proposalId, bool auth) external;

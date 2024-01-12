@@ -105,7 +105,7 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer {
         return blockNumber;
     }
 
-    function execute(uint256 blockNumber) public override payable onlyAgent returns (uint256) {
+    function execute(uint256 blockNumber) public payable onlyAgent returns (uint256) {
         ProposalSupplyInfo memory data = getProposalSupplyInfoByBlockNumber(blockNumber);
         bytes32 IdCache = blockProposal[blockNumber];
         (bool callback) = _execute(IdCache);
