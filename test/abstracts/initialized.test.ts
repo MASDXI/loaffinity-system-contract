@@ -23,7 +23,7 @@ describe("Abstract Initialized Contract", function () {
         initializedMock = contract;
         signers = accounts;
         initializer = initAccount;
-    })
+    });
     
     describe("InitializedMock Contract", async function () {
         it("initializer: isinit false", async function () {

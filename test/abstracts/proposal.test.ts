@@ -26,7 +26,7 @@ describe("Abstract Proposal Contract", function () {
         signers = accounts;
         // skip 100 blocks
         await mine(100);
-    })
+    });
 
     describe("Get function", function () {
         it("get ", async function () {
@@ -42,7 +42,6 @@ describe("Abstract Proposal Contract", function () {
             expect(proposalPassed).to.equal(false);
         });
 
-        //LogCreateProposal
         it("test event create", async function () {
             await expect(proposalMock.connect(signers[0]).propose(constants.PROPOSE_PERIOD, 1))
                 .to.be.emit(proposalMock,"LogCreateProposal")
@@ -121,10 +120,10 @@ describe("Abstract Proposal Contract", function () {
             .to.be.revertedWith(revertedMessage.proposal_vote_delay_exist);
         });
 
-        it(revertedMessage.proposal_propose_period_exist, async function () {
+        it(revertedMessage.proposal_vote_period_exist, async function () {
             await expect(proposalMock.connect(signers[0])
-            .setProposePeriod(constants.PROPOSE_PERIOD))
-            .to.be.revertedWith(revertedMessage.proposal_propose_period_exist);
+            .setVotePeriod(constants.VOTE_PERIOD))
+            .to.be.revertedWith(revertedMessage.proposal_vote_period_exist);
         });
 
         it(revertedMessage.proposal_vote_threshold_exist, async function () {
