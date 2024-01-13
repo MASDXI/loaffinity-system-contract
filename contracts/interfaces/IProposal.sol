@@ -47,4 +47,5 @@ interface IProposal {
     function vote(bytes32 proposalId, bool auth) external;
     function votingDeley() external view returns(uint256);
     function votingPeriod() external view returns(uint256);
+    function latestProposal(address account) external view returns(uint256);
 }

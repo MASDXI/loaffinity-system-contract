@@ -88,33 +88,33 @@ abstract contract Proposal is IProposal {
         emit LogVote(proposalId, msg.sender, auth, block.timestamp);
     }
 
-    function _execute(bytes32 proposalId) internal virtual returns (bool) {
+    function _execute(bytes32 proposalId) internal virtual returns (bool success) {
         require(_proposals[proposalId].status == ProposalStatus.PENDING, "proposal: proposal not pending");
         require(_proposals[proposalId].endBlock < block.number,"proposal: are in voting period");
         address proposerCache = _proposals[proposalId].proposer;
         uint16 acceptCache = _proposals[proposalId].accept;
         uint16 rejectCache = _proposals[proposalId].reject;
+        uint256 thresholdCache = (_proposals[proposalId].nVoter * uint256(threshold())) / 100;
 
         _counter[proposerCache]--;
 
-        if (acceptCache == rejectCache) {
-            _proposals[proposalId].status = ProposalStatus.REJECT;
-            emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
-            return false;
-        } else if (acceptCache > rejectCache &&
-            acceptCache >= (_proposals[proposalId].nVoter * uint256(threshold())) / 100) {
-            _pass[proposalId] = true;
-            _proposals[proposalId].status = ProposalStatus.EXECUTE;
-            emit LogProposal(proposalId, block.timestamp, ProposalStatus.EXECUTE);
-            return true;
-        } else if (rejectCache > acceptCache &&
-            rejectCache >= (_proposals[proposalId].nVoter * uint256(threshold())) / 100) {
-            _proposals[proposalId].status = ProposalStatus.REJECT;
-            emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
-            return true;
+        if (acceptCache != rejectCache &&
+           (acceptCache >= thresholdCache || rejectCache >= thresholdCache)) {
+            if (acceptCache > rejectCache) {
+                _pass[proposalId] = true;
+                _proposals[proposalId].status = ProposalStatus.EXECUTE;
+                emit LogProposal(proposalId, block.timestamp, ProposalStatus.EXECUTE);
+                success = true;
+            }
+            if (rejectCache > acceptCache) {
+                _proposals[proposalId].status = ProposalStatus.REJECT;
+                emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
+                success = true;
+            }
         } else {
+            _proposals[proposalId].status = ProposalStatus.REJECT;
             emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
-            return false;
+            success = false;
         }
     }
 
@@ -122,16 +122,19 @@ abstract contract Proposal is IProposal {
         return _voteThreshold;
     }
 
-    function votingDeley() public view virtual override returns(uint256) {
+    function votingDeley() public view override returns(uint256) {
         return _voteDelay;
     }
 
-    function votingPeriod() public view virtual override returns(uint256) {
+    function votingPeriod() public view override returns(uint256) {
         return _votePeriod;
     }
 
-    function proposePeriod() public view virtual override returns(uint32) {
+    function proposePeriod() public view override returns(uint32) {
         return _proposePeriod;
     }
 
+    function latestProposal(address account) public view override returns(uint256) {
+        return _latestProposal[account];
+    }
 }
