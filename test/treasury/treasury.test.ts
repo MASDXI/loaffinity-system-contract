@@ -28,6 +28,12 @@ describe("Supply Control System Contract", function () {
     treasury = contract;
     signers = accounts;
     initializer = initAccount;
+    await fixture.supplycontrol.connect(initializer).initialize(
+      constants.VOTE_DELAY, 
+      constants.VOTE_PERIOD, 
+      constants.PROPOSE_PERIOD, 
+      [fixture.committee1.address], 
+      fixture.committee1.address);
   });
 
   describe("Unit test", function () {
@@ -51,6 +57,7 @@ describe("Supply Control System Contract", function () {
       const { supplycontrol, committee, initializerCallerSigner, committee1, admin, proposer1 } = 
         await loadFixture(setSystemContractFixture);
       await time.setNextBlockTimestamp(timestamp);
+      fixture.supplycontrol.connect(initializer).initialize()
       await committee.connect(initializerCallerSigner).initialize(
         constants.VOTE_DELAY, 
         constants.VOTE_PERIOD, 
