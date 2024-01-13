@@ -15,8 +15,12 @@ abstract contract Initializer {
     }
 
     function _initialized() internal {
-        require(!_init, "initializer: already init");
+        require(!isInit(),"initializer: already init");
         _init = true;
         emit Initialized();
+    }
+
+    function isInit() public view returns (bool) {
+        return _init;
     }
 }
