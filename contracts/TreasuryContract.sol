@@ -65,7 +65,7 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer {
         return address(this).balance - _lockedBalance;
     }
 
-    function getLockBalance() public view returns (uint256){
+    function getLockedBalance() public view returns (uint256){
         return _lockedBalance;
     }
 
