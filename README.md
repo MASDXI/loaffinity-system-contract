@@ -85,5 +85,5 @@ npx hardhat is_agent --help
          proposer can only create proposal every n' block.
 - [] refactoring test
     - [] test abstract class
-- [] update task script
+- [] update and refactor task script
 - [] update readme and documentation

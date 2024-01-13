@@ -34,3 +34,8 @@ import {
     const committee = await ethers.getContractAt("Committee",constants.COMMITTEE_CONTRACT_ADDRESS);
     return { committee, admin , committee1, committee2, committee3, proposer1 , proposer2 , otherAccount, initializerCallerSigner, supplycontrol };
   }
+
+  export async function setUp(contractName: string, params: any) {
+    const { contract } = await ethers.deployContract(contractName, params);
+    return contract;
+  }

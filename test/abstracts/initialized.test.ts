@@ -1,47 +1,56 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { mine, setBalance } from "@nomicfoundation/hardhat-toolbox/network-helpers";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
-
+import { setBalance } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { constants } from "../utils/constants";
+import { revertedMessage } from "../utils/reverted";
 
 async function setup() {
-    const initializedMock = await ethers.deployContract("InitializedMock");
-    const initializer = await ethers.getImpersonatedSigner(constants.INITIALIZER_ADDRESS);
-    const signers = await ethers.getSigners();
-    await setBalance(await initializer.getAddress(),constants.ONE_HUNDRED_TOKEN);
-    return { initializedMock, signers, initializer };
+    const contract = await ethers.deployContract("InitializedMock");
+    const initAccount = await ethers.getImpersonatedSigner(constants.INITIALIZER_ADDRESS);
+    const accounts = await ethers.getSigners();
+    await setBalance(await initAccount.getAddress(), constants.ONE_HUNDRED_TOKEN);
+    return { contract, accounts, initAccount };
 }
 
 describe("Abstract Initialized Contract", function () {
+    
+    let initializedMock: any;
+    let signers: any;
+    let initializer: any
+
+    beforeEach(async function () {
+        const { contract, accounts, initAccount } = await setup();
+        initializedMock = contract;
+        signers = accounts;
+        initializer = initAccount;
+    })
+    
     describe("InitializedMock Contract", async function () {
         it("initializer: isinit false", async function () {
-            const { initializedMock } = await setup();
             const status = await initializedMock.isInit();
             expect(status).to.be.equal(false);
         });
 
         it("initializer: isinit true", async function () {
-            const { initializedMock, initializer } = await setup();
             await initializedMock.connect(initializer).init();
             const status = await initializedMock.isInit();
             expect(status).to.be.equal(true);
         });
 
-        it("initializer: onlyInitializer can call", async function () {
-            const { initializedMock, signers } = await setup();
-            await expect(initializedMock.connect(signers[0]).init()).to.be.revertedWith("initializer: onlyInitializer can call");
+        it(revertedMessage.initializer_only_can_call, async function () {
+            await expect(initializedMock.connect(signers[0]).init())
+                .to.be.revertedWith(revertedMessage.initializer_only_can_call);
         });
 
-        it("initializer: already init", async function () {
-            const { initializedMock, initializer } = await setup();
+        it(revertedMessage.initializer_already_initialized, async function () {
             await initializedMock.connect(initializer).init();
-            await expect(initializedMock.connect(initializer).init()).to.be.revertedWith("initializer: already init");
+            await expect(initializedMock.connect(initializer).init())
+                .to.be.revertedWith(revertedMessage.initializer_already_initialized);
         });
 
         it("initializer: events", async function () {
-            const { initializedMock, initializer } = await setup();
-            await expect(initializedMock.connect(initializer).init()).to.be.emit(initializedMock,"Initialized");
+            await expect(initializedMock.connect(initializer).init())
+                .to.be.emit(initializedMock,"Initialized");
         });
     });
 });

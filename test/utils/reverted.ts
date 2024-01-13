@@ -1,4 +1,5 @@
 export const revertedMessage = {
+    // abstract proposal contract
     proposal_vote_delay_exist: "proposal: this vote delay value already set",
     proposal_vote_period_exist: "proposal: this vote period value already set",
     proposal_vote_threshold_exist: "proposal: this vote threshold value already set",
@@ -11,5 +12,12 @@ export const revertedMessage = {
     proposal_not_start: "proposal: proposal not start",
     proposal_expire: "proposal: proposal expired",
     proposal_not_pending: "proposal: proposal not pending",
-    proposal_voting_period: "proposal: are in voting period"
+    proposal_voting_period: "proposal: are in voting period",
+    // abstract initializer contract
+    initializer_already_initialized: "initializer: already init",
+    initializer_only_can_call: "initializer: onlyInitializer can call"
+    // committee contract
+    // @TODO
+    // treasury contract
+    // @TODO
 }
