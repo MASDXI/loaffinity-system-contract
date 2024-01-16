@@ -9,16 +9,18 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor {
 
     address private _treasury;
 
-    event Ex
+    event Transfer(address indexed account, uint256 amount);
 
     function submitTxGasUsed(uint256 gasUsed, uint256 gasPrice) external returns (bool) {
         address cache = _registry[msg.sender];
+        uint256 amount = calculate(gasUsed, gasPrice);
+        // TODO consider to change to .call instead?
         if (cache != address(0)) {
-            payable(cache).transfer(calculate(gasUsed, gasPrice));
-            emit 
+            payable(cache).transfer(amount);
+            emit Transfer(cache, amount);
         } else {
-            payable(_treasury).transfer(calculate(gasUsed, gasPrice));
-            emit
+            payable(_treasury).transfer(amount);
+            emit Transfer(_treasury, amount);
         }
     }
 

@@ -10,9 +10,12 @@ abstract contract TransactionTransport {
     // interface
     ITransactionFeeDistributor private _txfeedistributor;
 
+    // reference: https://ethereum.github.io/yellowpaper/paper.pdf
+    uint16 private constant Gtransaction = 21_000;
+
     modifier calculatorGasUsed {
         // temporary caching gas used in execution
-        uint256 gasCache = gasleft();
+        uint256 gasCache = gasleft() + Gtransaction;
         _;
         gasCache = gasCache - gasleft();
         _txfeedistributor.submitTxGasUsed(gasCache, tx.gasprice);
