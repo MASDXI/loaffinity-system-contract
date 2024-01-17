@@ -14,10 +14,10 @@ abstract contract TransactionTransport {
     uint16 private constant Gtransaction = 21_000;
 
     modifier calculatorGasUsed {
-        // temporary caching gas used in execution
-        uint256 gasCache = gasleft() + Gtransaction;
+        uint256 gasCache = gasleft();
         _;
-        gasCache = gasCache - gasleft();
+        // caching transaction cost
+        gasCache = gasCache - gasleft() + Gtransaction;
         _txfeedistributor.submitTxGasUsed(gasCache, tx.gasprice);
     }
 
