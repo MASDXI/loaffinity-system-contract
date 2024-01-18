@@ -32,6 +32,7 @@ export async function setSystemContractFixture() {
   // load contract from to address
   const supplycontrol = await ethers.getContractAt("TreasuryContract",constants.SUPPLY_CONTRACT_ADDRESS);
   const committee = await ethers.getContractAt("Committee",constants.COMMITTEE_CONTRACT_ADDRESS);
+  await mine(200);
   return { committee, admin , committee1, committee2, committee3, proposer1 , proposer2 , otherAccount, initializerCallerSigner, supplycontrol };
 }
 

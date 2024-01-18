@@ -114,7 +114,6 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         } else {
             require(isCommittee(account), "committee: propose remove not exist commitee");
         }
-        require((current + votingPeriod()) < blockNumber,"committee: invalid blocknumber");
         require(blockProposal[blockNumber] == bytes32(0),"committee: blocknumber has propose");
         require(blockNumber - block.number <= MAX_FUTURE_BLOCK,"committee: block too future");
 

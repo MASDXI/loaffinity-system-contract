@@ -4,7 +4,6 @@ import { mine } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { constants } from "../utils/constants"
 import { revertedMessage } from "../utils/reverted";
-import { hrtime } from "process";
 
 async function setup(voteDelay: BigInt, votePeriod: BigInt, threshold: BigInt, proposePeriod: BigInt) {
     const contract = await ethers.deployContract("ProposalMock",[voteDelay, votePeriod, threshold, proposePeriod]);
