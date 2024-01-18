@@ -38,9 +38,14 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         _;
     }
 
-    /// @notice initialize the contract instead of constructor.
-    /// @param committees_ array of committee addresses
-    /// @param admin_ root admin address
+    /**
+     * @notice initialize the contract instead of constructor.
+     * @param voteDelay_ waiting period before proposal active
+     * @param votePeriod_ active period of proposal
+     * @param proposePeriod_ waiting period between propose
+     * @param committees_ array of committee addresses
+     * @param admin_ root admin address
+     */
     function initialize(
         uint256 voteDelay_,
         uint256 votePeriod_,

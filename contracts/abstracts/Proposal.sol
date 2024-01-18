@@ -109,7 +109,7 @@ abstract contract Proposal is IProposal {
             if (rejectCache > acceptCache) {
                 _proposals[proposalId].status = ProposalStatus.REJECT;
                 emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
-                success = true;
+                success = false;
             }
         } else {
             _proposals[proposalId].status = ProposalStatus.REJECT;

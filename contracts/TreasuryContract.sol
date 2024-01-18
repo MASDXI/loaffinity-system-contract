@@ -33,6 +33,13 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer {
         _;
     }
 
+    /**
+     * @notice initialize the contract instead of constructor.
+     * @param voteDelay_ waiting period before proposal active
+     * @param votePeriod_ active period of proposal
+     * @param proposePeriod_ waiting period between propose
+     * @param commiteeContractAddress_ committee contract address
+     */
     function initialize (
         uint256 voteDelay_,
         uint256 votePeriod_,
