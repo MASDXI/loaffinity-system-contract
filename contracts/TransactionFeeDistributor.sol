@@ -18,14 +18,15 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor {
      * @param gasPrice
      */
     function submitTxGasUsed(uint256 gasUsed, uint256 gasPrice) external returns (bool) {
-        address cache = _registry[msg.sender];
+        address addressCache = _registry[msg.sender];
         uint256 amount = calculate(gasUsed, gasPrice);
-        // TODO consider to change to .call instead?
-        if (cache != address(0)) {
-            payable(cache).transfer(amount);
-            emit Transfer(cache, amount);
+        if (addressCache != address(0)) {
+            (bool success, ) = payable(addressCache).call{value: amount}("");
+            require(success, "Transfer transaction fee to address failed");
+            emit Transfer(addressCache, amount);
         } else {
-            payable(_treasury).transfer(amount);
+            (bool success, ) = payable(_treasury).call{value: amount}("");
+            require(success, "Transfer transction fee to treasury failed");
             emit Transfer(_treasury, amount);
         }
     }
