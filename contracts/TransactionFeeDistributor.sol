@@ -40,6 +40,8 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor {
      * @notice constant 10 came from tranasction processor in core blockchain that deduct
      * 10 percent of each transaction fee to transaction fee distributor contract address.
      */ 
+    /// @TODO handle case zero gas fee network if node validator set gas price to 0 or
+    /// validator adding config piority_local_rpc and dump gas price to zero 
     function calculate(uint256 gasUsed, uint256 gasPrice) public view returns (uint256) {
         uint256 percentageAmount = ((gasUsed * gasPrice ) * 10 /** constant */) / 100;
         uint256 transactionFee = (percentageAmount * _percentage) / 100;
