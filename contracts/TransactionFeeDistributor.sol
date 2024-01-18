@@ -17,6 +17,9 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor {
      * @param gasUsed
      * @param gasPrice
      */
+    // @TODO change to custom error for gas optimization.
+    // submitTxGasUsed likely to be call by every registered contract at least 1 function
+    // in registered contract
     function submitTxGasUsed(uint256 gasUsed, uint256 gasPrice) external returns (bool) {
         address addressCache = _registry[msg.sender];
         uint256 amount = calculate(gasUsed, gasPrice);
