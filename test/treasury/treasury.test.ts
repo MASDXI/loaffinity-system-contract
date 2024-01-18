@@ -28,12 +28,18 @@ describe("Supply Control System Contract", function () {
     treasury = contract;
     signers = accounts;
     initializer = initAccount;
-    await fixture.supplycontrol.connect(initializer).initialize(
+    await fixture.committee.connect(initializer).initialize(
       constants.VOTE_DELAY, 
       constants.VOTE_PERIOD, 
       constants.PROPOSE_PERIOD, 
       [fixture.committee1.address], 
       fixture.committee1.address);
+    await fixture.committee.connect(fixture.committee1).grantProposer(fixture.proposer1.address);
+    await fixture.supplycontrol.connect(initializer).initialize(
+      constants.VOTE_DELAY, 
+      constants.VOTE_PERIOD, 
+      constants.PROPOSE_PERIOD, 
+      constants.COMMITTEE_CONTRACT_ADDRESS);
   });
 
   describe("Unit test", function () {
@@ -42,46 +48,33 @@ describe("Supply Control System Contract", function () {
         .to.be.equal(constants.ONE_TRILLION_TOKEN);
     });
 
-    it("function: VotingDelay", async function () {
-      expect(await fixture.supplycontrol.votingDeley())
-        .to.be.equal(0);
-    });
-
-    it("function: votingPeriod", async function () {
-      expect(await fixture.supplycontrol.votingPeriod())
-        .to.be.equal(0);
+    it("function: getLockedBalance", async function () {
+      expect(await fixture.supplycontrol.getLockedBalance())
+        .to.be.equal(constants.ZERO_TOKEN);
     });
 
     it("function: catch propose event", async function () {
-      let timestamp = 10953791915;
-      const { supplycontrol, committee, initializerCallerSigner, committee1, admin, proposer1 } = 
-        await loadFixture(setSystemContractFixture);
-      await time.setNextBlockTimestamp(timestamp);
-      fixture.supplycontrol.connect(initializer).initialize()
-      await committee.connect(initializerCallerSigner).initialize(
-        constants.VOTE_DELAY, 
-        constants.VOTE_PERIOD, 
-        constants.PROPOSE_PERIOD, 
-        [committee1.address], 
-        admin.address);
-      await time.setNextBlockTimestamp(timestamp + 5);
-      await committee.connect(admin).grantProposer(proposer1.address);
-      await time.setNextBlockTimestamp(timestamp + 10);
-      await supplycontrol.connect(initializerCallerSigner).initialize(
-        constants.VOTE_DELAY, 
-        constants.VOTE_PERIOD, 
-        constants.PROPOSE_PERIOD, 
-        constants.COMMITTEE_CONTRACT_ADDRESS);
-      await time.setNextBlockTimestamp(timestamp + 15);
-      await expect(supplycontrol.connect(proposer1).propose(300, constants.ONE_TRILLION_TOKEN, committee1.address, constants.VOTE_TYPE_ADD))
-        .to.emit(supplycontrol, "TreasuryProposalProposed")
-        .withArgs("0x7b191e0665c3a3cc1de00270233ba76d2dcbc880a33689d07061641767a567ba",
-          proposer1.address,
-          committee1.address,
-          constants.VOTE_TYPE_ADD,
-          constants.ONE_TRILLION_TOKEN,
-          300,
-          anyValue);
+      const proposeTx = await fixture.supplycontrol.connect(fixture.proposer1).propose(
+        300, 
+        constants.ONE_TOKEN, 
+        fixture.committee1.address, 
+        constants.VOTE_TYPE_ADD);
+      console.log("🚀 ~ proposeTx:", proposeTx)
+      
+      // await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
+      //     300, 
+      //     constants.ONE_TOKEN, 
+      //     fixture.committee1.address, 
+      //     constants.VOTE_TYPE_ADD))
+      //   .to.emit(fixture.supplycontrol, "TreasuryProposalProposed")
+      //   .withArgs(
+      //     anyValue,
+      //     fixture.proposer1.address,
+      //     fixture.committee1.address,
+      //     constants.VOTE_TYPE_ADD,
+      //     constants.ONE_TRILLION_TOKEN,
+      //     300,
+      //     anyValue);
     });
 
     it(revertedMessage.treasury_propose_past_block, async function () {

@@ -13,14 +13,11 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor {
 
     uint8 private _percentage = 100;
 
-    /**
-     * @param gasUsed
-     * @param gasPrice
-     */
-    // @TODO change to custom error for gas optimization.
+
+    // TODO change to custom error for gas optimization.
     // submitTxGasUsed likely to be call by every registered contract at least 1 function
     // in registered contract
-    function submitTxGasUsed(uint256 gasUsed, uint256 gasPrice) external returns (bool) {
+    function submitTxGasUsed(uint256 gasUsed, uint256 gasPrice) external {
         address addressCache = _registry[msg.sender];
         uint256 amount = calculate(gasUsed, gasPrice);
         if (addressCache != address(0)) {
@@ -40,7 +37,7 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor {
      * @notice constant 10 came from tranasction processor in core blockchain that deduct
      * 10 percent of each transaction fee to transaction fee distributor contract address.
      */ 
-    /// @TODO handle case zero gas fee network if node validator set gas price to 0 or
+    /// TODO handle case zero gas fee network if node validator set gas price to 0 or
     /// validator adding config piority_local_rpc and dump gas price to zero 
     function calculate(uint256 gasUsed, uint256 gasPrice) public view returns (uint256) {
         uint256 percentageAmount = ((gasUsed * gasPrice ) * 10 /** constant */) / 100;

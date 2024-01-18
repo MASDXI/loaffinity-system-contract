@@ -21,13 +21,13 @@ abstract contract TransactionTransport {
         _txfeedistributor.submitTxGasUsed(gasCache, tx.gasprice);
     }
 
-    function _setTxFeeDistributor(ITransactionFeeDistributor _new) external {
+    function _setTxFeeDistributor(ITransactionFeeDistributor _new) internal {
         require(_new != txfeedistributor(),"transaction: tx feedistributor already set");
         _txfeedistributor = _new;
         emit TransportUpdated(_new);
     }
 
-    function txfeedistributor() public view returns (ITransactionFeeDistributor memory) {
+    function txfeedistributor() public view returns (ITransactionFeeDistributor) {
         return _txfeedistributor;
     }
 }
