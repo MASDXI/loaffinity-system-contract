@@ -11,6 +11,12 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor {
 
     event Transfer(address indexed account, uint256 amount);
 
+    uint8 private _percentage = 100;
+
+    /**
+     * @param gasUsed
+     * @param gasPrice
+     */
     function submitTxGasUsed(uint256 gasUsed, uint256 gasPrice) external returns (bool) {
         address cache = _registry[msg.sender];
         uint256 amount = calculate(gasUsed, gasPrice);
@@ -24,9 +30,16 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor {
         }
     }
 
+    /**
+     * @param gasUsed
+     * @param gasPrice
+     * @notice constant 10 came from tranasction processor in core blockchain that deduct
+     * 10 percent of each transaction fee to transaction fee distributor contract address.
+     */ 
     function calculate(uint256 gasUsed, uint256 gasPrice) public view returns (uint256) {
-        // TODO adding more advance logic here.
-        return gasUsed * gasPrice;
+        uint256 percentageAmount = ((gasUsed * gasPrice ) * 10 /** constant */) / 100;
+        uint256 transactionFee = (percentageAmount * _percentage) / 100;
+        return transactionFee;
     }
 
     function onboardMerchant(address merchant) external returns (bool) {
