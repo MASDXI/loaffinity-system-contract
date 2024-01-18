@@ -54,6 +54,7 @@ describe("Supply Control System Contract", function () {
     });
 
     it("function: catch propose event", async function () {
+      await ethers.provider.getBlockNumber();
       const proposeTx = await fixture.supplycontrol.connect(fixture.proposer1).propose(
         300, 
         constants.ONE_TOKEN, 
