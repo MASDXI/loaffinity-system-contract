@@ -1,19 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+import "./abstracts/NativeTransfer.sol";
 import "./interfaces/ITransactionFeeDistributor.sol";
 
-contract TransactionFeeDistributor is ITransactionFeeDistributor {
+contract TransactionFeeDistributor is ITransactionFeeDistributor,  NativeTransfer {
 
     mapping(address => address) private _registry;
 
     address private _treasury;
 
-    event Transfer(address indexed account, uint256 amount);
-
     uint8 private _percentage = 100;
-
-    error TransferFailed();
 
     /**
      * @param gasUsed gasUsed of transaction.
@@ -24,25 +21,12 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor {
         uint256 amount = calculate(gasUsed, gasPrice);
         if (amount != 0) {
             if (addressCache != address(0)) {
-                _transfer(addressCache, amount);
+                _transferEther(addressCache, amount);
             } else {
-                _transfer(_treasury, amount);
+                _transferEther(_treasury, amount);
             }
         } else {
             return;
-        }
-    }
-     
-    /**
-     * @param account recipient address.
-     * @param amount amount of native token.
-     */
-    function _transfer(address account, uint256 amount) private {
-        (bool success, ) = payable(account).call{value: amount}("");
-        if (success) {
-            emit Transfer(account, amount);
-        } else {
-            revert TransferFailed();
         }
     }
 

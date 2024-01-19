@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+import "./abstracts/NativeTransfer.sol";
 import "./abstracts/Proposal.sol";
 import "./abstracts/Initializer.sol";
 import "./interfaces/ICommittee.sol";
 import "./interfaces/ITreasury.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
-contract TreasuryContract is ITreasury ,Proposal, Initializer {
+contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
 
     uint256 private _lockedBalance;
     uint16 private constant MAX_FUTURE_BLOCK = type(uint16).max;
@@ -85,15 +86,15 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer {
         uint256 current = block.number;
         require(amount > 0, "treasury: invalid amount");
         require(amount <= getAvailableBalance(),"treasury: amount exceed");
+        require(blockNumber - current <= MAX_FUTURE_BLOCK,"treasury: block too future");
+        require(blockProposal[blockNumber] == bytes32(0),"treasury: blocknumber has propose");
         require(current < blockNumber, "treasury: propose past block");
+        require((current + votingPeriod()) < blockNumber,"treasury: invalid blocknumber");
         if (proposeType == ProposalType.RELEASED) {
             require(account != address(0), "treasury: propose released to zero address");
         } else {
             require(account == address(0), "treasury: propose locked to non-zero address");
         }
-        require((current + votingPeriod()) < blockNumber,"treasury: invalid blocknumber");
-        require(blockProposal[blockNumber] == bytes32(0),"treasury: blocknumber has propose");
-        require(blockNumber - current <= MAX_FUTURE_BLOCK,"treasury: block too future");
 
         _lockedBalance += amount;
 
@@ -119,10 +120,10 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer {
         uint256 timeCache = block.timestamp;
         if (callback) {
             if (data.proposeType == ProposalType.RELEASED) {
-                payable(data.recipient).transfer(data.amount);
+                _transferEther(data.recipient, data.amount);
                 emit TreasuryProposalExecuted(IdCache, ProposalType.RELEASED, data.recipient, data.amount, timeCache);
             } else {
-                payable(address(0)).transfer(data.amount);
+                _transferEther(address(0), data.amount);
                 emit TreasuryProposalExecuted(IdCache, ProposalType.LOCKED, data.recipient, data.amount, timeCache);
             }
         } else {
