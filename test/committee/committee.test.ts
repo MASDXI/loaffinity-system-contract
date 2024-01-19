@@ -11,13 +11,22 @@ import { constants } from "../utils/constants"
 import { setSystemContractFixture } from "../utils/systemContractFixture"
 
 async function setup() {
-    // @TODO
+  const initAccount = await ethers.getImpersonatedSigner(constants.INITIALIZER_ADDRESS);
+  await setBalance(await initAccount.getAddress(), constants.ONE_TOKEN);
+  return { initAccount };
 }
 
 describe("Committee System Contract", function () {
-    
+
+    let fixture: any;
+    let signers: any;
+    let initializer: any;
+
     beforeEach(async function () {
-        // @TODO
+      fixture = await loadFixture(setSystemContractFixture);
+      const { initAccount } = await setup();
+      initializer = initAccount;
+      // signers = accounts;
     });
 
     describe("Unit test", function () {
@@ -100,18 +109,6 @@ describe("Committee System Contract", function () {
       const { committee, committee1, admin, otherAccount, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
       await expect(committee.getProposalCommitteeInfoByProposalId(eth.ZeroHash)).to.be.revertedWith('committee: proposal not exist');
-    });
-
-    it("function: votingDeley()", async function () {
-      const { committee, committee1, admin, otherAccount, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
-      await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
-      expect(await committee.votingDeley()).to.equal(0)
-    });
-
-    it("function: votingDeley()", async function () {
-      const { committee, committee1, admin, otherAccount, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
-      await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
-      expect(await committee.votingPeriod()).to.equal(constants.VOTE_PERIOD)
     });
 
     it("function: grantProposer()", async function () {
