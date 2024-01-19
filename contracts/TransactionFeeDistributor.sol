@@ -13,38 +13,51 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor {
 
     uint8 private _percentage = 100;
 
+    error TransferFailed();
+
+    /**
+     * @param gasUsed gasUsed of transaction.
+     * @param gasPrice gasPrice of tranaction.
+     */
     function submitTxGasUsed(uint256 gasUsed, uint256 gasPrice) external {
-        // TODO change to custom error for gas optimization.
-        // submitTxGasUsed likely to be call by every registered contract at least 1 function
-        // in registered contract
         address addressCache = _registry[msg.sender];
         uint256 amount = calculate(gasUsed, gasPrice);
         if (amount != 0) {
             if (addressCache != address(0)) {
-                (bool success, ) = payable(addressCache).call{value: amount}("");
-                require(success, "Transfer transaction fee to address failed");
-                emit Transfer(addressCache, amount);
+                _transfer(addressCache, amount);
             } else {
-                (bool success, ) = payable(_treasury).call{value: amount}("");
-                require(success, "Transfer transction fee to treasury failed");
-                emit Transfer(_treasury, amount);
+                _transfer(_treasury, amount);
             }
         } else {
             return;
         }
     }
+     
+    /**
+     * @param account recipient address.
+     * @param amount amount of native token.
+     */
+    function _transfer(address account, uint256 amount) private {
+        (bool success, ) = payable(account).call{value: amount}("");
+        if (success) {
+            emit Transfer(account, amount);
+        } else {
+            revert TransferFailed();
+        }
+    }
 
     /**
-     * @param gasUsed gasUsde of tx
-     * @param gasPrice gasPrice of tx
+     * @param gasUsed gasUsed of transaction.
+     * @param gasPrice gasPrice of tranaction.
+     * @return transactionCost cost of transaction
      * @notice constant 10 came from tranasction processor in core blockchain that deduct
      * 10 percent of each transaction fee to transaction fee distributor contract address.
      */ 
-    function calculate(uint256 gasUsed, uint256 gasPrice) public view returns (uint256) {
+    function calculate(uint256 gasUsed, uint256 gasPrice) public view returns (uint256 transactionCost) {
         if (gasPrice != 0) {
             uint256 percentageAmount = ((gasUsed * gasPrice ) * 10 /** constant */) / 100;
-            uint256 transactionFee = (percentageAmount * _percentage) / 100;
-            return transactionFee;
+            transactionCost = (percentageAmount * _percentage) / 100;
+            return transactionCost;
         } else {
             return 0;
         }
