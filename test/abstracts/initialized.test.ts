@@ -28,29 +28,29 @@ describe("Abstract Initialized Contract", function () {
     describe("InitializedMock Contract", async function () {
         it("initializer: isinit false", async function () {
             const status = await initializedMock.isInit();
-            expect(status).to.be.equal(false);
+            expect(status).to.equal(false);
         });
 
         it("initializer: isinit true", async function () {
             await initializedMock.connect(initializer).init();
             const status = await initializedMock.isInit();
-            expect(status).to.be.equal(true);
+            expect(status).to.equal(true);
         });
 
         it(revertedMessage.initializer_only_can_call, async function () {
             await expect(initializedMock.connect(signers[0]).init())
-                .to.be.revertedWith(revertedMessage.initializer_only_can_call);
+                .to.revertedWith(revertedMessage.initializer_only_can_call);
         });
 
         it(revertedMessage.initializer_already_initialized, async function () {
             await initializedMock.connect(initializer).init();
             await expect(initializedMock.connect(initializer).init())
-                .to.be.revertedWith(revertedMessage.initializer_already_initialized);
+                .to.revertedWith(revertedMessage.initializer_already_initialized);
         });
 
         it("initializer: events", async function () {
             await expect(initializedMock.connect(initializer).init())
-                .to.be.emit(initializedMock,"Initialized");
+                .to.emit(initializedMock,"Initialized");
         });
     });
 });

@@ -14,7 +14,7 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor,  NativeTransfe
 
     /**
      * @param gasUsed gasUsed of transaction.
-     * @param gasPrice gasPrice of tranaction.
+     * @param gasPrice gasPrice of transaction.
      */
     function submitTxGasUsed(uint256 gasUsed, uint256 gasPrice) external {
         address addressCache = _registry[msg.sender];

@@ -46,7 +46,7 @@ describe("Abstract Proposal Contract", function () {
 
         it("test event create", async function () {
             await expect(proposalMock.connect(signers[0]).propose(1, 1))
-                .to.be.emit(proposalMock,"LogCreateProposal")
+                .to.emit(proposalMock,"LogCreateProposal")
                 .withArgs(anyValue, anyValue, signers[0].getAddress);
         });
 
@@ -55,7 +55,7 @@ describe("Abstract Proposal Contract", function () {
             const proposalId = await proposalMock.blockProposal(constants.PROPOSE_PERIOD);
             await mine(constants.VOTE_DELAY);
             await expect(proposalMock.connect(signers[0]).vote(proposalId, true))
-                .to.be.emit(proposalMock,"LogVote")
+                .to.emit(proposalMock,"LogVote")
                 .withArgs(anyValue, anyValue, true, anyValue);
         });
 
@@ -68,7 +68,7 @@ describe("Abstract Proposal Contract", function () {
             await mine(constants.VOTE_PERIOD);
             await expect(proposalMock.connect(signers[0])
                 .execute(constants.PROPOSE_PERIOD))
-                .to.be.emit(proposalMock,"LogProposal")
+                .to.emit(proposalMock,"LogProposal")
                 .withArgs(anyValue, anyValue, 1);
         });
 
@@ -81,7 +81,7 @@ describe("Abstract Proposal Contract", function () {
             await mine(constants.VOTE_PERIOD);
             await expect(proposalMock.connect(signers[0])
                 .execute(constants.PROPOSE_PERIOD))
-                .to.be.emit(proposalMock,"LogProposal")
+                .to.emit(proposalMock,"LogProposal")
                 .withArgs(anyValue, anyValue, 2);
         });
 
@@ -95,7 +95,7 @@ describe("Abstract Proposal Contract", function () {
             await mine(constants.VOTE_PERIOD);
             await expect(proposalMock.connect(signers[0])
                 .execute(constants.PROPOSE_PERIOD))
-                .to.be.emit(proposalMock,"LogProposal")
+                .to.emit(proposalMock,"LogProposal")
                 .withArgs(anyValue, anyValue, 2);
         });
 
@@ -109,7 +109,7 @@ describe("Abstract Proposal Contract", function () {
             await mine(constants.VOTE_PERIOD);
             await expect(proposalMock.connect(signers[0])
                 .execute(constants.PROPOSE_PERIOD))
-                .to.be.emit(proposalMock,"LogProposal")
+                .to.emit(proposalMock,"LogProposal")
                 .withArgs(anyValue, anyValue, 2);
         });
 
@@ -123,7 +123,7 @@ describe("Abstract Proposal Contract", function () {
             await mine(constants.VOTE_PERIOD);
             await expect(proposalMock.connect(signers[0])
                 .execute(constants.PROPOSE_PERIOD))
-                .to.be.emit(proposalMock,"LogProposal")
+                .to.emit(proposalMock,"LogProposal")
                 .withArgs(anyValue, anyValue, 2);
         });
 
@@ -137,32 +137,32 @@ describe("Abstract Proposal Contract", function () {
             await mine(constants.VOTE_PERIOD);
             await expect(proposalMock.connect(signers[0])
                 .execute(constants.PROPOSE_PERIOD))
-                .to.be.emit(proposalMock,"LogProposal")
+                .to.emit(proposalMock,"LogProposal")
                 .withArgs(anyValue, anyValue, 2);
         });
         
         it(revertedMessage.proposal_vote_delay_exist, async function () {
             await expect(proposalMock.connect(signers[0])
                 .setVoteDelay(constants.VOTE_DELAY))
-                .to.be.revertedWith(revertedMessage.proposal_vote_delay_exist);
+                .to.revertedWith(revertedMessage.proposal_vote_delay_exist);
         });
 
         it(revertedMessage.proposal_vote_period_exist, async function () {
             await expect(proposalMock.connect(signers[0])
                 .setVotePeriod(constants.VOTE_PERIOD))
-                .to.be.revertedWith(revertedMessage.proposal_vote_period_exist);
+                .to.revertedWith(revertedMessage.proposal_vote_period_exist);
         });
 
         it(revertedMessage.proposal_vote_threshold_exist, async function () {
             await expect(proposalMock.connect(signers[0])
                 .setVoteThreshold(constants.VOTE_THREADSHOLD))
-                .to.be.revertedWith(revertedMessage.proposal_vote_threshold_exist);
+                .to.revertedWith(revertedMessage.proposal_vote_threshold_exist);
         });
 
         it(revertedMessage.proposal_propose_period_exist, async function () {
             await expect(proposalMock.connect(signers[0])
                 .setProposePeriod(constants.PROPOSE_PERIOD))
-                .to.be.revertedWith(revertedMessage.proposal_propose_period_exist);
+                .to.revertedWith(revertedMessage.proposal_propose_period_exist);
         });
 
         it(revertedMessage.proposal_vote_threshold_min, async function () {
@@ -171,7 +171,7 @@ describe("Abstract Proposal Contract", function () {
             constants.VOTE_PERIOD,
             constants.ZERO,
             constants.PROPOSE_PERIOD);
-            await expect(deploy).to.be.revertedWith(revertedMessage.proposal_vote_threshold_min);
+            await expect(deploy).to.revertedWith(revertedMessage.proposal_vote_threshold_min);
         });
 
         it(revertedMessage.proposal_vote_threshold_max, async function () {
@@ -180,7 +180,7 @@ describe("Abstract Proposal Contract", function () {
             constants.VOTE_PERIOD,
             constants.VOTE_THREADSHOLD_EXCEED,
             constants.PROPOSE_PERIOD);
-            await expect(deploy).to.be.revertedWith(revertedMessage.proposal_vote_threshold_max);
+            await expect(deploy).to.revertedWith(revertedMessage.proposal_vote_threshold_max);
         });
 
         it(revertedMessage.proposal_already_exists, async function () {
@@ -188,15 +188,15 @@ describe("Abstract Proposal Contract", function () {
             await proposalMock.connect(signers[0]).propose(constants.PROPOSE_PERIOD, 1);
             await expect(proposalMock.connect(signers[0])
                 .propose(constants.PROPOSE_PERIOD, 1))
-                .to.be.revertedWith(revertedMessage.proposal_already_exists);
+                .to.revertedWith(revertedMessage.proposal_already_exists);
         });
 
         it(revertedMessage.proposal_propose_too_soon, async function () {
             await expect(proposalMock.connect(signers[0]).propose(1, 1))
-            .to.be.emit(proposalMock,"LogCreateProposal")
+            .to.emit(proposalMock,"LogCreateProposal")
             .withArgs(anyValue, anyValue, signers[0].getAddress);
             await expect(proposalMock.connect(signers[0]).propose(2, 1))
-            .to.be.revertedWith(revertedMessage.proposal_propose_too_soon)
+            .to.revertedWith(revertedMessage.proposal_propose_too_soon)
         });
 
         it(revertedMessage.proposal_vote_not_exist, async function () {
@@ -205,7 +205,7 @@ describe("Abstract Proposal Contract", function () {
             const randomProposalId = ethers.randomBytes(32);
             await expect(proposalMock.connect(signers[0])
                 .vote(randomProposalId, true))
-                .to.be.revertedWith(revertedMessage.proposal_vote_not_exist);
+                .to.revertedWith(revertedMessage.proposal_vote_not_exist);
         });
 
         it(revertedMessage.proposal_vote_twice, async function () {
@@ -215,7 +215,7 @@ describe("Abstract Proposal Contract", function () {
             await proposalMock.connect(signers[0]).vote(proposalId, true);
             await expect(proposalMock.connect(signers[0])
                 .vote(proposalId, true))
-                .to.be.revertedWith(revertedMessage.proposal_vote_twice);
+                .to.revertedWith(revertedMessage.proposal_vote_twice);
         });
 
         it(revertedMessage.proposal_not_start, async function () {
@@ -223,7 +223,7 @@ describe("Abstract Proposal Contract", function () {
             const proposalId = await proposalMock.blockProposal(constants.PROPOSE_PERIOD);;
             await expect(proposalMock.connect(signers[0])
                 .vote(proposalId, true))
-                .to.be.revertedWith(revertedMessage.proposal_not_start);
+                .to.revertedWith(revertedMessage.proposal_not_start);
         });
 
         it(revertedMessage.proposal_expire, async function () {
@@ -232,7 +232,7 @@ describe("Abstract Proposal Contract", function () {
             await mine(constants.VOTE_DELAY + constants.VOTE_PERIOD)
             await expect(proposalMock.connect(signers[0])
                 .vote(proposalId, true))
-                .to.be.revertedWith(revertedMessage.proposal_expire);
+                .to.revertedWith(revertedMessage.proposal_expire);
         });
 
         it(revertedMessage.proposal_voting_period, async function () {
@@ -242,7 +242,7 @@ describe("Abstract Proposal Contract", function () {
             await proposalMock.connect(signers[0]).vote(proposalId, true);
             await expect(proposalMock.connect(signers[0])
                 .execute(constants.PROPOSE_PERIOD))
-                .to.be.revertedWith(revertedMessage.proposal_voting_period);
+                .to.revertedWith(revertedMessage.proposal_voting_period);
         });
 
         it(revertedMessage.proposal_not_pending, async function () {
@@ -254,7 +254,7 @@ describe("Abstract Proposal Contract", function () {
             await proposalMock.connect(signers[0]).execute(constants.PROPOSE_PERIOD);
             await expect(proposalMock.connect(signers[0])
                 .execute(constants.PROPOSE_PERIOD))
-                .to.be.revertedWith(revertedMessage.proposal_not_pending);
+                .to.revertedWith(revertedMessage.proposal_not_pending);
         });
 
         it(revertedMessage.proposal_max_stack, async function () {
@@ -265,7 +265,7 @@ describe("Abstract Proposal Contract", function () {
             }
             await expect(proposalMock.connect(signers[0])
                 .propose(maxuint8, 1))
-                .to.be.revertedWith(revertedMessage.proposal_max_stack);
+                .to.revertedWith(revertedMessage.proposal_max_stack);
         });
     });
 });

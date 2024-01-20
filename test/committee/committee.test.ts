@@ -59,12 +59,12 @@ describe("Committee System Contract", function () {
     it("function: intialized()", async function () {
       const { committee, committee1, admin, otherAccount, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await expect(committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address)).to.emit(committee, "Initialized");
-      await expect(committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address)).to.be.revertedWith("initializer: already init")
+      await expect(committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address)).to.revertedWith("initializer: already init")
     });
 
     it("function: intialized() fail", async function () {
       const { committee, committee1, admin} = await loadFixture(setSystemContractFixture);
-      await expect(committee.connect(admin).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address)).to.be.revertedWith("initializer: onlyInitializer can call")
+      await expect(committee.connect(admin).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address)).to.revertedWith("initializer: onlyInitializer can call")
     });
 
     it("function: IsCommittee()", async function () {
@@ -102,13 +102,13 @@ describe("Committee System Contract", function () {
     it("function: getProposalCommitteeInfoByBlockNumber()", async function () {
       const { committee, committee1, admin, otherAccount, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
-      await expect(committee.getProposalCommitteeInfoByBlockNumber(0)).to.be.revertedWith('committee: proposal not exist');
+      await expect(committee.getProposalCommitteeInfoByBlockNumber(0)).to.revertedWith('committee: proposal not exist');
     });
 
     it("function: getProposalCommitteeInfoByProposalId()", async function () {
       const { committee, committee1, admin, otherAccount, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
-      await expect(committee.getProposalCommitteeInfoByProposalId(eth.ZeroHash)).to.be.revertedWith('committee: proposal not exist');
+      await expect(committee.getProposalCommitteeInfoByProposalId(eth.ZeroHash)).to.revertedWith('committee: proposal not exist');
     });
 
     it("function: grantProposer()", async function () {
@@ -121,7 +121,7 @@ describe("Committee System Contract", function () {
     it("function: grantProposer()", async function () {
       const { committee, committee1, admin, proposer1, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
-      await expect(committee.connect(committee1).grantProposer(proposer1.address)).to.be.revertedWith("committee: onlyAdmin can call")
+      await expect(committee.connect(committee1).grantProposer(proposer1.address)).to.revertedWith("committee: onlyAdmin can call")
     });
 
     it("function: revokeProposer()", async function () {
@@ -136,7 +136,7 @@ describe("Committee System Contract", function () {
       const { committee, committee1, admin, proposer1, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address)
-      await expect(committee.connect(committee1).revokeProposer(proposer1.address)).to.be.revertedWith("committee: onlyAdmin can call")
+      await expect(committee.connect(committee1).revokeProposer(proposer1.address)).to.revertedWith("committee: onlyAdmin can call")
     });
 
 
@@ -144,19 +144,19 @@ describe("Committee System Contract", function () {
       const { committee, committee1, admin, proposer1, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address)
-      await expect(committee.connect(admin).grantProposer(proposer1.address)).to.be.revertedWith("committee: grant exist proposer address");
+      await expect(committee.connect(admin).grantProposer(proposer1.address)).to.revertedWith("committee: grant exist proposer address");
     });
 
     it("function: revokeProposer()", async function () {
       const { committee, committee1, admin, proposer1, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
-      await expect(committee.connect(admin).revokeProposer(proposer1.address)).to.be.revertedWith("committee: revoke non proposer address");
+      await expect(committee.connect(admin).revokeProposer(proposer1.address)).to.revertedWith("committee: revoke non proposer address");
     });
 
     it("function: propose() grant", async function () {
       const { committee, committee1, committee2, admin, proposer1, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
-      await expect(committee.connect(proposer1).propose(300, committee2.address, 1)).to.be.revertedWith("committee: onlyProposer can call")
+      await expect(committee.connect(proposer1).propose(300, committee2.address, 1)).to.revertedWith("committee: onlyProposer can call")
     });
 
     it("function: propose() grant", async function () {
@@ -189,8 +189,8 @@ describe("Committee System Contract", function () {
       // console.log("🚀 ~ file: Committee.test.ts:175 ~ object:", object)
       const ret = await committee.getProposalCommitteeInfoByProposalId(proposalId);
       expect(ret.proposer).to.equal(proposer1.address);
-      expect(ret.commitee).to.be.equal(committee1.address);
-      expect(ret.blockNumber).to.be.equal(300);
+      expect(ret.commitee).to.equal(committee1.address);
+      expect(ret.blockNumber).to.equal(300);
     });
 
     it("function: propose()", async function () {
@@ -198,7 +198,7 @@ describe("Committee System Contract", function () {
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address);
       await committee.connect(proposer1).propose(300, committee2.address, 1);
-      await expect(committee.connect(proposer1).propose(300, committee2.address, 1)).to.be.revertedWith('proposal: proposalId already exists')
+      await expect(committee.connect(proposer1).propose(300, committee2.address, 1)).to.revertedWith('proposal: proposalId already exists')
     });
 
     
@@ -206,28 +206,28 @@ describe("Committee System Contract", function () {
       const { committee, committee1, committee2, admin, proposer1, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address);
-      await expect(committee.connect(proposer1).propose(300, committee1.address, 1)).to.be.revertedWith('committee: propose add existing committee')
+      await expect(committee.connect(proposer1).propose(300, committee1.address, 1)).to.revertedWith('committee: propose add existing committee')
     });
 
     it("function: propose()", async function () {
       const { committee, committee1, committee2, admin, proposer1, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address);
-      await expect(committee.connect(proposer1).propose(300, committee2.address, 0)).to.be.revertedWith('committee: propose remove not exist commitee')
+      await expect(committee.connect(proposer1).propose(300, committee2.address, 0)).to.revertedWith('committee: propose remove not exist commitee')
     });
 
     it("function: propose()", async function () {
       const { committee, committee1, committee2, admin, proposer1, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address);
-      await expect(committee.connect(proposer1).propose(300, eth.ZeroAddress, 1)).to.be.revertedWith('committee: propose zero address')
+      await expect(committee.connect(proposer1).propose(300, eth.ZeroAddress, 1)).to.revertedWith('committee: propose zero address')
     });
 
     it("function: propose()", async function () {
       const { committee, committee1, committee2, admin, proposer1, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address);
-      await expect(committee.connect(proposer1).propose(230, committee2.address, 1)).to.be.revertedWith('committee: invalid blocknumber')
+      await expect(committee.connect(proposer1).propose(230, committee2.address, 1)).to.revertedWith('committee: invalid blocknumber')
     });
 
     it("function: propose()", async function () {
@@ -235,7 +235,7 @@ describe("Committee System Contract", function () {
       const blockNumber = await time.latestBlock()
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
       await committee.connect(admin).grantProposer(proposer1.address);
-      await expect(committee.connect(proposer1).propose(blockNumber, committee2.address, 1)).to.be.revertedWith('committee: propose past block')
+      await expect(committee.connect(proposer1).propose(blockNumber, committee2.address, 1)).to.revertedWith('committee: propose past block')
     });
 
     it("function: execute() fail", async function () {
@@ -256,13 +256,13 @@ describe("Committee System Contract", function () {
     it("function: execute() fail not exist", async function () {
       const { committee, committee1, committee2, admin, proposer1, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
-      await expect(committee.connect(initializerCallerSigner).execute(300)).to.be.revertedWith("committee: proposal not exist");
+      await expect(committee.connect(initializerCallerSigner).execute(300)).to.revertedWith("committee: proposal not exist");
     });
 
     it("function: execute() fail not system address", async function () {
       const { committee, committee1, committee2, admin, proposer1, initializerCallerSigner} = await loadFixture(setSystemContractFixture);
       await committee.connect(initializerCallerSigner).initialize(constants.ZERO, constants.VOTE_PERIOD, constants.PROPOSE_PERIOD, [committee1.address], admin.address);
-      await expect(committee.connect(admin).execute(300)).to.be.revertedWith("initializer: onlyInitializer can call");
+      await expect(committee.connect(admin).execute(300)).to.revertedWith("initializer: onlyInitializer can call");
     });
 
     it("function: execute() success", async function () {

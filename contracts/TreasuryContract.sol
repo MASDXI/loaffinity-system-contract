@@ -86,15 +86,15 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
         uint256 current = block.number;
         require(amount > 0, "treasury: invalid amount");
         require(amount <= getAvailableBalance(),"treasury: amount exceed");
-        require(blockNumber - current <= MAX_FUTURE_BLOCK,"treasury: block too future");
-        require(blockProposal[blockNumber] == bytes32(0),"treasury: blocknumber has propose");
         require(current < blockNumber, "treasury: propose past block");
-        require((current + votingPeriod()) < blockNumber,"treasury: invalid blocknumber");
         if (proposeType == ProposalType.RELEASED) {
             require(account != address(0), "treasury: propose released to zero address");
         } else {
             require(account == address(0), "treasury: propose locked to non-zero address");
         }
+        require((current + votingPeriod()) < blockNumber,"treasury: invalid blocknumber");
+        require(blockProposal[blockNumber] == bytes32(0),"treasury: blocknumber has propose");
+        require(blockNumber - current <= MAX_FUTURE_BLOCK,"treasury: block too future");
 
         _lockedBalance += amount;
 
