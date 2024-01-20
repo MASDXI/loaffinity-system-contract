@@ -18,8 +18,23 @@ export const revertedMessage = {
     // abstract initializer contract
     initializer_already_initialized: "initializer: already init",
     initializer_only_can_call: "initializer: onlyInitializer can call",
+    // abstract transaction transaport contract
+    // TODO
     // committee contract
-    // @TODO
+    commitee_only_agent_can_call: "committee: onlyAgent can call",
+    commitee_only_committee_can_call: "committee: onlyCommittee can call",
+    commitee_only_proposer_can_call: "committee: onlyProposer can call",
+    commitee_propose_past_block:" committee: propose past block",
+    commitee_propose_zero_address: "committee: propose zero address",
+    commitee_propose_invalid_block: "committee: invalid blocknumber",
+    commitee_propose_too_future: "committee: block too future",
+    commitee_propose_add_exist_address: "committee: propose add existing committee",
+    commitee_propose_remove_non_exist_address: "committee: propose remove not exist commitee",
+    commitee_propose_to_exist_block: "committee: blocknumber has propose",
+    commitee_grant_exist_agent: "committee: grant exist agent address",
+    commitee_revoke_non_exist_agent: "committee: revoke non agent address",
+    commitee_grant_exist_proposer: "committee: grant exist proposer address",
+    commitee_revoke_non_exist_proposer: "committee: revoke non proposer address",
     // treasury contract
     treasury_proposal_not_exist: "treasury: proposal not exist",
     treasury_propose_past_block: "treasury: propose past block",
@@ -30,4 +45,6 @@ export const revertedMessage = {
     treasury_propose_locked_to_non_zero_address: "treasury: propose locked to non-zero address",
     treasury_propose_to_exist_block: "treasury: blocknumber has propose",
     treasury_propose_too_future: "treasury: block too future",
+    // transaction fee distributor contract
+    // TODO
 }

@@ -20,7 +20,7 @@ async function targetBlock() {
   return targetBlock;
 }
 
-describe("Supply Control System Contract", function () {
+describe("Treasury System Contract", function () {
 
   let fixture: any;
   let signers: any;

@@ -44,13 +44,13 @@ describe("Abstract Proposal Contract", function () {
             expect(latestProposal).to.equal(0);
         });
 
-        it("test event create", async function () {
+        it("proposal: event create", async function () {
             await expect(proposalMock.connect(signers[0]).propose(1, 1))
                 .to.emit(proposalMock,"LogCreateProposal")
                 .withArgs(anyValue, anyValue, signers[0].getAddress);
         });
 
-        it("test event vote", async function () {
+        it("proposal: event vote", async function () {
             await proposalMock.connect(signers[0]).propose(constants.PROPOSE_PERIOD, 1);
             const proposalId = await proposalMock.blockProposal(constants.PROPOSE_PERIOD);
             await mine(constants.VOTE_DELAY);
@@ -59,7 +59,7 @@ describe("Abstract Proposal Contract", function () {
                 .withArgs(anyValue, anyValue, true, anyValue);
         });
 
-        it("test event", async function () {
+        it("proposal: event", async function () {
             await proposalMock.connect(signers[0]).propose(constants.PROPOSE_PERIOD, 1);
             const proposalId = await proposalMock.blockProposal(constants.PROPOSE_PERIOD);
             await mine(constants.VOTE_DELAY);
@@ -72,7 +72,7 @@ describe("Abstract Proposal Contract", function () {
                 .withArgs(anyValue, anyValue, 1);
         });
 
-        it("test event", async function () {
+        it("proposal: event", async function () {
             await proposalMock.connect(signers[0]).propose(constants.PROPOSE_PERIOD, 1);
             const proposalId = await proposalMock.blockProposal(constants.PROPOSE_PERIOD);
             await mine(constants.VOTE_DELAY);
@@ -85,7 +85,7 @@ describe("Abstract Proposal Contract", function () {
                 .withArgs(anyValue, anyValue, 2);
         });
 
-        it("test event", async function () {
+        it("proposal: event", async function () {
             await proposalMock.connect(signers[0]).propose(constants.PROPOSE_PERIOD, 10);
             const proposalId = await proposalMock.blockProposal(constants.PROPOSE_PERIOD);
             await mine(constants.VOTE_DELAY);
@@ -99,7 +99,7 @@ describe("Abstract Proposal Contract", function () {
                 .withArgs(anyValue, anyValue, 2);
         });
 
-        it("test event", async function () {
+        it("proposal: event", async function () {
             await proposalMock.connect(signers[0]).propose(constants.PROPOSE_PERIOD, 10);
             const proposalId = await proposalMock.blockProposal(constants.PROPOSE_PERIOD);
             await mine(constants.VOTE_DELAY);
@@ -113,7 +113,7 @@ describe("Abstract Proposal Contract", function () {
                 .withArgs(anyValue, anyValue, 2);
         });
 
-        it("test event", async function () {
+        it("proposal: event", async function () {
             await proposalMock.connect(signers[0]).propose(constants.PROPOSE_PERIOD, 10);
             const proposalId = await proposalMock.blockProposal(constants.PROPOSE_PERIOD);
             await mine(constants.VOTE_DELAY);
@@ -127,7 +127,7 @@ describe("Abstract Proposal Contract", function () {
                 .withArgs(anyValue, anyValue, 2);
         });
 
-        it("test event", async function () {
+        it("proposal: event", async function () {
             await proposalMock.connect(signers[0]).propose(constants.PROPOSE_PERIOD, 5);
             const proposalId = await proposalMock.blockProposal(constants.PROPOSE_PERIOD);
             await mine(constants.VOTE_DELAY);

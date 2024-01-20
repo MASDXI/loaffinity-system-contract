@@ -29,12 +29,12 @@ describe("Abstract NativeTransfer Contract", function () {
             expect(balance).to.equal(constants.ONE_HUNDRED_TOKEN);
         });
 
-        it("initializer: transfer failed exceed balance", async function () {
+        it("nativetransfer: transfer failed exceed balance", async function () {
             await expect(nativeTransferMock.transferEther(mockAddress,  constants.ONE_MILLION_TOKEN)).
             to.revertedWithCustomError(nativeTransferMock,"TransferExceedBalance");
         });
 
-        it("initializer: transfer failed zero amount", async function () {
+        it("nativetransfer: transfer failed zero amount", async function () {
             await expect(nativeTransferMock.transferEther(mockAddress,  constants.ZERO_TOKEN)).
             to.revertedWithCustomError(nativeTransferMock,"TransferZeroAmount");
         });
