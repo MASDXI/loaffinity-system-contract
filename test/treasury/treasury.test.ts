@@ -36,8 +36,8 @@ describe("Supply Control System Contract", function () {
       constants.VOTE_PERIOD, 
       constants.PROPOSE_PERIOD, 
       [fixture.committee1.address], 
-      fixture.committee1.address);
-    await fixture.committee.connect(fixture.committee1).grantProposer(fixture.proposer1.address);
+      fixture.admin.address);
+    await fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer1.address);
     await fixture.supplycontrol.connect(initializer).initialize(
       constants.VOTE_DELAY, 
       constants.VOTE_PERIOD, 
