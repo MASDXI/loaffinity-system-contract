@@ -17,6 +17,8 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor,  NativeTransfe
      * @param gasPrice gasPrice of transaction.
      */
     function submitTxGasUsed(uint256 gasUsed, uint256 gasPrice) external {
+        // research gas calculate not perfect. 
+        // should add additional gasUsed from _transferEther()?
         address addressCache = _registry[msg.sender];
         uint256 amount = calculate(gasUsed, gasPrice);
         if (amount != 0) {
