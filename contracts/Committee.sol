@@ -97,7 +97,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
     }
 
     function isAgent(address account) public override view returns (bool) {
-        return hasRole(PROPOSER_ROLE, account);
+        return hasRole(EXECUTOR_AGENT_ROLE, account);
     }
 
     function propose(

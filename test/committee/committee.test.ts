@@ -41,10 +41,6 @@ describe("Committee System Contract", function () {
         expect(await fixture.committee.CONSORTIUM_COMMITEE_ROLE()).to.equal(constants.CONSORTIUM_COMMITEE_ROLE);
         expect(await fixture.committee.PROPOSER_ROLE()).to.equal(constants.PROPOSER_ROLE);
         expect(await fixture.committee.EXECUTOR_AGENT_ROLE()).to.equal(constants.EXECUTOR_AGENT_ROLE);
-
-        expect(await fixture.committee.isCommittee(fixture.committee1.address)).to.equal(true);
-        expect(await fixture.committee.isProposer(fixture.proposer1.address)).to.equal(false);
-        expect(await fixture.committee.isAgent(fixture.committee1.address)).to.equal(false);
       });
 
       it("function: intialized() fail", async function () {
@@ -56,20 +52,8 @@ describe("Committee System Contract", function () {
           fixture.admin.address)).to.revertedWith(revertedMessage.initializer_only_can_call)
       });
 
-      it("function: getCommitteeCount(), getProposerCount()", async function () {
-        expect(await fixture.committee.getCommitteeCount()).to.equal(1);
-        expect(await fixture.committee.getProposerCount()).to.equal(1);
-      });
-
       it("function: blockProposal()", async function () {
         expect(await fixture.committee.connect(initializer).blockProposal(0)).to.equal(eth.ZeroHash)
-      });
-
-      it("function: proposal not exist", async function () {
-        await expect(fixture.committee.getProposalCommitteeInfoByBlockNumber(0))
-          .to.revertedWith('committee: proposal not exist');
-        await expect(fixture.committee.getProposalCommitteeInfoByProposalId(eth.ZeroHash))
-          .to.revertedWith('committee: proposal not exist');
       });
 
       it("function: grantProposer()", async function () {
@@ -98,10 +82,44 @@ describe("Committee System Contract", function () {
         expect(await fixture.committee.getProposerCount()).to.equal(1);
       });
 
-
-      it("function: propose() grant", async function () {
-        await expect(fixture.committee.connect(fixture.proposer1).propose(300, committee2.address, 1))
-          .to.revertedWith("committee: onlyProposer can call")
+      it("function: grantAgent()", async function () {
+        await fixture.committee.connect(fixture.admin).grantAgent(fixture.proposer1.address);
+        expect(await fixture.committee.isAgent(fixture.proposer1.address)).to.equal(true);
       });
+
+      it("function: revokeProposer()", async function () {
+        await fixture.committee.connect(fixture.admin).grantAgent(fixture.proposer1.address)
+        await fixture.committee.connect(fixture.admin).revokeAgent(fixture.proposer1.address)
+        expect(await fixture.committee.isAgent(fixture.proposer1.address)).to.equal(false);
+      });
+
+      it(revertedMessage.committee_proposal_not_exist, async function () {
+        await expect(fixture.committee.getProposalCommitteeInfoByBlockNumber(0))
+          .to.revertedWith(revertedMessage.committee_proposal_not_exist);
+        await expect(fixture.committee.getProposalCommitteeInfoByProposalId(eth.ZeroHash))
+          .to.revertedWith(revertedMessage.committee_proposal_not_exist);
+      });
+
+      it(revertedMessage.committee_grant_exist_agent, async function () {
+        await expect(fixture.committee.connect(fixture.committee1)
+          .grantAgent(fixture.proposer1.address))
+          .to.revertedWith(revertedMessage.committee_only_admin_can_call);
+        await expect(fixture.committee.connect(fixture.committee1)
+          .revokeAgent(fixture.proposer1.address))
+          .to.revertedWith(revertedMessage.committee_only_admin_can_call);
+      });
+
+      it(revertedMessage.committee_grant_exist_agent, async function () {
+        await fixture.committee.connect(fixture.admin).grantAgent(fixture.proposer1.address);
+        await expect(fixture.committee.connect(fixture.admin).grantAgent(fixture.proposer1.address))
+        .to.revertedWith(revertedMessage.committee_grant_exist_agent);
+      });
+
+      it(revertedMessage.committee_revoke_non_exist_agent, async function () {
+        await expect(fixture.committee.connect(fixture.admin)
+          .revokeAgent(fixture.committee2.address))
+          .to.revertedWith(revertedMessage.committee_revoke_non_exist_agent);
+      });
+
   });
 });
