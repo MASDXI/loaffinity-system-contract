@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "clean": "npx hardhat clean && rm -rf build",
+    "clean": "npx hardhat clean && rm -rf build cache coverage coverage.json",
     "compile": "npx hardhat run scripts/generateInitializer.ts && npx hardhat compile",
     "coverage": "npx hardhat coverage",
     "build": "yarn clean && yarn compile && yarn test && npx hardhat run scripts/build.ts",
