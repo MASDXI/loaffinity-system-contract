@@ -76,6 +76,14 @@ describe("Treasury System Contract", function () {
       expect(type).to.equal(constants.VOTE_TYPE_ADD);
     });
 
+    it("treasury: vote", async function () {
+      // TODO
+    });
+
+    it("treasury: execute", async function () {
+      // TODO
+    });
+
     it(revertedMessage.treasury_propose_past_block, async function () {
       await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
         100,
