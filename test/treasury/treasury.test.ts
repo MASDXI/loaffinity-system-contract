@@ -5,19 +5,13 @@ import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { loadFixture, setBalance, time, mine} from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { constants } from "../utils/constants"
 import { revertedMessage } from "../utils/reverted";
-import { setSystemContractFixture } from "../utils/systemContractFixture"
+import { setSystemContractFixture, targetBlock } from "../utils/systemContractFixture"
 
 async function setup() {
   const initAccount = await ethers.getImpersonatedSigner(constants.INITIALIZER_ADDRESS);
   const accounts = await ethers.getSigners();
   await setBalance(await initAccount.getAddress(), constants.ONE_TOKEN);
   return { accounts, initAccount };
-}
-
-async function targetBlock() {
-  const currentBlock = await ethers.provider.getBlockNumber();
-  const targetBlock = BigInt(currentBlock) + constants.VOTE_PERIOD;
-  return targetBlock;
 }
 
 describe("Treasury System Contract", function () {

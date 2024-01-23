@@ -26,7 +26,7 @@ export const revertedMessage = {
     committee_only_committee_can_call: "committee: onlyCommittee can call",
     committee_only_proposer_can_call: "committee: onlyProposer can call",
     committee_proposal_not_exist: "committee: proposal not exist",
-    committee_propose_past_block:" committee: propose past block",
+    committee_propose_past_block: "committee: propose past block",
     committee_propose_zero_address: "committee: propose zero address",
     committee_propose_invalid_block: "committee: invalid blocknumber",
     committee_propose_too_future: "committee: block too future",

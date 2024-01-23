@@ -6,9 +6,9 @@ import {
 } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { ethers as eth } from "ethers";
+import { ZeroAddress, ethers as eth } from "ethers";
 import { constants } from "../utils/constants"
-import { setSystemContractFixture } from "../utils/systemContractFixture"
+import { setSystemContractFixture, targetBlock } from "../utils/systemContractFixture"
 import { revertedMessage } from "../utils/reverted";
 
 async function setup() {
@@ -91,6 +91,60 @@ describe("Committee System Contract", function () {
         await fixture.committee.connect(fixture.admin).grantAgent(fixture.proposer1.address)
         await fixture.committee.connect(fixture.admin).revokeAgent(fixture.proposer1.address)
         expect(await fixture.committee.isAgent(fixture.proposer1.address)).to.equal(false);
+      });
+
+      it(revertedMessage.committee_propose_past_block, async function () {
+        await expect(fixture.committee.connect(fixture.admin).propose(
+          constants.ZERO,
+          fixture.proposer1.address,
+          constants.VOTE_TYPE_ADD)).to.revertedWith(revertedMessage.committee_propose_past_block);
+      });
+
+      it(revertedMessage.committee_propose_zero_address, async function () {
+        await expect(fixture.committee.connect(fixture.admin).propose(
+          await targetBlock() + constants.VOTE_PERIOD,
+          ZeroAddress,
+          constants.VOTE_TYPE_ADD)).to.revertedWith(revertedMessage.committee_propose_zero_address);
+      });
+
+      it(revertedMessage.committee_propose_invalid_block, async function () {
+        await expect(fixture.committee.connect(fixture.admin).propose(
+          await targetBlock(),
+          fixture.committee2.address,
+          constants.VOTE_TYPE_ADD)).to.revertedWith(revertedMessage.committee_propose_invalid_block);
+      });
+
+      it(revertedMessage.committee_propose_too_future, async function () {
+        await expect(fixture.committee.connect(fixture.admin).propose(
+          await targetBlock() + constants.EXCEED_UINT16,
+          fixture.committee2.address,
+          constants.VOTE_TYPE_ADD)).to.revertedWith(revertedMessage.committee_propose_too_future);
+      });
+
+      it(revertedMessage.committee_propose_add_exist_address, async function () {
+        await expect(fixture.committee.connect(fixture.admin).propose(
+          await targetBlock() + constants.VOTE_PERIOD,
+          fixture.committee1.address,
+          constants.VOTE_TYPE_ADD)).to.revertedWith(revertedMessage.committee_propose_add_exist_address);
+      });
+
+      it(revertedMessage.committee_propose_remove_non_exist_address, async function () {
+        await expect(fixture.committee.connect(fixture.admin).propose(
+          await targetBlock() + constants.VOTE_PERIOD,
+          fixture.committee2.address,
+          constants.VOTE_TYPE_REMOVE)).to.revertedWith(revertedMessage.committee_propose_remove_non_exist_address);
+      });
+
+      it(revertedMessage.committee_propose_to_exist_block, async function () {
+        const block = await targetBlock() + constants.VOTE_PERIOD;
+        await fixture.committee.connect(fixture.admin).propose(
+          block,
+          fixture.committee2.address,
+          constants.VOTE_TYPE_ADD);
+        await expect(fixture.committee.connect(fixture.admin).propose(
+          block,
+          fixture.committee2.address,
+          constants.VOTE_TYPE_ADD)).to.revertedWith(revertedMessage.committee_propose_to_exist_block);
       });
 
       it(revertedMessage.committee_proposal_not_exist, async function () {

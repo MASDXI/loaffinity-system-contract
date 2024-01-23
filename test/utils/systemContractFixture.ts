@@ -42,3 +42,9 @@ export async function setUp(contractName: string, params: any) {
   const { contract } = await ethers.deployContract(contractName, params);
   return contract;
 }
+
+export async function targetBlock() {
+  const currentBlock = await ethers.provider.getBlockNumber();
+  const targetBlock = BigInt(currentBlock) + constants.VOTE_PERIOD;
+  return targetBlock;
+}
