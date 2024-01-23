@@ -38,6 +38,10 @@ export const revertedMessage = {
     committee_grant_exist_proposer: "committee: grant exist proposer address",
     committee_revoke_non_exist_proposer: "committee: revoke non proposer address",
     // treasury contract
+    treasury_only_admin_can_call: "treasury: onlyAdmin can call",
+    treasury_only_agent_can_call: "treasury: onlyAgent can call",
+    treasury_only_committee_can_call: "treasury: onlyCommittee can call",
+    treasury_only_proposer_can_call: "treasury: onlyProposer can call",
     treasury_proposal_not_exist: "treasury: proposal not exist",
     treasury_propose_past_block: "treasury: propose past block",
     treasury_propose_invalid_block: "treasury: invalid blocknumber",

@@ -20,17 +20,17 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
     receive() external payable {}
 
     modifier onlyProposer() {
-        require(_commiteeContract.isProposer(msg.sender));
+        require(_commiteeContract.isProposer(msg.sender),"treasury: onlyProposer can call");
         _;
     }
 
     modifier onlyCommittee() {
-        require(_commiteeContract.isCommittee(msg.sender));
+        require(_commiteeContract.isCommittee(msg.sender),"treasury: onlyCommittee can call");
         _;
     }
 
     modifier onlyAgent() {
-        require(_commiteeContract.isAgent(msg.sender));
+        require(_commiteeContract.isAgent(msg.sender),"treasury: onlyAgent can call");
         _;
     }
 
@@ -92,7 +92,7 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
         } else {
             require(account == address(0), "treasury: propose locked to non-zero address");
         }
-        require((current + votingPeriod()) < blockNumber,"treasury: invalid blocknumber");
+        require(blockNumber > (current + votingPeriod()),"treasury: invalid blocknumber");
         require(blockProposal[blockNumber] == bytes32(0),"treasury: blocknumber has propose");
         require(blockNumber - current <= MAX_FUTURE_BLOCK,"treasury: block too future");
 
