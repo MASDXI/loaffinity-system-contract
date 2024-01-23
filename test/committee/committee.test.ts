@@ -40,14 +40,14 @@ describe("Committee System Contract", function () {
     });
 
     describe("Unit test", function () {
-      it("committee all role", async function () {
+      it("committee: all role", async function () {
         expect(await fixture.committee.ROOT_ADMIN_ROLE()).to.equal(constants.ROOT_ADMIN_ROLE);
         expect(await fixture.committee.CONSORTIUM_COMMITEE_ROLE()).to.equal(constants.CONSORTIUM_COMMITEE_ROLE);
         expect(await fixture.committee.PROPOSER_ROLE()).to.equal(constants.PROPOSER_ROLE);
         expect(await fixture.committee.EXECUTOR_AGENT_ROLE()).to.equal(constants.EXECUTOR_AGENT_ROLE);
       });
 
-      it("committee intialized() fail", async function () {
+      it("committee: intialized() fail", async function () {
         await expect(fixture.committee.connect(fixture.admin).initialize(
           constants.VOTE_DELAY,
           constants.VOTE_PERIOD,
@@ -56,7 +56,7 @@ describe("Committee System Contract", function () {
           fixture.admin.address)).to.revertedWith(revertedMessage.initializer_only_can_call)
       });
 
-      it("committee catch propose event", async function () {
+      it("committee: catch propose event", async function () {
         await expect(fixture.committee.connect(fixture.proposer1).propose(
           block,  
           fixture.committee2.address, 
@@ -77,54 +77,46 @@ describe("Committee System Contract", function () {
         expect(type).to.equal(constants.VOTE_TYPE_ADD);
       });
 
-      it("committee grantProposer()", async function () {
+      it("committee: grantProposer()", async function () {
         await fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer2.address)
-        expect(await fixture.committee.isProposer(fixture.proposer2.address)).to.equal(true);
-
-        await expect(fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer2.address))
-          .to.revertedWith("committee: grant exist proposer address");
-
-        await expect(fixture.committee.connect(fixture.committee1).grantProposer(fixture.proposer2.address))
-          .to.revertedWith("committee: onlyAdmin can call");
-        
+        expect(await fixture.committee.isProposer(fixture.proposer2.address)).to.equal(true);        
         expect(await fixture.committee.getProposerCount()).to.equal(3);
       });
 
-      it("committee revokeProposer()", async function () {
-        await expect(fixture.committee.connect(fixture.committee1).revokeProposer(fixture.proposer1.address))
-          .to.revertedWith("committee: onlyAdmin can call");
-        
-        await expect(fixture.committee.connect(fixture.admin).revokeProposer(fixture.proposer2.address))
-          .to.revertedWith("committee: revoke non proposer address");
-        
+      it("committee: revokeProposer()", async function () {
         await fixture.committee.connect(fixture.admin).revokeProposer(fixture.proposer1.address)
         expect(await fixture.committee.isProposer(fixture.proposer1.address)).to.equal(false);
         expect(await fixture.committee.getProposerCount()).to.equal(1);
       });
 
-      it("committee grantAgent()", async function () {
+      it("committee: grantAgent()", async function () {
         await fixture.committee.connect(fixture.admin).grantAgent(fixture.proposer1.address);
         expect(await fixture.committee.isAgent(fixture.proposer1.address)).to.equal(true);
       });
 
-      it("committee revokeProposer()", async function () {
+      it("committee: revokeProposer()", async function () {
         await fixture.committee.connect(fixture.admin).grantAgent(fixture.proposer1.address)
         await fixture.committee.connect(fixture.admin).revokeAgent(fixture.proposer1.address)
         expect(await fixture.committee.isAgent(fixture.proposer1.address)).to.equal(false);
       });
 
-      it("committee revokeProposer()", async function () {
-        await fixture.committee.connect(fixture.admin).grantAgent(fixture.proposer1.address)
-        await fixture.committee.connect(fixture.admin).revokeAgent(fixture.proposer1.address)
-        expect(await fixture.committee.isAgent(fixture.proposer1.address)).to.equal(false);
-      });
-
-      it("committee vote()", async function () {
+      it("committee: vote()", async function () {
         // TODO
       });
 
-      it("committee execute()", async function () {
+      it("committee: execute()", async function () {
         // TODO
+      });
+
+      it(revertedMessage.committee_only_admin_can_call, async function () {
+        await expect(fixture.committee.connect(fixture.committee1).grantProposer(fixture.proposer1.address))
+        .to.revertedWith(revertedMessage.committee_only_admin_can_call);
+        await expect(fixture.committee.connect(fixture.committee1).revokeProposer(fixture.proposer1.address))
+        .to.revertedWith(revertedMessage.committee_only_admin_can_call);
+        await expect(fixture.committee.connect(fixture.committee1).grantAgent(fixture.proposer1.address))
+        .to.revertedWith(revertedMessage.committee_only_admin_can_call);
+        await expect(fixture.committee.connect(fixture.committee1).revokeAgent(fixture.proposer1.address))
+        .to.revertedWith(revertedMessage.committee_only_admin_can_call);
       });
 
       it(revertedMessage.committee_only_proposer_can_call, async function () {
@@ -196,19 +188,24 @@ describe("Committee System Contract", function () {
           .to.revertedWith(revertedMessage.committee_proposal_not_exist);
       });
 
-      it(revertedMessage.committee_grant_exist_agent, async function () {
-        await expect(fixture.committee.connect(fixture.committee1)
-          .grantAgent(fixture.proposer1.address))
-          .to.revertedWith(revertedMessage.committee_only_admin_can_call);
-        await expect(fixture.committee.connect(fixture.committee1)
-          .revokeAgent(fixture.proposer1.address))
-          .to.revertedWith(revertedMessage.committee_only_admin_can_call);
+      it(revertedMessage.committee_grant_exist_proposer, async function () {
+        await fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer2.address);
+        await expect(fixture.committee.connect(fixture.admin)
+          .grantProposer(fixture.proposer2.address))
+          .to.revertedWith(revertedMessage.committee_grant_exist_proposer);
       });
 
       it(revertedMessage.committee_grant_exist_agent, async function () {
         await fixture.committee.connect(fixture.admin).grantAgent(fixture.proposer1.address);
-        await expect(fixture.committee.connect(fixture.admin).grantAgent(fixture.proposer1.address))
-        .to.revertedWith(revertedMessage.committee_grant_exist_agent);
+        await expect(fixture.committee.connect(fixture.admin)
+          .grantAgent(fixture.proposer1.address))
+          .to.revertedWith(revertedMessage.committee_grant_exist_agent);
+      });
+
+      it(revertedMessage.committee_revoke_non_exist_proposer, async function () {
+        await expect(fixture.committee.connect(fixture.admin)
+          .revokeProposer(fixture.committee2.address))
+          .to.revertedWith(revertedMessage.committee_revoke_non_exist_proposer);
       });
 
       it(revertedMessage.committee_revoke_non_exist_agent, async function () {
