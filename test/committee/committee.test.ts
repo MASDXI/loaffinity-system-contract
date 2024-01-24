@@ -275,8 +275,11 @@ describe("Committee System Contract", function () {
           .to.revertedWith(revertedMessage.committee_only_agent_can_call);
       })
 
-      it("32. revert: execute() + onlyCommittee can call", async function () {
-        await fixture.committee.connect(fixture.proposer1).vote(0x1, false)
+      it("32. revert: vote() + onlyCommittee can call", async function () {
+        const currentBlock = await targetBlock() + BigInt(100);
+        await fixture.committee.connect(fixture.admin).propose(currentBlock, fixture.committee2.address, constants.VOTE_TYPE_ADD);
+        const proposalId = await fixture.committee.blockProposal(constants.PROPOSE_PERIOD);
+        await expect(fixture.committee.connect(fixture.proposer1).vote(proposalId, false))
           .to.revertedWith(revertedMessage.committee_only_committee_can_call);
       })
 
