@@ -102,11 +102,17 @@ describe("Treasury System Contract", function () {
     });
 
     it("treasury: execute release", async function () {
+      // before locked balance
+      const balanceBefore = await fixture.supplycontrol.getLockedBalance();
+      expect(balanceBefore).to.equal(constants.ZERO);
       await fixture.supplycontrol.connect(fixture.proposer1).propose(
         block,
         constants.ONE_HUNDRED_TOKEN,
         fixture.otherAccount1.address, 
         constants.VOTE_TYPE_ADD);
+      // after locked after
+      const balanceAfter = await fixture.supplycontrol.getLockedBalance();
+      expect(balanceAfter).to.equal(constants.ONE_HUNDRED_TOKEN);
       await mine(constants.VOTE_DELAY);
       const proposalId = await fixture.supplycontrol.blockProposal(block);
       await fixture.supplycontrol.connect(fixture.committee1)
@@ -126,12 +132,19 @@ describe("Treasury System Contract", function () {
     });
 
     it("treasury: execute locked", async function () {
+      // before locked balance
+      const balanceBefore = await fixture.supplycontrol.getLockedBalance();
+      expect(balanceBefore).to.equal(constants.ZERO);
       await fixture.supplycontrol.connect(fixture.proposer1).propose(
         block,
         constants.ONE_HUNDRED_TOKEN,
         ZeroAddress, 
         constants.VOTE_TYPE_REMOVE);
+      // after locked after
+      const balanceAfter = await fixture.supplycontrol.getLockedBalance();
+      expect(balanceAfter).to.equal(constants.ONE_HUNDRED_TOKEN);
       await mine(constants.VOTE_DELAY);
+      await fixture.supplycontrol.getLockedBalance();
       const proposalId = await fixture.supplycontrol.blockProposal(block);
       await fixture.supplycontrol.connect(fixture.committee1)
         .vote(proposalId,constants.VOTE_AGREE);
