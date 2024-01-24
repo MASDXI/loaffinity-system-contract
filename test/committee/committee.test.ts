@@ -194,47 +194,68 @@ describe("Committee System Contract", function () {
           .to.revertedWith("committee: revoke non proposer address");
       })
 
-      it("19. revert: propose() + onlyProposer can call", async function () {
+      it("19. revert: grantAgent() + onlyAdmin can call", async function () {
+        await expect(fixture.committee.connect(fixture.committee1).grantAgent(fixture.proposer2.address))
+        .to.revertedWith(revertedMessage.committee_only_admin_can_call);
+      })
+
+      it("20. revert: grantAgent() + grant exist agent address", async function () {
+        await fixture.committee.connect(fixture.admin).grantAgent(fixture.proposer2.address)
+        await expect(fixture.committee.connect(fixture.admin).grantAgent(fixture.proposer2.address))
+        .to.revertedWith(revertedMessage.committee_grant_exist_agent);
+      })
+
+      it("21. revert: revokeAgent() + onlyAdmin can call", async function () {
+        await expect(fixture.committee.connect(fixture.committee1).revokeAgent(fixture.proposer1.address))
+          .to.revertedWith(revertedMessage.committee_only_admin_can_call);
+      })
+
+      it("22. revert: revokeAgent() + revoke non agent address", async function () {
+        await expect(fixture.committee.connect(fixture.admin).revokeAgent(fixture.committee2.address))
+          .to.revertedWith("committee: revoke non agent address");
+      })
+
+      it("23. revert: propose() + onlyProposer can call", async function () {
         await expect(fixture.committee.connect(fixture.proposer1).propose(1, fixture.committee2.address, constants.VOTE_TYPE_ADD))
           .to.revertedWith(revertedMessage.committee_only_proposer_can_call);
       })
 
-      it("20. revert: propose() + propose past block", async function () {
+      it("24. revert: propose() + propose past block", async function () {
         const currentBlock = await ethers.provider.getBlockNumber();
         await fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer1.address)
         await expect(fixture.committee.connect(fixture.proposer1).propose(currentBlock, fixture.committee2.address, constants.VOTE_TYPE_ADD))
           .to.revertedWith(revertedMessage.committee_propose_past_block);
       })
 
-      it("21. revert: propose() + propose zero address", async function () {
+      it("25. revert: propose() + propose zero address", async function () {
         const currentBlock = await targetBlock() + BigInt(100);
         await fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer1.address)
         await expect(fixture.committee.connect(fixture.proposer1).propose(currentBlock, constants.ZERO_ADDRESS, constants.VOTE_TYPE_ADD))
           .to.revertedWith(revertedMessage.committee_propose_zero_address);
       })
 
-      it("22. revert: propose() + invalid blocknumber", async function () {
+      it("26. revert: propose() + invalid blocknumber", async function () {
         const currentBlock = await targetBlock();
         await fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer1.address)
         await expect(fixture.committee.connect(fixture.proposer1).propose(currentBlock - BigInt(10), fixture.committee2.address, constants.VOTE_TYPE_ADD))
           .to.revertedWith(revertedMessage.committee_propose_invalid_block);
       })
 
-      it("23. revert: propose() + propose add existing committee", async function () {
+      it("27. revert: propose() + propose add existing committee", async function () {
         const currentBlock = await targetBlock() + BigInt(100);
         await fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer1.address)
         await expect(fixture.committee.connect(fixture.proposer1).propose(currentBlock, fixture.committee1.address, constants.VOTE_TYPE_ADD))
           .to.revertedWith(revertedMessage.committee_propose_add_exist_address);
       })
 
-      it("24. revert: propose() + propose remove not exist committee", async function () {
+      it("28. revert: propose() + propose remove not exist committee", async function () {
         const currentBlock = await targetBlock() + BigInt(100);
         await fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer1.address)
         await expect(fixture.committee.connect(fixture.proposer1).propose(currentBlock, fixture.committee2.address, constants.VOTE_TYPE_REMOVE))
           .to.revertedWith(revertedMessage.committee_propose_remove_non_exist_address);
       })
 
-      it("25. revert: propose() + propose blocknumber has propose", async function () {
+      it("29. revert: propose() + propose blocknumber has propose", async function () {
         const currentBlock = await targetBlock() + BigInt(100);
         await fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer1.address)
         await fixture.committee.connect(fixture.proposer1).propose(currentBlock, fixture.committee2.address, constants.VOTE_TYPE_ADD);
@@ -242,14 +263,24 @@ describe("Committee System Contract", function () {
           .to.revertedWith(revertedMessage.committee_propose_to_exist_block);
       })
 
-      it("26. revert: propose() + propose block too future", async function () {
+      it("30. revert: propose() + propose block too future", async function () {
         const currentBlock = await targetBlock() + constants.EXCEED_UINT16;
         await fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer1.address)
         await expect(fixture.committee.connect(fixture.proposer1).propose(currentBlock, fixture.committee2.address, constants.VOTE_TYPE_ADD))
           .to.revertedWith(revertedMessage.committee_propose_too_future);
       })
 
-      it("27. revert: getProposal + proposal not exist", async function () {
+      it("31. revert: execute() + onlyAgent can call", async function () {
+        await expect(fixture.committee.connect(fixture.proposer1).execute(constants.PROPOSE_PERIOD))
+          .to.revertedWith(revertedMessage.committee_only_agent_can_call);
+      })
+
+      it("32. revert: execute() + onlyCommittee can call", async function () {
+        await fixture.committee.connect(fixture.proposer1).vote(0x1, false)
+          .to.revertedWith(revertedMessage.committee_only_committee_can_call);
+      })
+
+      it("33. revert: getProposal + proposal not exist", async function () {
         await expect(fixture.committee.getProposalCommitteeInfoByBlockNumber(0))
           .to.revertedWith(revertedMessage.committee_proposal_not_exist);
         await expect(fixture.committee.getProposalCommitteeInfoByProposalId(eth.ZeroHash))
