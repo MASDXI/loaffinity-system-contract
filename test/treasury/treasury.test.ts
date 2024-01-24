@@ -101,11 +101,11 @@ describe("Treasury System Contract", function () {
         .withArgs(proposalId, fixture.committee1.address, constants.VOTE_AGREE, anyValue);
     });
 
-    it("treasury: execute", async function () {
+    it("treasury: execute release", async function () {
       await fixture.supplycontrol.connect(fixture.proposer1).propose(
         block,
         constants.ONE_HUNDRED_TOKEN,
-        fixture.committee2.address, 
+        fixture.otherAccount1.address, 
         constants.VOTE_TYPE_ADD);
       await mine(constants.VOTE_DELAY);
       const proposalId = await fixture.supplycontrol.blockProposal(block);
@@ -117,10 +117,40 @@ describe("Treasury System Contract", function () {
         .withArgs(
           proposalId,
           constants.VOTE_TYPE_ADD,
-          fixture.committee2.address,
+          fixture.otherAccount1.address,
           constants.ONE_HUNDRED_TOKEN,
           anyValue
         );
+      const balance = await ethers.provider.getBalance(fixture.otherAccount1.address);
+      expect(balance).to.equal(ethers.parseEther("10100"));
+    });
+
+    it("treasury: execute locked", async function () {
+      await fixture.supplycontrol.connect(fixture.proposer1).propose(
+        block,
+        constants.ONE_HUNDRED_TOKEN,
+        ZeroAddress, 
+        constants.VOTE_TYPE_REMOVE);
+      await mine(constants.VOTE_DELAY);
+      const proposalId = await fixture.supplycontrol.blockProposal(block);
+      await fixture.supplycontrol.connect(fixture.committee1)
+        .vote(proposalId,constants.VOTE_AGREE);
+      await mine(constants.VOTE_PERIOD);
+      await expect(fixture.supplycontrol.connect(fixture.otherAccount).execute(block))
+        .to.emit(fixture.supplycontrol, "TreasuryProposalExecuted")
+        .withArgs(
+          proposalId,
+          constants.VOTE_TYPE_REMOVE,
+          ZeroAddress,
+          constants.ONE_HUNDRED_TOKEN,
+          anyValue
+        );
+      const balance = await ethers.provider.getBalance(ZeroAddress);
+      expect(balance).to.equal(ethers.parseEther("100"));
+    });
+
+    it("treasury: execute reject", async function () {
+      // TODO
     });
 
     it(revertedMessage.treasury_only_agent_can_call, async function () {

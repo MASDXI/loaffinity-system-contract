@@ -113,7 +113,7 @@ describe("Committee System Contract", function () {
           .withArgs(proposalId, fixture.committee1.address, constants.VOTE_AGREE, anyValue);
       });
 
-      it("committee: execute", async function () {
+      it("committee: execute add", async function () {
         await fixture.committee.connect(fixture.proposer1).propose(
           block,
           fixture.committee2.address, 
@@ -132,6 +132,33 @@ describe("Committee System Contract", function () {
             fixture.committee2.address,
             anyValue
           );
+        expect(await fixture.committee.isCommittee(fixture.committee2.address)).to.equal(true);
+      });
+
+      it("committee: execute remove", async function () {
+        await fixture.committee.connect(fixture.proposer1).propose(
+          block,
+          fixture.committee1.address, 
+          constants.VOTE_TYPE_REMOVE);
+        await mine(constants.VOTE_DELAY);
+        const proposalId = await fixture.committee.blockProposal(block);
+        await fixture.committee.connect(fixture.committee1)
+          .vote(proposalId,constants.VOTE_AGREE);
+        await fixture.committee.connect(fixture.admin).grantAgent(fixture.otherAccount.address);
+        await mine(constants.VOTE_PERIOD);
+        await expect(fixture.committee.connect(fixture.otherAccount).execute(block))
+          .to.emit(fixture.committee, "CommitteeProposalExecuted")
+          .withArgs(
+            proposalId,
+            constants.VOTE_TYPE_REMOVE,
+            fixture.committee1.address,
+            anyValue
+          );
+        expect(await fixture.committee.isCommittee(fixture.committee1.address)).to.equal(false);
+      });
+
+      it("committee: execute reject", async function () {
+        // TODO
       });
 
       it(revertedMessage.committee_only_agent_can_call, async function () {

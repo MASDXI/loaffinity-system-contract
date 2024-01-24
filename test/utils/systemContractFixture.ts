@@ -17,7 +17,8 @@ export async function setSystemContractFixture() {
     committee3,
     proposer1, 
     proposer2, 
-    otherAccount] = await ethers.getSigners();
+    otherAccount,
+    otherAccount1] = await ethers.getSigners();
     
   const initializerCallerSigner = await ethers.getImpersonatedSigner(constants.INITIALIZER_ADDRESS);
     
@@ -35,7 +36,7 @@ export async function setSystemContractFixture() {
   const committee = await ethers.getContractAt("Committee",
     constants.COMMITTEE_CONTRACT_ADDRESS);
   await mine(200);
-  return { committee, admin , committee1, committee2, committee3, proposer1 , proposer2 , otherAccount, initializerCallerSigner, supplycontrol };
+  return { committee, admin , committee1, committee2, committee3, proposer1 , proposer2 , otherAccount, otherAccount1, initializerCallerSigner, supplycontrol };
 }
 
 export async function setUp(contractName: string, params: any) {
