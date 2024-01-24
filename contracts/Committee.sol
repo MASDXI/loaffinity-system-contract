@@ -11,7 +11,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
     uint16 private constant MAX_FUTURE_BLOCK = type(uint16).max;
 
     bytes32 public constant ROOT_ADMIN_ROLE = keccak256("ROOT_ADMIN_ROLE");
-    bytes32 public constant CONSORTIUM_COMMITEE_ROLE = keccak256("CONSORTIUM_COMMITEE_ROLE");
+    bytes32 public constant CONSORTIUM_COMMITTEE_ROLE = keccak256("CONSORTIUM_COMMITTEE_ROLE");
     bytes32 public constant PROPOSER_ROLE = keccak256("PROPOSER_ROLE");
     bytes32 public constant EXECUTOR_AGENT_ROLE = keccak256("EXECUTOR_AGENT_ROLE");
 
@@ -58,7 +58,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         _setupRole(ROOT_ADMIN_ROLE, admin_);
         _setupRole(PROPOSER_ROLE, admin_);
         for (uint256 i = 0; i < committeeLen; ++i) {
-            _setupRole(CONSORTIUM_COMMITEE_ROLE, committees_[i]);
+            _setupRole(CONSORTIUM_COMMITTEE_ROLE, committees_[i]);
         }
         _setVoteDelay(voteDelay_);
         _setVotePeriod(votePeriod_);
@@ -81,7 +81,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
     }
 
     function getCommitteeCount() public view returns (uint256) {
-        return getRoleMemberCount(CONSORTIUM_COMMITEE_ROLE);
+        return getRoleMemberCount(CONSORTIUM_COMMITTEE_ROLE);
     }
 
     function getProposerCount() external view returns (uint256) {
@@ -89,7 +89,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
     }
 
     function isCommittee(address account) public override view returns (bool) {
-        return hasRole(CONSORTIUM_COMMITEE_ROLE, account);
+        return hasRole(CONSORTIUM_COMMITTEE_ROLE, account);
     }
 
     function isProposer(address account) public override view returns (bool) {
@@ -121,7 +121,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
 
         blockProposal[blockNumber] = proposalId;
         _committeeProposals[proposalId].proposer = msg.sender;
-        _committeeProposals[proposalId].commitee = account;
+        _committeeProposals[proposalId].committee = account;
         _committeeProposals[proposalId].blockNumber = blockNumber;
         _committeeProposals[proposalId].proposeType = proposeType;
         
@@ -158,14 +158,14 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         uint256 timeCache = block.timestamp;
         if (callback) {
             if (data.proposeType == ProposalType.ADD) {
-                _grantRole(CONSORTIUM_COMMITEE_ROLE, data.commitee);
-                emit CommitteeProposalExecuted(IdCache, ProposalType.ADD, data.proposer, timeCache);
+                _grantRole(CONSORTIUM_COMMITTEE_ROLE, data.committee);
+                emit CommitteeProposalExecuted(IdCache, ProposalType.ADD, data.committee, timeCache);
             } else {
-                _revokeRole(CONSORTIUM_COMMITEE_ROLE, data.commitee);
-                emit CommitteeProposalExecuted(IdCache, ProposalType.REMOVE, data.proposer, timeCache);
+                _revokeRole(CONSORTIUM_COMMITTEE_ROLE, data.committee);
+                emit CommitteeProposalExecuted(IdCache, ProposalType.REMOVE, data.committee, timeCache);
             }
         } else {
-            emit CommitteeProposalRejected(IdCache, data.proposeType, data.proposer, timeCache);
+            emit CommitteeProposalRejected(IdCache, data.proposeType, data.committee, timeCache);
         }
         return blockNumber;
     }

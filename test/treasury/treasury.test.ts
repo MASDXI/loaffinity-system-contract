@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { ZeroAddress, ZeroHash } from "ethers";
 import { ethers } from "hardhat";
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
-import { loadFixture, setBalance} from "@nomicfoundation/hardhat-toolbox/network-helpers";
+import { loadFixture, setBalance, mine } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { constants } from "../utils/constants"
 import { revertedMessage } from "../utils/reverted";
 import { setSystemContractFixture, targetBlock } from "../utils/systemContractFixture"
@@ -33,6 +33,7 @@ describe("Treasury System Contract", function () {
       [fixture.committee1.address], 
       fixture.admin.address);
     await fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer1.address);
+    await fixture.committee.connect(fixture.admin).grantAgent(fixture.otherAccount.address);
     await fixture.supplycontrol.connect(initializer).initialize(
       constants.VOTE_DELAY, 
       constants.VOTE_PERIOD, 
@@ -86,11 +87,60 @@ describe("Treasury System Contract", function () {
     });
 
     it("treasury: vote", async function () {
-      // TODO
+      await fixture.supplycontrol.connect(fixture.proposer1).propose(
+        block,
+        constants.ONE_HUNDRED_TOKEN,
+        fixture.committee2.address, 
+        constants.VOTE_TYPE_ADD);
+      await mine(constants.VOTE_DELAY);
+      const proposalId = await fixture.supplycontrol.blockProposal(block);
+      await expect(fixture.supplycontrol.connect(fixture.committee1).vote(
+        proposalId,
+        constants.VOTE_AGREE
+      )).to.emit(fixture.supplycontrol,"TreasuryVoted")
+        .withArgs(proposalId, fixture.committee1.address, constants.VOTE_AGREE, anyValue);
     });
 
     it("treasury: execute", async function () {
-      // TODO
+      await fixture.supplycontrol.connect(fixture.proposer1).propose(
+        block,
+        constants.ONE_HUNDRED_TOKEN,
+        fixture.committee2.address, 
+        constants.VOTE_TYPE_ADD);
+      await mine(constants.VOTE_DELAY);
+      const proposalId = await fixture.supplycontrol.blockProposal(block);
+      await fixture.supplycontrol.connect(fixture.committee1)
+        .vote(proposalId,constants.VOTE_AGREE);
+      await mine(constants.VOTE_PERIOD);
+      await expect(fixture.supplycontrol.connect(fixture.otherAccount).execute(block))
+        .to.emit(fixture.supplycontrol, "TreasuryProposalExecuted")
+        .withArgs(
+          proposalId,
+          constants.VOTE_TYPE_ADD,
+          fixture.committee2.address,
+          constants.ONE_HUNDRED_TOKEN,
+          anyValue
+        );
+    });
+
+    it(revertedMessage.treasury_only_agent_can_call, async function () {
+      await expect(fixture.supplycontrol.connect(fixture.admin).execute(
+        ZeroHash))
+        .to.revertedWith(revertedMessage.treasury_only_agent_can_call);
+    });
+
+    it(revertedMessage.treasury_only_committee_can_call, async function () {
+      await fixture.supplycontrol.connect(fixture.proposer1).propose(
+        block,
+        constants.ONE_TOKEN, 
+        fixture.committee1.address, 
+        constants.VOTE_TYPE_ADD);
+      await mine(constants.VOTE_DELAY);
+      const proposalId = await fixture.supplycontrol.blockProposal(block);
+      await expect(fixture.supplycontrol.connect(fixture.admin).vote(
+        proposalId,
+        constants.VOTE_AGREE))
+        .to.revertedWith(revertedMessage.treasury_only_committee_can_call);
     });
 
     it(revertedMessage.treasury_only_proposer_can_call, async function () {
@@ -99,7 +149,7 @@ describe("Treasury System Contract", function () {
         constants.ONE_TOKEN, 
         fixture.committee1.address, 
         constants.VOTE_TYPE_ADD))
-        .to.revertedWith(revertedMessage.treasury_only_proposer_can_call)
+        .to.revertedWith(revertedMessage.treasury_only_proposer_can_call);
     });
 
     it(revertedMessage.treasury_propose_past_block, async function () {
@@ -108,7 +158,7 @@ describe("Treasury System Contract", function () {
         constants.ONE_TOKEN, 
         fixture.committee1.address, 
         constants.VOTE_TYPE_ADD))
-        .to.revertedWith(revertedMessage.treasury_propose_past_block)
+        .to.revertedWith(revertedMessage.treasury_propose_past_block);
     });
 
     it(revertedMessage.treasury_propose_invalid_block, async function () {
@@ -117,7 +167,7 @@ describe("Treasury System Contract", function () {
         constants.ONE_TOKEN, 
         fixture.committee1.address,
         constants.VOTE_TYPE_ADD))
-        .to.revertedWith(revertedMessage.treasury_propose_invalid_block)
+        .to.revertedWith(revertedMessage.treasury_propose_invalid_block);
     });
 
     it(revertedMessage.treasury_propose_too_future, async function () {
@@ -125,7 +175,8 @@ describe("Treasury System Contract", function () {
         block + constants.EXCEED_UINT16,
         constants.ONE_TOKEN,
         fixture.committee1.address,
-        constants.VOTE_TYPE_ADD)).to.revertedWith(revertedMessage.treasury_propose_too_future);
+        constants.VOTE_TYPE_ADD))
+        .to.revertedWith(revertedMessage.treasury_propose_too_future);
     });
 
     it(revertedMessage.treasury_propose_amount_exceed, async function () {
@@ -167,7 +218,7 @@ describe("Treasury System Contract", function () {
         constants.ONE_TOKEN, 
         ZeroAddress, 
         constants.VOTE_TYPE_ADD))
-        .to.revertedWith(revertedMessage.treasury_propose_released_to_zero_address)
+        .to.revertedWith(revertedMessage.treasury_propose_released_to_zero_address);
     });
 
     it(revertedMessage.treasury_propose_locked_to_non_zero_address, async function () {
@@ -176,11 +227,12 @@ describe("Treasury System Contract", function () {
         constants.ONE_TOKEN, 
         fixture.committee1.address, 
         constants.VOTE_TYPE_REMOVE))
-        .to.revertedWith(revertedMessage.treasury_propose_locked_to_non_zero_address)
+        .to.revertedWith(revertedMessage.treasury_propose_locked_to_non_zero_address);
     });
 
     it(revertedMessage.treasury_proposal_not_exist, async function () {
-      await expect(fixture.supplycontrol.connect(fixture.proposer1).getProposalSupplyInfoByProposalId(ZeroHash))
+      await expect(fixture.supplycontrol.connect(fixture.proposer1)
+        .getProposalSupplyInfoByProposalId(ZeroHash))
         .to.revertedWith(revertedMessage.treasury_proposal_not_exist);
     });
 
