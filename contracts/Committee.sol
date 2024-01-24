@@ -112,7 +112,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         if (proposeType == ProposalType.ADD) {
             require(!isCommittee(account), "committee: propose add existing committee");
         } else {
-            require(isCommittee(account), "committee: propose remove not exist commitee");
+            require(isCommittee(account), "committee: propose remove not exist committee"); // typo commitee
         }
         require(blockProposal[blockNumber] == bytes32(0),"committee: blocknumber has propose");
         require(blockNumber - block.number <= MAX_FUTURE_BLOCK,"committee: block too future");
