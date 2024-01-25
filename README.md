@@ -76,14 +76,6 @@ npx hardhat is_agent --help
 - Everyblock can contain only one proposal.
 
 ### TODO
-- [] DoS Mitigation
-    - [x] adding threads hold for proposer
-         proposer can't create proposal stack more than x proposal.
-    - [x] adding max future block 
-         proposer can't create proposal too future block.
-    - [x] adding period for create proposal
-         proposer can only create proposal every n' block.
-- [] refactoring test
-    - [] test abstract class
+- [] issue propose block can be shorten than votedelay
 - [] update and refactor task script
 - [] update readme and documentation

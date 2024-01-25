@@ -92,7 +92,7 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
         } else {
             require(account == address(0), "treasury: propose locked to non-zero address");
         }
-        require(blockNumber > (current + votingPeriod()),"treasury: invalid blocknumber");
+        require(blockNumber > (current + votingPeriod() + votingDeley()),"treasury: invalid blocknumber");
         require(blockProposal[blockNumber] == bytes32(0),"treasury: blocknumber has propose");
         require(blockNumber - current <= MAX_FUTURE_BLOCK,"treasury: block too future");
 

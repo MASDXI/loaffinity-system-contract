@@ -13,8 +13,9 @@ import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 
 async function setup() {
   const initAccount = await ethers.getImpersonatedSigner(constants.INITIALIZER_ADDRESS);
+  const accounts = await ethers.getSigners();
   await setBalance(await initAccount.getAddress(), constants.ONE_TOKEN);
-  return { initAccount };
+  return { initAccount, accounts };
 }
 
 describe("Committee System Contract", function () {
@@ -26,7 +27,8 @@ describe("Committee System Contract", function () {
 
     beforeEach(async function () {
       fixture = await loadFixture(setSystemContractFixture);
-      const { initAccount } = await setup();
+      const { initAccount, accounts } = await setup();
+      signers = accounts;
       initializer = initAccount;
       await fixture.committee.connect(initializer).initialize(
         constants.VOTE_DELAY, 
@@ -158,7 +160,39 @@ describe("Committee System Contract", function () {
       });
 
       it("committee: execute reject", async function () {
-        // TODO
+        const proposeBlock = block +1n;
+        const contract = await loadFixture(setSystemContractFixture);
+        await contract.committee.connect(initializer).initialize(
+          constants.VOTE_DELAY, 
+          constants.VOTE_PERIOD, 
+          constants.PROPOSE_PERIOD, 
+          [signers[1].address, signers[2].address, signers[3].address, signers[4].address], 
+          signers[0].address);
+        await contract.committee.connect(fixture.admin).grantProposer(fixture.proposer1.address);
+        await contract.committee.connect(fixture.admin).grantAgent(fixture.otherAccount.address);
+        await contract.committee.connect(fixture.proposer1).propose(
+          proposeBlock,
+          fixture.otherAccount1.address, 
+          constants.VOTE_TYPE_ADD);
+        await mine(constants.VOTE_DELAY);
+        const proposalId = await contract.committee.blockProposal(proposeBlock);
+        await contract.committee.connect(signers[1])
+          .vote(proposalId, constants.VOTE_AGREE);
+        await contract.committee.connect(signers[2])
+          .vote(proposalId, constants.VOTE_AGREE);
+        await contract.committee.connect(signers[3])
+          .vote(proposalId, constants.VOTE_DIAGREE);
+        await contract.committee.connect(signers[4])
+          .vote(proposalId, constants.VOTE_DIAGREE);
+        await mine(constants.VOTE_PERIOD);
+        await expect(contract.committee.connect(fixture.otherAccount).execute(proposeBlock))
+          .to.emit(contract.committee, "CommitteeProposalRejected")
+          .withArgs(
+            proposalId,
+            constants.VOTE_TYPE_ADD,
+            fixture.otherAccount1.address,
+            anyValue
+          );
       });
 
       it(revertedMessage.committee_only_agent_can_call, async function () {
