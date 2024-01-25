@@ -19,7 +19,7 @@ async function setup() {
 
 async function targetBlock() {
   const currentBlock = await ethers.provider.getBlockNumber();
-  const targetBlock = BigInt(currentBlock) + constants.VOTE_PERIOD;
+  const targetBlock = BigInt(currentBlock) + constants.VOTE_DELAY + constants.VOTE_PERIOD;
   return targetBlock;
 }
 
