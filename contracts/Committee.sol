@@ -108,7 +108,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         uint256 current = block.number;
         require(current < blockNumber, "committee: propose past block");
         require(account != address(0), "committee: propose zero address");
-        require((current + votingPeriod()) < blockNumber,"committee: invalid blocknumber");
+        require((current + votingDeley() + votingPeriod()) < blockNumber,"committee: invalid blocknumber"); // add + votingDeley()
         if (proposeType == ProposalType.ADD) {
             require(!isCommittee(account), "committee: propose add existing committee");
         } else {
