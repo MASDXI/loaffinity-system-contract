@@ -102,7 +102,13 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
 
         blockProposal[blockNumber] = proposalId;
         _supplyProposals[proposalId].proposer = msg.sender;
-        _supplyProposals[proposalId].recipient = account;
+        if (proposeType == ProposalType.RELEASED) {
+            _supplyProposals[proposalId].recipient = account;
+        }
+        else {
+            _supplyProposals[proposalId].recipient = address(0);
+        }
+        // _supplyProposals[proposalId].recipient = account; // release => account  , remove => address(0)
         _supplyProposals[proposalId].amount = amount;
         _supplyProposals[proposalId].blockNumber = blockNumber;
         _supplyProposals[proposalId].proposeType = proposeType;
@@ -119,13 +125,16 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
         (bool callback) = _execute(IdCache);
         uint256 timeCache = block.timestamp;
         if (callback) {
-            if (data.proposeType == ProposalType.RELEASED) {
-                _transferEther(data.recipient, data.amount);
-                emit TreasuryProposalExecuted(IdCache, ProposalType.RELEASED, data.recipient, data.amount, timeCache);
-            } else {
-                _transferEther(address(0), data.amount);
-                emit TreasuryProposalExecuted(IdCache, ProposalType.REMOVED, data.recipient, data.amount, timeCache);
-            }
+             _transferEther(data.recipient, data.amount);
+                emit TreasuryProposalExecuted(IdCache, data.proposeType, data.recipient, data.amount, timeCache);
+
+            // if (data.proposeType == ProposalType.RELEASED) {
+            //     _transferEther(data.recipient, data.amount);
+            //     emit TreasuryProposalExecuted(IdCache, ProposalType.RELEASED, data.recipient, data.amount, timeCache);
+            // } else {
+            //     _transferEther(address(0), data.amount);
+            //     emit TreasuryProposalExecuted(IdCache, ProposalType.REMOVED, data.recipient, data.amount, timeCache);
+            // }
         } else {
             emit TreasuryProposalRejected(IdCache, data.proposeType, data.recipient, data.amount, timeCache);
         }
