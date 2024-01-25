@@ -163,7 +163,45 @@ describe("Treasury System Contract", function () {
     });
 
     it("treasury: execute reject", async function () {
-      // TODO
+      const contract = await loadFixture(setSystemContractFixture);
+      await contract.committee.connect(initializer).initialize(
+        constants.VOTE_DELAY, 
+        constants.VOTE_PERIOD, 
+        constants.PROPOSE_PERIOD, 
+        [signers[1].address, signers[2].address, signers[3].address, signers[4].address], 
+        signers[0].address);
+      await contract.committee.connect(fixture.admin).grantProposer(fixture.proposer1.address);
+      await contract.committee.connect(fixture.admin).grantAgent(fixture.otherAccount.address);
+      await contract.supplycontrol.connect(initializer).initialize(
+        constants.VOTE_DELAY, 
+        constants.VOTE_PERIOD, 
+        constants.PROPOSE_PERIOD, 
+        constants.COMMITTEE_CONTRACT_ADDRESS);
+      await fixture.supplycontrol.connect(fixture.proposer1).propose(
+        block,
+        constants.ONE_HUNDRED_TOKEN,
+        fixture.otherAccount1.address, 
+        constants.VOTE_TYPE_ADD);
+      await mine(constants.VOTE_DELAY);
+      const proposalId = await fixture.supplycontrol.blockProposal(block);
+      await contract.supplycontrol.connect(signers[1])
+        .vote(proposalId, constants.VOTE_AGREE);
+      await contract.supplycontrol.connect(signers[2])
+        .vote(proposalId, constants.VOTE_AGREE);
+      await contract.supplycontrol.connect(signers[3])
+        .vote(proposalId, constants.VOTE_DIAGREE);
+      await contract.supplycontrol.connect(signers[4])
+        .vote(proposalId, constants.VOTE_DIAGREE);
+      await mine(constants.VOTE_PERIOD);
+      await expect(fixture.supplycontrol.connect(fixture.otherAccount).execute(block))
+        .to.emit(fixture.supplycontrol, "TreasuryProposalRejected")
+        .withArgs(
+          proposalId,
+          constants.VOTE_TYPE_ADD,
+          fixture.otherAccount1.address,
+          constants.ONE_HUNDRED_TOKEN,
+          anyValue
+        );
     });
 
     it(revertedMessage.treasury_only_agent_can_call, async function () {
