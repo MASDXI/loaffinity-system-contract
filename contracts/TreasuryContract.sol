@@ -124,7 +124,7 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
                 emit TreasuryProposalExecuted(IdCache, ProposalType.RELEASED, data.recipient, data.amount, timeCache);
             } else {
                 _transferEther(address(0), data.amount);
-                emit TreasuryProposalExecuted(IdCache, ProposalType.LOCKED, data.recipient, data.amount, timeCache);
+                emit TreasuryProposalExecuted(IdCache, ProposalType.REMOVED, data.recipient, data.amount, timeCache);
             }
         } else {
             emit TreasuryProposalRejected(IdCache, data.proposeType, data.recipient, data.amount, timeCache);

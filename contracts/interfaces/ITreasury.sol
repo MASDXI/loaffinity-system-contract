@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 interface ITreasury {
 
-    enum ProposalType { LOCKED, RELEASED }
+    enum ProposalType { REMOVED, RELEASED } // LOCKED => REMOVED
 
     struct ProposalSupplyInfo {
         address proposer;
