@@ -19,18 +19,18 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
     // handle receive Ether
     receive() external payable {}
 
-    modifier onlyProposer() {
-        require(_commiteeContract.isProposer(msg.sender));
+   modifier onlyProposer() {
+        require(_commiteeContract.isProposer(msg.sender),"treasury: onlyProposer can call");
         _;
     }
 
     modifier onlyCommittee() {
-        require(_commiteeContract.isCommittee(msg.sender));
+        require(_commiteeContract.isCommittee(msg.sender),"treasury: onlyCommittee can call");
         _;
     }
 
     modifier onlyAgent() {
-        require(_commiteeContract.isAgent(msg.sender));
+        require(_commiteeContract.isAgent(msg.sender),"treasury: onlyAgent can call");
         _;
     }
 
