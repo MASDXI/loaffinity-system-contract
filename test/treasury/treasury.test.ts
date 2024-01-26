@@ -178,7 +178,7 @@ describe("Treasury System Contract", function () {
         .to.revertedWith(revertedMessage.treasury_propose_invalid_amount);
     });
 
-    it("10. revert: propose() + exceeded amount", async function () {
+    it("11. revert: propose() + exceeded amount", async function () {
       const block = await targetBlock();
       await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
         block, 
@@ -188,7 +188,7 @@ describe("Treasury System Contract", function () {
         .to.revertedWith(revertedMessage.treasury_propose_amount_exceed);
     });
 
-    it("10. revert: propose() + block too future", async function () {
+    it("12. revert: propose() + block too future", async function () {
       const Block = BigInt(await ethers.provider.getBlockNumber()) + constants.EXCEED_UINT16 + 20n;
       await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
         Block, 
@@ -198,7 +198,7 @@ describe("Treasury System Contract", function () {
         .to.revertedWith(revertedMessage.treasury_propose_too_future);
     });
 
-    it("10. revert: propose() + onlyProposer can call", async function () {
+    it("13. revert: propose() + onlyProposer can call", async function () {
       const Block = await targetBlock() + BigInt(100);
       await expect(fixture.supplycontrol.connect(fixture.committee1).propose(
         Block, 
@@ -208,7 +208,7 @@ describe("Treasury System Contract", function () {
         .to.revertedWith(revertedMessage.treasury_only_proposer_can_call);
     });
 
-    it("4. revert: vote() + onlyCommittee can call", async function () {
+    it("14. revert: vote() + onlyCommittee can call", async function () {
       const currentBlock = await targetBlock() + BigInt(100);
       await fixture.supplycontrol.connect(fixture.proposer1).propose(
         currentBlock, 
@@ -220,7 +220,7 @@ describe("Treasury System Contract", function () {
       .to.revertedWith(revertedMessage.treasury_only_committee_can_call);
     });
 
-    it("11. revert: propose() + blocknumber has propose", async function () {
+    it("15. revert: propose() + blocknumber has propose", async function () {
       const block = (await targetBlock()) + 5n;
       await fixture.supplycontrol.connect(fixture.proposer1).propose(
         block, 
@@ -235,7 +235,7 @@ describe("Treasury System Contract", function () {
         .to.revertedWith(revertedMessage.treasury_propose_to_exist_block);
     });
 
-    it("12. revert: propose() + released to zero address", async function () {
+    it("16. revert: propose() + released to zero address", async function () {
       const block = await targetBlock();
       await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
         block, 
@@ -245,7 +245,7 @@ describe("Treasury System Contract", function () {
         .to.revertedWith(revertedMessage.treasury_propose_released_to_zero_address)
     });
 
-    it("12. revert: propose() + released to zero address", async function () {
+    it("17. revert: propose() + released to zero address", async function () {
       const block = await targetBlock();
       await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
         block, 
@@ -255,7 +255,7 @@ describe("Treasury System Contract", function () {
         .to.revertedWith(revertedMessage.treasury_propose_released_to_zero_address)
     });
 
-    it("13. revert: propose() + locked to non-zero address", async function () {
+    it("18. revert: propose() + locked to non-zero address", async function () {
       const block = await targetBlock();
       await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
         block, 
@@ -265,7 +265,7 @@ describe("Treasury System Contract", function () {
         .to.revertedWith(revertedMessage.treasury_propose_locked_to_non_zero_address)
     });
 
-    it("14. revert: intialized() + onlyInitializer can call", async function () {
+    it("19. revert: intialized() + onlyInitializer can call", async function () {
       await expect(fixture.supplycontrol.connect(fixture.proposer1).initialize(
         constants.VOTE_DELAY, 
         constants.VOTE_PERIOD, 
@@ -273,14 +273,12 @@ describe("Treasury System Contract", function () {
         constants.COMMITTEE_CONTRACT_ADDRESS)).to.revertedWith(revertedMessage.initializer_only_can_call);
     });
 
-    it("7. function: execute() + onlyAgent can call", async function () {
+    it("20. revert: execute() + onlyAgent can call", async function () {
       const Block = await targetBlock() + BigInt(100);
       await expect(fixture.supplycontrol.connect(fixture.proposer2).execute(Block)).to.revertedWith(revertedMessage.treasury_only_agent_can_call);
     });
 
-
-
-    it(revertedMessage.treasury_proposal_not_exist, async function () {
+    it("21. revert: getProposalSupplyInfoByProposalId() + proposal not exist", async function () {
       await expect(fixture.supplycontrol.connect(fixture.proposer1).getProposalSupplyInfoByProposalId(ZeroHash))
         .to.revertedWith(revertedMessage.treasury_proposal_not_exist);
     });
