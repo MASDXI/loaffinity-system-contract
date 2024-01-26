@@ -1,6 +1,6 @@
 import { task } from "hardhat/config"
-import { loadCommitteContract, loadSupplyControlContract } from "../helpers/helper";import { ContractTransactionResponse, TransactionResponse } from "ethers";
- "../helpers/helper"
+import { loadCommitteContract, loadSupplyControlContract } from "../helpers/helper";
+import { ContractTransactionResponse, TransactionResponse } from "ethers";
 
 task("vote", "vote proposal")
   .addParam("proposal", "destination address")
