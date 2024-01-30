@@ -23,4 +23,8 @@ abstract contract Initializer {
     function isInit() public view returns (bool) {
         return _init;
     }
+
+    function isIntializer(address account) external pure returns (bool) {
+        return account == _initializer;
+    }
 }

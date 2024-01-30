@@ -49,6 +49,15 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor,  NativeTransfe
         }
     }
 
+    // /**
+    //  * @param account smart contract address
+    //  * @param signature bytes4 function signature
+    //  * @return bool return true if function registered and return false if function not registered
+    //  */
+    // function trustedFunction(address account, bytes4 signature) public view returns (bool) {
+    //     return ITrustedContractRegistry.isFunctionRegis(account, signature);
+    // }
+
     function onboardMerchant(address merchant) external returns (bool) {
         // TODO provisioning role.
         _registry[merchant] = msg.sender;
