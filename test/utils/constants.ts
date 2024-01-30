@@ -5,7 +5,7 @@ import { deployedBytecode as CommitteeBin } from "../../artifacts/contracts/Comm
 const constants = { 
     // Contract addresses
     "INITIALIZER_ADDRESS": process.env.INITIALIZER_ADDRESS ? 
-        process.env.INITIALIZER_ADDRESS : ZeroAddress,
+    ethers.getAddress(process.env.INITIALIZER_ADDRESS) : ZeroAddress,
     "COMMITTEE_CONTRACT_ADDRESS":  "0x0000000000000000000000000000000000000776",
     "TREASURY_CONTRACT_ADDRESS": "0x0000000000000000000000000000000000000777",
     "DISTRIBUTOR_CONTRACT_ADDRESS": "0x0000000000000000000000000000000000000778",
