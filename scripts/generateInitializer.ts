@@ -1,39 +1,47 @@
-import * as fs from 'fs';
-import { ethers } from 'ethers';
+import * as fs from 'fs/promises';
+import { ZeroAddress, ethers } from 'ethers';
+import { PathLike } from 'fs';
 
 const solidityFilePath = './contracts/abstracts/Initializer.sol';
-const constantFilePath = './test/utils/constants.ts';
-const listFilePath = [solidityFilePath, constantFilePath];
-const oldAddress = '0x0000000000000000000000000000000000000000';
-const newAddress =
-  process.env.INITIALIZER_ADDRESS ||
-  '0x0000000000000000000000000000000000000000';
+const listFilePath = [solidityFilePath];
+const lineToReplace = 10; // Replace with the line number where _initializer is defined
+const charToReplace = 45; // Replace with the character position within the line
+const newAddress = process.env.INITIALIZER_ADDRESS || ZeroAddress;
 
-function isValidEthereumAddress(address: string): boolean {
+function isValidEthereumAddress(address: any) {
   return ethers.isAddress(address);
 }
 
-async function updateAddressInFile(filePath: string): Promise<void> {
+async function updateAddressInFile(filePath: PathLike | fs.FileHandle, newAddress: string) {
   try {
-    const data = await fs.promises.readFile(filePath, 'utf8');
+     // Validate the new address first
+    newAddress = ethers.getAddress(newAddress);
+    if (!isValidEthereumAddress(newAddress)) {
+      throw new Error('Invalid Ethereum address.');
+    }
+    const data = await fs.readFile(filePath, 'utf8');
+    const lines = data.split('\n');
 
-    // Replace the old address with the new address
-    const match = data.match(newAddress);
-    if (match == null) {
-        const updatedContent = data.replace(oldAddress, newAddress);
-        // Validate the new address
-        if (!isValidEthereumAddress(newAddress)) {
-            console.error('Invalid Ethereum address.');
-            return;
-        }
-    
-        await fs.promises.writeFile(filePath, updatedContent, 'utf8');
-        console.log(`Address replaced and validated successfully in ${filePath}.`);
+    if (lines.length >= lineToReplace) {
+      const line = lines[lineToReplace - 1];
+      if (line.length >= charToReplace) {
+        lines[lineToReplace - 1] =
+          line.substring(0, charToReplace - 1) +
+          newAddress +
+          line.substring(charToReplace + newAddress.length - 1);
+      } else {
+        throw new Error('Character position is beyond the line length.');
+      }
     } else {
-        console.error(`Address already updated in ${filePath}.`);
-        return;
+      throw new Error('Line number is beyond the total number of lines.');
     }
 
+    const updatedContent = lines.join('\n');
+
+
+    await fs.writeFile(filePath, updatedContent, 'utf8');
+    console.log(`Address replaced and validated successfully in ${filePath}.`);
+    console.log(`Address replaced with ${newAddress}`);
   } catch (error) {
     console.error(`Error updating file ${filePath}: ${error}`);
   }
@@ -41,12 +49,10 @@ async function updateAddressInFile(filePath: string): Promise<void> {
 
 async function main() {
   for (const filePath of listFilePath) {
-    await updateAddressInFile(filePath);
+    await updateAddressInFile(filePath, newAddress);
   }
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
