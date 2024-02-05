@@ -74,7 +74,7 @@ describe("Abstract Proposal Contract", function () {
             await expect(proposalMock.connect(signers[0])
                 .execute(constants.PROPOSE_PERIOD))
                 .to.be.emit(proposalMock,"LogProposal")
-                .withArgs(anyValue, anyValue, 2);
+                .withArgs(anyValue, anyValue, constants.PROPOSAL_STATUS_REJECT);
         });
 
         it("5. function: execute() + if(vote true and false < threshold && true == false) => fail", async function () {
@@ -91,7 +91,7 @@ describe("Abstract Proposal Contract", function () {
             await expect(proposalMock.connect(signers[0])
                 .execute(constants.PROPOSE_PERIOD))
                 .to.be.emit(proposalMock,"LogProposal")
-                .withArgs(anyValue, anyValue, 2);
+                .withArgs(anyValue, anyValue, constants.PROPOSAL_STATUS_REJECT);
         });
 
         it("6. function: execute() + if(vote true and false < threshold && true > false) => fail", async function () {
@@ -108,7 +108,7 @@ describe("Abstract Proposal Contract", function () {
             await expect(proposalMock.connect(signers[0])
                 .execute(constants.PROPOSE_PERIOD))
                 .to.be.emit(proposalMock,"LogProposal")
-                .withArgs(anyValue, anyValue, 2);
+                .withArgs(anyValue, anyValue, constants.PROPOSAL_STATUS_REJECT);
         });
 
         it("7. function: execute() + if(vote true and false < threshold && true < false) => fail", async function () {
@@ -125,7 +125,7 @@ describe("Abstract Proposal Contract", function () {
             await expect(proposalMock.connect(signers[0])
                 .execute(constants.PROPOSE_PERIOD))
                 .to.be.emit(proposalMock,"LogProposal")
-                .withArgs(anyValue, anyValue, 2);
+                .withArgs(anyValue, anyValue, constants.PROPOSAL_STATUS_REJECT);
         });
 
         it("8. function: execute() + if(vote true || vote false > threshold && true > false) => success", async function () {
@@ -142,7 +142,7 @@ describe("Abstract Proposal Contract", function () {
             await expect(proposalMock.connect(signers[0])
                 .execute(constants.PROPOSE_PERIOD))
                 .to.be.emit(proposalMock,"LogProposal")
-                .withArgs(anyValue, anyValue, 1);
+                .withArgs(anyValue, anyValue, constants.PROPOSAL_STATUS_EXECUTE);
         });
 
         it("9. function: execute() + test event execute: if(vote true || vote false > threshold && true < false) => fail", async function () {
@@ -159,7 +159,7 @@ describe("Abstract Proposal Contract", function () {
             await expect(proposalMock.connect(signers[0])
                 .execute(constants.PROPOSE_PERIOD))
                 .to.be.emit(proposalMock,"LogProposal")
-                .withArgs(anyValue, anyValue, 2);
+                .withArgs(anyValue, anyValue, constants.PROPOSAL_STATUS_REJECT);
         });
 
         it("10. revert: this vote period value already set", async function () {

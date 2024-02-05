@@ -33,6 +33,10 @@ const constants = {
     "VOTE_TYPE_ADD": 1,
     "VOTE_AGREE": true,
     "VOTE_DIAGREE": false,
+    "PROPOSAL_STATUS_DEFAULT": 0,
+    "PROPOSAL_STATUS_PENDING": 1,
+    "PROPOSAL_STATUS_EXECUTE": 2,
+    "PROPOSAL_STATUS_REJECT": 3,
     // Role Based Access Control
     "AGENT_ROLE": "",
     "ROOT_ADMIN_ROLE": "0x77ccc78fff97648b6361d5a6f0bd0a9f7c43fd29c1369941d3474c71311418fc",

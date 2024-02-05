@@ -125,7 +125,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         _committeeProposals[proposalId].blockNumber = blockNumber;
         _committeeProposals[proposalId].proposeType = proposeType;
         
-        _proposal(proposalId, uint16(getCommitteeCount()));
+        _proposal(proposalId, uint16(getCommitteeCount()), blockNumber);
         emit CommitteeProposalProposed(proposalId, msg.sender, account, proposeType, blockNumber, block.timestamp);
 
         return true;

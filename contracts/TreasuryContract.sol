@@ -107,7 +107,7 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
         _supplyProposals[proposalId].blockNumber = blockNumber;
         _supplyProposals[proposalId].proposeType = proposeType;
 
-        _proposal(proposalId, uint16(_commiteeContract.getCommitteeCount()));
+        _proposal(proposalId, uint16(_commiteeContract.getCommitteeCount()), blockNumber);
         emit TreasuryProposalProposed(proposalId, msg.sender, account, proposeType, amount, blockNumber, block.timestamp);
 
         return blockNumber;
