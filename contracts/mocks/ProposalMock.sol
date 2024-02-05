@@ -53,4 +53,8 @@ contract ProposalMock is Proposal {
     function setVotePeriod(uint256 delay) external {
         _setVotePeriod(delay);
     }
+
+    function setExecuteRetentionPeriod(uint32 period) external {
+        _setExecuteRetentionPeriod(period);
+    }
 }

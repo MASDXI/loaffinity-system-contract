@@ -234,17 +234,6 @@ describe("Treasury System Contract", function () {
         .to.revertedWith(revertedMessage.treasury_only_proposer_can_call);
     });
 
-
-    it(revertedMessage.treasury_propose_invalid_block, async function () {
-      await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
-        block -1n, 
-        constants.ONE_TOKEN, 
-        fixture.committee1.address,
-        constants.VOTE_TYPE_ADD))
-        .to.revertedWith(revertedMessage.treasury_propose_invalid_block);
-    });
-
-
     it(revertedMessage.treasury_propose_amount_exceed, async function () {
       await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
         block, 

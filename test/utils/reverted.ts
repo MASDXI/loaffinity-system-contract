@@ -3,6 +3,7 @@ export const revertedMessage = {
     proposal_vote_delay_exist: "proposal: this vote delay value already set",
     proposal_vote_period_exist: "proposal: this vote period value already set",
     proposal_vote_threshold_exist: "proposal: this vote threshold value already set",
+    proposal_execute_retention_exist: "proposal: this execution retention period value already set",
     proposal_vote_not_exist: "proposal: proposalId not exist",
     proposal_propose_past_block: "proposal: propose past block",
     proposal_propose_invalid_block: "proposal: invalid blocknumber",
