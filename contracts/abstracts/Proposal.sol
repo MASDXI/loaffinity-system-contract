@@ -9,11 +9,12 @@ abstract contract Proposal is IProposal {
     uint256 private _voteDelay;
     uint8 private _voteThreshold;
     uint32 private _proposePeriod;
-    uint8 private _executeRetentionPeriod;
+    uint32 private _executeRetentionPeriod;
 
     uint8 private constant MAX_PROPOSAL = type(uint8).max;
     uint8 private constant MAX_THRESHOLD = 100;
     uint8 private constant MIN_THRESHOLD = 50;
+    uint16 private constant MAX_FUTURE_BLOCK = type(uint16).max;
 
     mapping(bytes32 => bool) private _pass;
     mapping(bytes32 => ProposalInfo) private _proposals;
@@ -43,7 +44,7 @@ abstract contract Proposal is IProposal {
         _voteThreshold = percentage;
     }
 
-    function _setExecuteRetentionPeriod(uint8 period) internal {
+    function _setExecuteRetentionPeriod(uint32 period) internal {
         require(executeRetentionPeriod() != period,"proposal: this execution retention period value already set");
         _executeRetentionPeriod = period;
     }
@@ -51,7 +52,11 @@ abstract contract Proposal is IProposal {
     function _proposal(bytes32 proposalId, uint16 nvoter, uint256 blockNumber) internal virtual returns (bytes32) {
         uint256 blockTimeCache = block.timestamp;
         uint256 blockNumberCache = block.number;
+        uint256 blockPeriodCache = (blockNumberCache + votingDeley() + votingPeriod());
         require(_proposals[proposalId].status == ProposalStatus.DEAFULT, "proposal: proposalId already exists");
+        require(blockNumberCache < blockNumber, "proposal: propose past block");
+        require(blockPeriodCache < blockNumber,"proposal: invalid blocknumber");
+        require(blockNumber - blockPeriodCache <= MAX_FUTURE_BLOCK,"proposal: block too future");
         require(_counter[msg.sender] < MAX_PROPOSAL, "proposal: propose max stack");
         require(blockNumberCache - _latestProposal[msg.sender] >= proposePeriod(), "proposal: propose again later");
 
@@ -98,7 +103,7 @@ abstract contract Proposal is IProposal {
     function _execute(bytes32 proposalId) internal virtual returns (bool success) {
         require(_proposals[proposalId].status == ProposalStatus.PENDING, "proposal: proposal not pending");
         require(_proposals[proposalId].endBlock < block.number, "proposal: are in voting period");
-        require(_proposals[proposalId].activateBlock + executeRetentionPeriod() <= block.number,"proposal: can't execute in retention period");
+        require(_proposals[proposalId].activateBlock + executeRetentionPeriod() < block.number,"proposal: can't execute in retention period");
         address proposerCache = _proposals[proposalId].proposer;
         uint16 acceptCache = _proposals[proposalId].accept;
         uint16 rejectCache = _proposals[proposalId].reject;

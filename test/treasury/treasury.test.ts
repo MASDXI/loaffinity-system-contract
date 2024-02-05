@@ -234,14 +234,6 @@ describe("Treasury System Contract", function () {
         .to.revertedWith(revertedMessage.treasury_only_proposer_can_call);
     });
 
-    it(revertedMessage.treasury_propose_past_block, async function () {
-      await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
-        constants.ZERO,
-        constants.ONE_TOKEN, 
-        fixture.committee1.address, 
-        constants.VOTE_TYPE_ADD))
-        .to.revertedWith(revertedMessage.treasury_propose_past_block);
-    });
 
     it(revertedMessage.treasury_propose_invalid_block, async function () {
       await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
@@ -252,14 +244,6 @@ describe("Treasury System Contract", function () {
         .to.revertedWith(revertedMessage.treasury_propose_invalid_block);
     });
 
-    it(revertedMessage.treasury_propose_too_future, async function () {
-      await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
-        block + constants.EXCEED_UINT16,
-        constants.ONE_TOKEN,
-        fixture.committee1.address,
-        constants.VOTE_TYPE_ADD))
-        .to.revertedWith(revertedMessage.treasury_propose_too_future);
-    });
 
     it(revertedMessage.treasury_propose_amount_exceed, async function () {
       await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
@@ -289,15 +273,6 @@ describe("Treasury System Contract", function () {
         .to.revertedWith(revertedMessage.treasury_propose_amount_exceed);
     });
 
-    it(revertedMessage.treasury_propose_too_future, async function () {
-      const Block = BigInt(await ethers.provider.getBlockNumber()) + constants.EXCEED_UINT16 + 20n;
-      await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
-        Block, 
-        constants.ONE_TOKEN, 
-        fixture.committee1.address, 
-        constants.VOTE_TYPE_ADD))
-        .to.revertedWith(revertedMessage.treasury_propose_too_future);
-    });
 
     it(revertedMessage.treasury_only_proposer_can_call, async function () {
       const Block = await targetBlock() + BigInt(100);

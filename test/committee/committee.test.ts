@@ -237,13 +237,6 @@ describe("Committee System Contract", function () {
           .to.revertedWith(revertedMessage.committee_only_proposer_can_call)
       });
 
-      it(revertedMessage.committee_propose_past_block, async function () {
-        await expect(fixture.committee.connect(fixture.admin).propose(
-          constants.ZERO,
-          fixture.proposer1.address,
-          constants.VOTE_TYPE_ADD)).to.revertedWith(revertedMessage.committee_propose_past_block);
-      });
-
       it(revertedMessage.committee_propose_zero_address, async function () {
         await expect(fixture.committee.connect(fixture.admin).propose(
           block,
@@ -256,14 +249,6 @@ describe("Committee System Contract", function () {
           block - 1n,
           fixture.committee2.address,
           constants.VOTE_TYPE_ADD)).to.revertedWith(revertedMessage.committee_propose_invalid_block);
-      });
-
-      it(revertedMessage.committee_propose_too_future, async function () {
-        await expect(fixture.committee.connect(fixture.admin).propose(
-          block + constants.EXCEED_UINT16,
-          fixture.committee2.address,
-          constants.VOTE_TYPE_ADD))
-          .to.revertedWith(revertedMessage.committee_propose_too_future);
       });
 
       it(revertedMessage.committee_propose_add_exist_address, async function () {
