@@ -2,7 +2,7 @@ import { task } from "hardhat/config"
 import { loadCommitteContract } from "../helpers/helper"
 
 task("grant_proposer", "propose new committee proposal")
-  .addParam("account", "destination address")
+  .addParam("account", "expected committee address")
   .addParam("action", "revoke:0, grant:1")
   .setAction(async (args, hre) => {
     const committee = await loadCommitteContract(hre)
