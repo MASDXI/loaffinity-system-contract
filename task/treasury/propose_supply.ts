@@ -20,9 +20,9 @@ task("propose_supply", "propose new supply proposal")
     try {
         const res: any = await supplycontrol.propose(blockTarget, amount, account, proposalType);
         await res.wait()
-        console.log(res)
-        // const { blockNumber, blockHash, hash } = await res.getTransaction()
-        // console.log(`blockNumber: ${blockNumber}\nblockHash: ${blockHash}\nhash: ${hash}`)
+        
+        const { blockNumber, blockHash, hash } = await res.getTransaction()
+        console.log(`blockNumber: ${blockNumber}\nblockHash: ${blockHash}\nhash: ${hash}`)
     } catch (err) {
         console.error(err)
     }
