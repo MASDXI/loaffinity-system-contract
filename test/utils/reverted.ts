@@ -17,6 +17,7 @@ export const revertedMessage = {
     proposal_vote_twice: "proposal: not allow to vote twice",
     proposal_not_start: "proposal: proposal not start",
     proposal_expire: "proposal: proposal expired",
+    proposal_not_exist: "proposal: proposal not exist",
     proposal_not_pending: "proposal: proposal not pending",
     proposal_voting_period: "proposal: are in voting period",
     proposal_execute_retention_period: "proposal: can't execute in retention period",

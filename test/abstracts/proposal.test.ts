@@ -6,7 +6,9 @@ import { constants } from "../utils/constants"
 import { revertedMessage } from "../utils/reverted";
 
 async function setup(voteDelay: BigInt, votePeriod: BigInt, threshold: BigInt, proposePeriod: BigInt, executeRetentionPeriod: BigInt) {
-    const contract = await ethers.deployContract("ProposalMock",[voteDelay, votePeriod, threshold, proposePeriod, executeRetentionPeriod]);
+    const contract = await ethers.deployContract(
+        "ProposalMock",
+        [voteDelay, votePeriod, threshold, proposePeriod, executeRetentionPeriod]);
     const accounts = await ethers.getSigners();
     return { contract, accounts };
 }
@@ -30,9 +32,10 @@ describe("Abstract Proposal Contract", function () {
         await mine(100);
         activateBlock = 
         BigInt(await ethers.provider.getBlockNumber())+
-        constants.VOTE_DELAY+
-        constants.VOTE_PERIOD+
-        2n;
+            constants.VOTE_DELAY+
+            constants.VOTE_PERIOD+
+            constants.EXECUTE_RETENTION_PERIOD+
+            2n;
     });
 
     describe("Unit test", async function () {
@@ -72,7 +75,7 @@ describe("Abstract Proposal Contract", function () {
             const proposalId = await proposalMock.blockProposal(activateBlock);
             await mine(constants.VOTE_DELAY);
                 for (let index = 0; index < 10; index++) {
-                await proposalMock.connect(signers[index]).vote(proposalId, true);
+                    await proposalMock.connect(signers[index]).vote(proposalId, true);
                 }
                 for (let index = 10; index < 20; index++) {
                     await proposalMock.connect(signers[index]).vote(proposalId, false);
@@ -90,10 +93,10 @@ describe("Abstract Proposal Contract", function () {
             const proposalId = await proposalMock.blockProposal(activateBlock);
             await mine(constants.VOTE_DELAY);
                 for (let index = 0; index < 5; index++) {
-                await proposalMock.connect(signers[index]).vote(proposalId, true);
+                    await proposalMock.connect(signers[index]).vote(proposalId, true);
                 }
                 for (let index = 5; index < 10; index++) {
-                await proposalMock.connect(signers[index]).vote(proposalId, false);
+                    await proposalMock.connect(signers[index]).vote(proposalId, false);
                 }
             await mine(constants.VOTE_PERIOD);
             await mine(constants.EXECUTE_RETENTION_PERIOD);
@@ -108,10 +111,10 @@ describe("Abstract Proposal Contract", function () {
             const proposalId = await proposalMock.blockProposal(activateBlock);
             await mine(constants.VOTE_DELAY);
                 for (let index = 0; index < 6; index++) {
-                await proposalMock.connect(signers[index]).vote(proposalId, true);
+                    await proposalMock.connect(signers[index]).vote(proposalId, true);
                 }
                 for (let index = 6; index < 11; index++) {
-                await proposalMock.connect(signers[index]).vote(proposalId, false);
+                    await proposalMock.connect(signers[index]).vote(proposalId, false);
                 }
             await mine(constants.VOTE_PERIOD);
             await mine(constants.EXECUTE_RETENTION_PERIOD);
@@ -126,10 +129,10 @@ describe("Abstract Proposal Contract", function () {
             const proposalId = await proposalMock.blockProposal(activateBlock);
             await mine(constants.VOTE_DELAY);
                 for (let index = 0; index < 5; index++) {
-                await proposalMock.connect(signers[index]).vote(proposalId, true);
+                    await proposalMock.connect(signers[index]).vote(proposalId, true);
                 }
                 for (let index = 5; index < 11; index++) {
-                await proposalMock.connect(signers[index]).vote(proposalId, false);
+                    await proposalMock.connect(signers[index]).vote(proposalId, false);
                 }
             await mine(constants.VOTE_PERIOD);
             await mine(constants.EXECUTE_RETENTION_PERIOD);
@@ -144,10 +147,10 @@ describe("Abstract Proposal Contract", function () {
             const proposalId = await proposalMock.blockProposal(activateBlock);
             await mine(constants.VOTE_DELAY);
                 for (let index = 0; index < 12; index++) {
-                await proposalMock.connect(signers[index]).vote(proposalId, true);
+                    await proposalMock.connect(signers[index]).vote(proposalId, true);
                 }
                 for (let index = 12; index < 18; index++) {
-                await proposalMock.connect(signers[index]).vote(proposalId, false);
+                    await proposalMock.connect(signers[index]).vote(proposalId, false);
                 }
             await mine(constants.VOTE_PERIOD);
             await mine(constants.EXECUTE_RETENTION_PERIOD);
@@ -162,10 +165,10 @@ describe("Abstract Proposal Contract", function () {
             const proposalId = await proposalMock.blockProposal(activateBlock);
             await mine(constants.VOTE_DELAY);
                 for (let index = 0; index < 6; index++) {
-                await proposalMock.connect(signers[index]).vote(proposalId, true);
+                    await proposalMock.connect(signers[index]).vote(proposalId, true);
                 }
                 for (let index = 6; index < 18; index++) {
-                await proposalMock.connect(signers[index]).vote(proposalId, false);
+                    await proposalMock.connect(signers[index]).vote(proposalId, false);
                 }
             await mine(constants.VOTE_PERIOD);
             await mine(constants.EXECUTE_RETENTION_PERIOD);
@@ -211,21 +214,21 @@ describe("Abstract Proposal Contract", function () {
 
         it("revert: less than min threshold", async function () {
             const deploy = setup(
-            constants.VOTE_DELAY,
-            constants.VOTE_PERIOD,
-            constants.ZERO,
-            constants.PROPOSE_PERIOD,
-            constants.EXECUTE_RETENTION_PERIOD);
+                constants.VOTE_DELAY,
+                constants.VOTE_PERIOD,
+                constants.ZERO,
+                constants.PROPOSE_PERIOD,
+                constants.EXECUTE_RETENTION_PERIOD);
             await expect(deploy).to.be.revertedWith(revertedMessage.proposal_vote_threshold_min);
         });
 
         it("revert: more than max threshold", async function () {
             const deploy = setup(
-            constants.VOTE_DELAY,
-            constants.VOTE_PERIOD,
-            constants.VOTE_THREADSHOLD_EXCEED,
-            constants.PROPOSE_PERIOD,
-            constants.EXECUTE_RETENTION_PERIOD);
+                constants.VOTE_DELAY,
+                constants.VOTE_PERIOD,
+                constants.VOTE_THREADSHOLD_EXCEED,
+                constants.PROPOSE_PERIOD,
+                constants.EXECUTE_RETENTION_PERIOD);
             await expect(deploy).to.be.revertedWith(revertedMessage.proposal_vote_threshold_max);
         });
 
@@ -272,7 +275,7 @@ describe("Abstract Proposal Contract", function () {
         it("revert: proposal expired", async function () {
             await proposalMock.connect(signers[0]).propose(activateBlock, 1);
             const proposalId = await proposalMock.blockProposal(activateBlock);;
-            await mine(constants.VOTE_DELAY + constants.VOTE_PERIOD)
+            await mine(constants.VOTE_DELAY + constants.VOTE_PERIOD);
             await expect(proposalMock.connect(signers[0])
                 .vote(proposalId, true))
                 .to.be.revertedWith(revertedMessage.proposal_expire);
@@ -289,9 +292,30 @@ describe("Abstract Proposal Contract", function () {
         });
 
         it("revert: proposal not pending", async function () {
+            await proposalMock.connect(signers[0]).propose(activateBlock, 10);
+            const proposalId = await proposalMock.blockProposal(activateBlock);
+            await mine(constants.VOTE_DELAY);
+                for (let index = 0; index < 12; index++) {
+                    await proposalMock.connect(signers[index]).vote(proposalId, true);
+                }
+                for (let index = 12; index < 18; index++) {
+                    await proposalMock.connect(signers[index]).vote(proposalId, false);
+                }
+            await mine(constants.VOTE_PERIOD);
+            await mine(constants.EXECUTE_RETENTION_PERIOD);
             await expect(proposalMock.connect(signers[0])
                 .execute(activateBlock))
-                .to.be.revertedWith(revertedMessage.proposal_not_pending);
+                .to.be.emit(proposalMock,"LogProposal")
+                .withArgs(anyValue, anyValue, constants.PROPOSAL_STATUS_EXECUTE);
+            await expect(proposalMock.connect(signers[0])
+               .execute(activateBlock))
+               .to.be.revertedWith(revertedMessage.proposal_not_pending);
+        });
+
+        it("revert: proposal not exist", async function () {
+            await expect(proposalMock.connect(signers[0])
+                .execute(activateBlock))
+                .to.be.revertedWith(revertedMessage.proposal_not_exist);
         });
 
         it("revert: proposal execute in retention period", async function () {
