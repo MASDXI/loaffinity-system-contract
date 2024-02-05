@@ -21,6 +21,7 @@ export const revertedMessage = {
     proposal_not_pending: "proposal: proposal not pending",
     proposal_voting_period: "proposal: are in voting period",
     proposal_execute_retention_period: "proposal: can't execute in retention period",
+    proposal_cancel_after_retention: "proposal: can't cancel after rentention period",
     // abstract initializer contract
     initializer_already_initialized: "initializer: already init",
     initializer_only_can_call: "initializer: onlyInitializer can call",
