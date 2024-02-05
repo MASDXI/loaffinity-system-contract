@@ -22,7 +22,8 @@ describe("Abstract NativeTransfer Contract", function () {
         signers = accounts;
     });
 
-    describe("NativeTransferMock Contract", async function () {
+    describe("Uint test", async function () {
+
         it("nativetransfer: transfer successful", async function () {
             await nativeTransferMock.transferEther(mockAddress, constants.ONE_HUNDRED_TOKEN);
             const balance = await ethers.provider.getBalance(mockAddress);

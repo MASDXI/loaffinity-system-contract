@@ -6,10 +6,10 @@
   "scripts": {
     "clean": "npx hardhat clean && rm -rf build cache coverage coverage.json",
     "compile": "npx hardhat run scripts/generateInitializer.ts && npx hardhat compile",
-    "coverage": "npx hardhat coverage",
+    "coverage": "yarn compile && npx hardhat coverage",
     "build": "yarn clean && yarn compile && yarn test && npx hardhat run scripts/build.ts",
     "size": "npx hardhat size-contracts",
-    "test": "npx hardhat test"
+    "test": "yarn compile && npx hardhat test"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.3",

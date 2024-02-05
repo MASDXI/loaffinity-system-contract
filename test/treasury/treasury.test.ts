@@ -43,12 +43,13 @@ describe("Treasury System Contract", function () {
   });
 
   describe("Unit test", function () {
-    it("treasury: getAvailableBalance", async function () {
+
+    it("1. function: getAvailableBalance", async function () {
       expect(await fixture.supplycontrol.getAvailableBalance())
         .to.equal(constants.ONE_TRILLION_TOKEN);
     });
 
-    it("treasury: getLockedBalance", async function () {
+    it("2. function: getLockedBalance", async function () {
       expect(await fixture.supplycontrol.getLockedBalance())
         .to.equal(constants.ZERO_TOKEN);
     });
@@ -128,7 +129,7 @@ describe("Treasury System Contract", function () {
           anyValue
         );
       const balance = await ethers.provider.getBalance(fixture.otherAccount1.address);
-      expect(balance).to.equal(ethers.parseEther("10100"));
+      expect(balance).to.equal(constants.ONE_HUNDRED_TOKEN);
     });
 
     it("treasury: execute locked", async function () {
@@ -159,7 +160,7 @@ describe("Treasury System Contract", function () {
           anyValue
         );
       const balance = await ethers.provider.getBalance(ZeroAddress);
-      expect(balance).to.equal(ethers.parseEther("100"));
+      expect(balance).to.equal(constants.ONE_HUNDRED_TOKEN);
     });
 
     it("treasury: execute reject", async function () {
@@ -276,6 +277,48 @@ describe("Treasury System Contract", function () {
         fixture.committee1.address, 
         constants.VOTE_TYPE_ADD))
         .to.revertedWith(revertedMessage.treasury_propose_invalid_amount);
+    });
+
+    it(revertedMessage.treasury_propose_amount_exceed, async function () {
+      const block = await targetBlock();
+      await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
+        block, 
+        constants.ONE_TRILLION_TOKEN + 200n, 
+        fixture.committee1.address, 
+        constants.VOTE_TYPE_ADD))
+        .to.revertedWith(revertedMessage.treasury_propose_amount_exceed);
+    });
+
+    it(revertedMessage.treasury_propose_too_future, async function () {
+      const Block = BigInt(await ethers.provider.getBlockNumber()) + constants.EXCEED_UINT16 + 20n;
+      await expect(fixture.supplycontrol.connect(fixture.proposer1).propose(
+        Block, 
+        constants.ONE_TOKEN, 
+        fixture.committee1.address, 
+        constants.VOTE_TYPE_ADD))
+        .to.revertedWith(revertedMessage.treasury_propose_too_future);
+    });
+
+    it(revertedMessage.treasury_only_proposer_can_call, async function () {
+      const Block = await targetBlock() + BigInt(100);
+      await expect(fixture.supplycontrol.connect(fixture.committee1).propose(
+        Block, 
+        constants.ONE_TOKEN, 
+        fixture.committee1.address, 
+        constants.VOTE_TYPE_ADD))
+        .to.revertedWith(revertedMessage.treasury_only_proposer_can_call);
+    });
+
+    it(revertedMessage.treasury_only_committee_can_call, async function () {
+      const currentBlock = await targetBlock() + BigInt(100);
+      await fixture.supplycontrol.connect(fixture.proposer1).propose(
+        currentBlock, 
+        constants.ONE_TOKEN, 
+        fixture.committee1.address, 
+        constants.VOTE_TYPE_ADD);
+      const proposalId = await fixture.supplycontrol.connect(fixture.proposer1).blockProposal(currentBlock);
+      await expect(fixture.supplycontrol.connect(fixture.proposer2).vote(proposalId, true))
+      .to.revertedWith(revertedMessage.treasury_only_committee_can_call);
     });
 
     it(revertedMessage.treasury_propose_to_exist_block, async function () {

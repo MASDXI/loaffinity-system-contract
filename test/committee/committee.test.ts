@@ -21,9 +21,9 @@ async function setup() {
 describe("Committee System Contract", function () {
 
     let fixture: any;
-    let signers: any;
     let initializer: any;
     let block: bigint;
+    let signers: any;
 
     beforeEach(async function () {
       fixture = await loadFixture(setSystemContractFixture);

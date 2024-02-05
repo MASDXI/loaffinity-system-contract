@@ -19,7 +19,7 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
     // handle receive Ether
     receive() external payable {}
 
-    modifier onlyProposer() {
+   modifier onlyProposer() {
         require(_commiteeContract.isProposer(msg.sender),"treasury: onlyProposer can call");
         _;
     }
@@ -92,7 +92,7 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
         } else {
             require(account == address(0), "treasury: propose locked to non-zero address");
         }
-        require(blockNumber > (current + votingPeriod() + votingDeley()),"treasury: invalid blocknumber");
+        require((current + votingDeley() + votingPeriod()) < blockNumber,"treasury: invalid blocknumber"); // add + votingDeley()
         require(blockProposal[blockNumber] == bytes32(0),"treasury: blocknumber has propose");
         require(blockNumber - current <= MAX_FUTURE_BLOCK,"treasury: block too future");
 
@@ -119,8 +119,13 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
         (bool callback) = _execute(IdCache);
         uint256 timeCache = block.timestamp;
         if (callback) {
-            _transferEther(data.recipient, data.amount);
-            emit TreasuryProposalExecuted(IdCache, data.proposeType, data.recipient, data.amount, timeCache);
+            if (data.proposeType == ProposalType.RELEASED) {
+                _transferEther(data.recipient, data.amount);
+                emit TreasuryProposalExecuted(IdCache, ProposalType.RELEASED, data.recipient, data.amount, timeCache);
+            } else {
+                _transferEther(address(0), data.amount);
+                emit TreasuryProposalExecuted(IdCache, ProposalType.REMOVED, data.recipient, data.amount, timeCache);
+            }
         } else {
             emit TreasuryProposalRejected(IdCache, data.proposeType, data.recipient, data.amount, timeCache);
         }

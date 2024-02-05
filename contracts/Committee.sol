@@ -108,11 +108,11 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         uint256 current = block.number;
         require(current < blockNumber, "committee: propose past block");
         require(account != address(0), "committee: propose zero address");
-        require(blockNumber > (current + votingPeriod() + votingDeley()),"committee: invalid blocknumber");
+        require((current + votingDeley() + votingPeriod()) < blockNumber,"committee: invalid blocknumber"); // add + votingDeley()
         if (proposeType == ProposalType.ADD) {
             require(!isCommittee(account), "committee: propose add existing committee");
         } else {
-            require(isCommittee(account), "committee: propose remove not exist committee");
+            require(isCommittee(account), "committee: propose remove not exist committee"); // typo commitee
         }
         require(blockProposal[blockNumber] == bytes32(0),"committee: blocknumber has propose");
         require(blockNumber - block.number <= MAX_FUTURE_BLOCK,"committee: block too future");

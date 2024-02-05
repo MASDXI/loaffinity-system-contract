@@ -17,10 +17,10 @@ export async function setSystemContractFixture() {
     committee3,
     proposer1, 
     proposer2, 
-    otherAccount,
-    otherAccount1] = await ethers.getSigners();
+    otherAccount] = await ethers.getSigners();
     
   const initializerCallerSigner = await ethers.getImpersonatedSigner(constants.INITIALIZER_ADDRESS);
+  const otherAccount1 = await ethers.getImpersonatedSigner(constants.RELEASE_TARGET_ADDESS);
     
   // pre-mint native token for initializer.
   await setBalance(constants.INITIALIZER_ADDRESS, constants.ONE_HUNDRED_TOKEN);
