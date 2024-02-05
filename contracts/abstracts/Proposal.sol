@@ -140,8 +140,8 @@ abstract contract Proposal is IProposal {
         require(_proposals[proposalId].status == ProposalStatus.PENDING, "proposal: proposal not pending");
         require(_proposals[proposalId].endBlock < blockNumberCache, "proposal: are in voting period");
         require(proposals[proposalId].endBlock + executeRetentionPeriod() < blockNumberCache,"proposal: can't cancel after rentention period");
-        _proposals[proposalId].status = ProposalStatus.REJECT;
-        emit LogProposalCanceled(proposalId, block.timestamp, ProposalStatus.REJECT);
+        _proposals[proposalId].status = ProposalStatus.CANCLE;
+        emit LogProposalCanceled(proposalId, block.timestamp, ProposalStatus.CANCLE);
     }
 
     function threshold() public view override returns (uint8) {
