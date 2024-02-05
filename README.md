@@ -76,6 +76,6 @@ npx hardhat is_agent --help
 - Everyblock can contain only one proposal.
 
 ### TODO
-- [] issue propose block can be shorten than votedelay
+- [] adding execute retention period (period delay before can execute)
 - [] update and refactor task script
 - [] update readme and documentation
