@@ -7,7 +7,7 @@ abstract contract Initializer {
 
     event Initialized();
     
-    address private constant _initializer = 0x32D5a21376C0dF3F98200a00380b06adeE341B91;
+    address private constant _initializer = 0x000000000000000000000000000000000000000F;
 
     modifier onlyInitializer() {
         require(msg.sender == _initializer,"initializer: onlyInitializer can call");
@@ -22,5 +22,9 @@ abstract contract Initializer {
 
     function isInit() public view returns (bool) {
         return _init;
+    }
+
+    function isIntializer(address account) external pure returns (bool) {
+        return account == _initializer;
     }
 }

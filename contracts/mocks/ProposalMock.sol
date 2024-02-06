@@ -7,23 +7,30 @@ contract ProposalMock is Proposal {
 
     mapping(uint256 => bytes32) public blockProposal;
 
-    constructor (uint256 voteDelay_, uint256 votePeriod_, uint8 threshold_, uint32 proposePeriod_) {
+    constructor (uint256 voteDelay_, uint256 votePeriod_, uint8 threshold_, uint32 proposePeriod_, uint32 executeRetentionPeriod_) {
         _setVoteDelay(voteDelay_);
         _setVotePeriod(votePeriod_);
         _setVoteThreshold(threshold_);
         _setProposePeriod(proposePeriod_);
+        _setExecuteRetentionPeriod(executeRetentionPeriod_);
     }
 
     function propose(uint256 blocknumber, uint16 nvote) public returns(bool) {
         bytes32 proposalId = keccak256(abi.encode(msg.sender, blocknumber));
         blockProposal[blocknumber] = proposalId;
-        _proposal(proposalId, nvote);
+        _proposal(proposalId, nvote, blocknumber);
         return true;
     }
     
     function execute(uint256 blockNumber) public payable returns (uint256) {
         bytes32 IdCache =  blockProposal[blockNumber];
         _execute(IdCache);
+        return blockNumber;
+    }
+
+    function cancel(uint256 blockNumber) public payable returns (uint256) {
+        bytes32 IdCache =  blockProposal[blockNumber];
+        _cancelProposal(IdCache);
         return blockNumber;
     }
 
@@ -45,5 +52,9 @@ contract ProposalMock is Proposal {
 
     function setVotePeriod(uint256 delay) external {
         _setVotePeriod(delay);
+    }
+
+    function setExecuteRetentionPeriod(uint32 period) external {
+        _setExecuteRetentionPeriod(period);
     }
 }

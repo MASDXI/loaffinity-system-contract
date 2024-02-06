@@ -3,13 +3,14 @@ pragma solidity 0.8.17;
 
 interface IProposal {
 
-    enum ProposalStatus { PENDING, EXECUTE, REJECT }
+    enum ProposalStatus { DEAFULT, PENDING, EXECUTE, REJECT, CANCLE }
 
     struct ProposalInfo {
         address proposer;
         uint256 createTime;
         uint256 startBlock;
         uint256 endBlock;
+        uint256 activateBlock;
         uint16 nVoter;
         uint16 accept;
         uint16 reject;
@@ -41,9 +42,16 @@ interface IProposal {
         ProposalStatus indexed status
     );
 
+    event LogProposalCanceled(
+        bytes32 indexed proposalId,
+        uint256 timestamp,
+        ProposalStatus indexed status
+    );
+
     function isProposalPassed(bytes32 proposalId) external view returns(bool);
     function threshold() external returns (uint8);
     function proposePeriod() external returns (uint32);
+    function executeRetentionPeriod() external view returns(uint32);
     function vote(bytes32 proposalId, bool auth) external;
     function votingDeley() external view returns(uint256);
     function votingPeriod() external view returns(uint256);

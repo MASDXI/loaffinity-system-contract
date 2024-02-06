@@ -20,23 +20,32 @@ export async function setSystemContractFixture() {
     otherAccount] = await ethers.getSigners();
     
   const initializerCallerSigner = await ethers.getImpersonatedSigner(constants.INITIALIZER_ADDRESS);
+  const otherAccount1 = await ethers.getImpersonatedSigner(constants.RELEASE_TARGET_ADDESS);
     
   // pre-mint native token for initializer.
   await setBalance(constants.INITIALIZER_ADDRESS, constants.ONE_HUNDRED_TOKEN);
-  await setBalance(constants.SUPPLY_CONTRACT_ADDRESS,constants.ONE_TRILLION_TOKEN);
+  await setBalance(constants.TREASURY_CONTRACT_ADDRESS, constants.ONE_TRILLION_TOKEN);
 
   // set contract code to preload contract address.
-  await setCode(constants.SUPPLY_CONTRACT_ADDRESS, constants.SUPPLY_CONTRACT_BIN);
+  await setCode(constants.TREASURY_CONTRACT_ADDRESS, constants.SUPPLY_CONTRACT_BIN);
   await setCode(constants.COMMITTEE_CONTRACT_ADDRESS, constants.COMMITEE_CONTRACT_BIN);
 
   // load contract from to address
-  const supplycontrol = await ethers.getContractAt("TreasuryContract",constants.SUPPLY_CONTRACT_ADDRESS);
-  const committee = await ethers.getContractAt("Committee",constants.COMMITTEE_CONTRACT_ADDRESS);
+  const supplycontrol = await ethers.getContractAt("TreasuryContract",
+    constants.TREASURY_CONTRACT_ADDRESS);
+  const committee = await ethers.getContractAt("Committee",
+    constants.COMMITTEE_CONTRACT_ADDRESS);
   await mine(200);
-  return { committee, admin , committee1, committee2, committee3, proposer1 , proposer2 , otherAccount, initializerCallerSigner, supplycontrol };
+  return { committee, admin , committee1, committee2, committee3, proposer1 , proposer2 , otherAccount, otherAccount1, initializerCallerSigner, supplycontrol };
 }
 
 export async function setUp(contractName: string, params: any) {
   const { contract } = await ethers.deployContract(contractName, params);
   return contract;
+}
+
+export async function targetBlock() {
+  const currentBlock = await ethers.provider.getBlockNumber();
+  const targetBlock = (BigInt(currentBlock) + constants.VOTE_PERIOD + constants.VOTE_DELAY) + 2n;
+  return targetBlock;
 }

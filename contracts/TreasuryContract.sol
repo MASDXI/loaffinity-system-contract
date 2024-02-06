@@ -11,7 +11,6 @@ import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
 
     uint256 private _lockedBalance;
-    uint16 private constant MAX_FUTURE_BLOCK = type(uint16).max;
     ICommittee private _commiteeContract;
     mapping(bytes32 => ProposalSupplyInfo) private _supplyProposals; 
     mapping(uint256 => bytes32) public blockProposal;
@@ -83,31 +82,26 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
         address account,
         ProposalType proposeType
     ) public onlyProposer returns(uint256) {
-        uint256 current = block.number;
         require(amount > 0, "treasury: invalid amount");
         require(amount <= getAvailableBalance(),"treasury: amount exceed");
-        require(current < blockNumber, "treasury: propose past block");
         if (proposeType == ProposalType.RELEASED) {
             require(account != address(0), "treasury: propose released to zero address");
         } else {
             require(account == address(0), "treasury: propose locked to non-zero address");
         }
-        require((current + votingDeley() + votingPeriod()) < blockNumber,"treasury: invalid blocknumber"); // add + votingDeley()
         require(blockProposal[blockNumber] == bytes32(0),"treasury: blocknumber has propose");
-        require(blockNumber - current <= MAX_FUTURE_BLOCK,"treasury: block too future");
-
-        _lockedBalance += amount;
 
         bytes32 proposalId = keccak256(abi.encode(msg.sender, account, amount, blockNumber));
-
+        _proposal(proposalId, uint16(_commiteeContract.getCommitteeCount()), blockNumber);
+        
+        _lockedBalance += amount;
         blockProposal[blockNumber] = proposalId;
         _supplyProposals[proposalId].proposer = msg.sender;
         _supplyProposals[proposalId].recipient = account;
         _supplyProposals[proposalId].amount = amount;
         _supplyProposals[proposalId].blockNumber = blockNumber;
         _supplyProposals[proposalId].proposeType = proposeType;
-
-        _proposal(proposalId, uint16(_commiteeContract.getCommitteeCount()));
+        
         emit TreasuryProposalProposed(proposalId, msg.sender, account, proposeType, amount, blockNumber, block.timestamp);
 
         return blockNumber;
