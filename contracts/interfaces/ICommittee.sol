@@ -7,7 +7,7 @@ interface ICommittee {
 
     struct ProposalCommitteeInfo {
         address proposer;
-        address commitee;
+        address committee;
         uint256 blockNumber;
         ProposalType proposeType;
     }

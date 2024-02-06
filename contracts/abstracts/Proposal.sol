@@ -139,7 +139,7 @@ abstract contract Proposal is IProposal {
         uint256 blockNumberCache = block.number;
         require(_proposals[proposalId].status == ProposalStatus.PENDING, "proposal: proposal not pending");
         require(_proposals[proposalId].endBlock < blockNumberCache, "proposal: are in voting period");
-        require(proposals[proposalId].endBlock + executeRetentionPeriod() < blockNumberCache,"proposal: can't cancel after rentention period");
+        require(_proposals[proposalId].endBlock + executeRetentionPeriod() < blockNumberCache,"proposal: can't cancel after rentention period");
         _proposals[proposalId].status = ProposalStatus.CANCLE;
         emit LogProposalCanceled(proposalId, block.timestamp, ProposalStatus.CANCLE);
     }

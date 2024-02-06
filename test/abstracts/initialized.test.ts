@@ -37,6 +37,16 @@ describe("Abstract Initialized Contract", function () {
             expect(status).to.equal(true);
         });
 
+        it("initializer: is initializer true", async function () {
+            const output = await initializedMock.isIntializer(initializer.address);
+            expect(output).to.equal(true);
+        });
+
+        it("initializer: is initializer false", async function () {
+            const output = await initializedMock.isIntializer(signers[0].address);
+            expect(output).to.equal(false);
+        });
+
         it(revertedMessage.initializer_only_can_call, async function () {
             await expect(initializedMock.connect(signers[0]).init())
                 .to.revertedWith(revertedMessage.initializer_only_can_call);
