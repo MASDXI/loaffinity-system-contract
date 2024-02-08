@@ -9,7 +9,11 @@ contract GasPriceOracle {
 
     enum PARAMETERS { CEC, CO2P, SCR }
 
+    enum FLAG { DISABLE, ENABLE }
+
     event ParameterUpdated(uint256 indexed blockNumber, string indexed params, uint256 value);
+    event Enabled();
+    event Disabled();
 
     uint32 constant private ONE_YEAR = 31_536_000; // 1 year in seconds.
     uint32 constant private ONE_HOUR = 3_600;      // 1 hour in seconds.
@@ -31,6 +35,7 @@ contract GasPriceOracle {
     uint256 private _constant;
     uint256 private _lastUpdatedBlock;
     bool private _init;
+    FLAG private _flag;
 
     function initialize() public {
         require(!_init);
@@ -43,6 +48,16 @@ contract GasPriceOracle {
         setBlockPeriod(15);       // decimal 9 _15/(ONE_HOUR * 1000)
         _constant = 278;
         _init = true;
+    }
+
+    function Enable() public {
+        if (_flag == FLAG.ENABLE) {
+            _flag = FLAG.DISABLE;
+            emit Disabled();
+        } else {
+            _flag = FLAG.ENABLE;
+            emit Enabled();
+        }
     }
 
     function _parameterSelector(PARAMETERS param) private pure returns (string memory) {
