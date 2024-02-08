@@ -19,8 +19,9 @@ interface ICommittee {
         ProposalType indexed proposeType,
         uint256 blockNumber,
         uint256 timestamp);
-
+        
     event CommitteeVoted(bytes32 indexed proposalId, address indexed voter, bool auth, uint256 time);
+    event CommitteeCancel(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 time); // add
     event CommitteeProposalExecuted(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 time);
     event CommitteeProposalRejected(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 time);
 

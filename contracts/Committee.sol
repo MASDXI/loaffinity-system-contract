@@ -48,6 +48,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         uint256 voteDelay_,
         uint256 votePeriod_,
         uint32 proposePeriod_,
+        uint32 retentionPeriod_, // add
         address [] calldata committees_, 
         address admin_
         ) external onlyInitializer {
@@ -62,6 +63,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         _setVotePeriod(votePeriod_);
         _setVoteThreshold(75);
         _setProposePeriod(proposePeriod_);
+        _setExecuteRetentionPeriod(retentionPeriod_); // add
     }
 
     function _getProposal(bytes32 proposalId) private view returns (ProposalCommitteeInfo memory) {
@@ -167,5 +169,14 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
     function vote(bytes32 proposalId, bool auth) external override onlyCommittee {
         _vote(proposalId, auth);
         emit CommitteeVoted(proposalId, msg.sender, auth, block.timestamp);
+    }
+
+    function cancel(uint256 blockNumber) public payable onlyAgent returns (uint256) { // add
+        ProposalCommitteeInfo memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
+        uint256 timeCache = block.timestamp;
+        bytes32 IdCache =  blockProposal[blockNumber];
+        _cancelProposal(IdCache);
+        emit CommitteeCancel(IdCache, data.proposeType, data.committee, timeCache);
+        return blockNumber;
     }
 }
