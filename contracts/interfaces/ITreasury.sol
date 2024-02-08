@@ -23,6 +23,7 @@ interface ITreasury {
         uint256 time);
 
     event TreasuryVoted(bytes32 indexed proposalId, address indexed voter, bool auth, uint256 time);
+    event TreasuryCancel(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time); // add
     event TreasuryProposalExecuted(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
     event TreasuryProposalRejected(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
 
