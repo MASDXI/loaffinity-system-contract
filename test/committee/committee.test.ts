@@ -33,7 +33,8 @@ describe("Committee System Contract", function () {
       await fixture.committee.connect(initializer).initialize(
         constants.VOTE_DELAY, 
         constants.VOTE_PERIOD, 
-        constants.PROPOSE_PERIOD, 
+        constants.PROPOSE_PERIOD,
+        constants.EXECUTE_RETENTION_PERIOD, 
         [fixture.committee1.address], 
         fixture.admin.address)
       await fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer1);
@@ -53,7 +54,8 @@ describe("Committee System Contract", function () {
           constants.VOTE_DELAY,
           constants.VOTE_PERIOD,
           constants.PROPOSE_PERIOD,
-          [fixture.committee1.address], 
+          constants.EXECUTE_RETENTION_PERIOD,
+          [fixture.committee1.address],
           fixture.admin.address)).to.revertedWith(revertedMessage.initializer_only_can_call)
       });
 
@@ -115,6 +117,25 @@ describe("Committee System Contract", function () {
           .withArgs(proposalId, fixture.committee1.address, constants.VOTE_AGREE, anyValue);
       });
 
+      it("committee: cancel proposal", async function () {
+        await fixture.committee.connect(fixture.proposer1).propose(
+          block,
+          fixture.committee2.address, 
+          constants.VOTE_TYPE_ADD);
+        await mine(constants.VOTE_DELAY);
+        const proposalId = await fixture.committee.blockProposal(block);
+        await fixture.committee.connect(fixture.committee1)
+          .vote(proposalId,constants.VOTE_AGREE);
+        await fixture.committee.connect(fixture.admin).grantAgent(fixture.otherAccount.address);
+        await mine(constants.VOTE_PERIOD);
+        await mine(constants.EXECUTE_RETENTION_PERIOD);
+        await mine(20n);
+        await expect(fixture.committee.connect(fixture.otherAccount)
+          .cancel(block))
+          .to.be.emit(fixture.committee,"CommitteeCancel")
+          .withArgs(proposalId, constants.VOTE_TYPE_ADD, fixture.committee2.address, anyValue);
+      });
+
       it("committee: execute add", async function () {
         await fixture.committee.connect(fixture.proposer1).propose(
           block,
@@ -126,6 +147,8 @@ describe("Committee System Contract", function () {
           .vote(proposalId,constants.VOTE_AGREE);
         await fixture.committee.connect(fixture.admin).grantAgent(fixture.otherAccount.address);
         await mine(constants.VOTE_PERIOD);
+        await mine(constants.EXECUTE_RETENTION_PERIOD);
+        await mine(10n);
         await expect(fixture.committee.connect(fixture.otherAccount).execute(block))
           .to.emit(fixture.committee, "CommitteeProposalExecuted")
           .withArgs(
@@ -148,6 +171,8 @@ describe("Committee System Contract", function () {
           .vote(proposalId,constants.VOTE_AGREE);
         await fixture.committee.connect(fixture.admin).grantAgent(fixture.otherAccount.address);
         await mine(constants.VOTE_PERIOD);
+        await mine(constants.EXECUTE_RETENTION_PERIOD);
+        await mine(10n);
         await expect(fixture.committee.connect(fixture.otherAccount).execute(block))
           .to.emit(fixture.committee, "CommitteeProposalExecuted")
           .withArgs(
@@ -166,6 +191,7 @@ describe("Committee System Contract", function () {
           constants.VOTE_DELAY, 
           constants.VOTE_PERIOD, 
           constants.PROPOSE_PERIOD, 
+          constants.EXECUTE_RETENTION_PERIOD, 
           [signers[1].address, signers[2].address, signers[3].address, signers[4].address], 
           signers[0].address);
         await contract.committee.connect(fixture.admin).grantProposer(fixture.proposer1.address);
@@ -185,6 +211,8 @@ describe("Committee System Contract", function () {
         await contract.committee.connect(signers[4])
           .vote(proposalId, constants.VOTE_DIAGREE);
         await mine(constants.VOTE_PERIOD);
+        await mine(constants.EXECUTE_RETENTION_PERIOD);
+        await mine(10n);
         await expect(contract.committee.connect(fixture.otherAccount).execute(proposeBlock))
           .to.emit(contract.committee, "CommitteeProposalRejected")
           .withArgs(
@@ -306,5 +334,10 @@ describe("Committee System Contract", function () {
           .to.revertedWith(revertedMessage.committee_revoke_non_exist_agent);
       });
 
+      it(revertedMessage.committee_only_agent_can_call, async function () {
+        await expect(fixture.committee.connect(fixture.admin).cancel(
+          ZeroHash))
+          .to.revertedWith(revertedMessage.committee_only_agent_can_call);
+      });
   });
 });
