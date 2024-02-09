@@ -5,6 +5,7 @@ task("initialize_supply", "init system contract")
     .addParam("delay", "voteDelay_")
     .addParam("period", "votePeriod_")
     .addParam("proposeperiod", "proposePeriod_")
+    .addParam("retention", "retentionPeriod_")
     .addParam("committeeaddress", "address committee contract")
     .setAction(async (args, hre) => {
         const supplycontrol = await loadSupplyControlContract(hre);
@@ -12,12 +13,13 @@ task("initialize_supply", "init system contract")
         const delay = BigInt(args.delay);
         const period = BigInt(args.period);
         const proposeperiod = BigInt(args.proposeperiod);
+        const retention = BigInt(args.retention);
         const committeeaddress = String(args.committeeaddress);
         let tx: any
         try {
             // should handle if sigenrs[0] is not match intili
             tx = await supplycontrol.initialize(
-                delay, period, proposeperiod, committeeaddress);
+                delay, period, proposeperiod, retention, committeeaddress);
             await tx.wait()
             const { blockNumber, blockHash, hash } = await tx.getTransaction()
             console.log(`blockNumber: ${blockNumber}\nblockHash: ${blockHash}\nhash: ${hash}`)
