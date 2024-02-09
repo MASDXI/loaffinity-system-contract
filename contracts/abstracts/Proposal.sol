@@ -102,8 +102,7 @@ abstract contract Proposal is IProposal {
 
     function _execute(bytes32 proposalId) internal virtual returns (bool success) {
         uint256 blockNumberCache = block.number;
-        require(_proposals[proposalId].startBlock != 0, "proposal: proposal not exist");
-        require(_proposals[proposalId].status == ProposalStatus.DEAFULT ||
+        require(_proposals[proposalId].status == ProposalStatus.CANCLE ||
                 _proposals[proposalId].status == ProposalStatus.PENDING, "proposal: proposal not pending");
         require(_proposals[proposalId].endBlock < blockNumberCache, "proposal: are in voting period");
         require(_proposals[proposalId].activateBlock < blockNumberCache,"proposal: can't execute in retention period");
@@ -139,7 +138,7 @@ abstract contract Proposal is IProposal {
         uint256 blockNumberCache = block.number;
         require(_proposals[proposalId].status == ProposalStatus.PENDING, "proposal: proposal not pending");
         require(_proposals[proposalId].endBlock < blockNumberCache, "proposal: are in voting period");
-        require(_proposals[proposalId].endBlock + executeRetentionPeriod() < blockNumberCache,"proposal: can't cancel after rentention period");
+        require(_proposals[proposalId].endBlock + executeRetentionPeriod() > blockNumberCache,"proposal: can't cancel after rentention period");
         _proposals[proposalId].status = ProposalStatus.CANCLE;
         emit LogProposalCanceled(proposalId, block.timestamp, ProposalStatus.CANCLE);
     }
