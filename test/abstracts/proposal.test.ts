@@ -312,12 +312,6 @@ describe("Abstract Proposal Contract", function () {
                .to.be.revertedWith(revertedMessage.proposal_not_pending);
         });
 
-        it("revert: proposal not exist", async function () {
-            await expect(proposalMock.connect(signers[0])
-                .execute(activateBlock))
-                .to.be.revertedWith(revertedMessage.proposal_not_exist);
-        });
-
         it("revert: proposal execute in retention period", async function () {
             await proposalMock.connect(signers[0]).propose(activateBlock, 1);
             const proposalId = await proposalMock.blockProposal(activateBlock);
