@@ -30,6 +30,7 @@ describe("Treasury System Contract", function () {
       constants.VOTE_DELAY, 
       constants.VOTE_PERIOD, 
       constants.PROPOSE_PERIOD, 
+      constants.EXECUTE_RETENTION_PERIOD, 
       [fixture.committee1.address], 
       fixture.admin.address);
     await fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer1.address);
@@ -38,6 +39,7 @@ describe("Treasury System Contract", function () {
       constants.VOTE_DELAY, 
       constants.VOTE_PERIOD, 
       constants.PROPOSE_PERIOD, 
+      constants.EXECUTE_RETENTION_PERIOD, 
       constants.COMMITTEE_CONTRACT_ADDRESS);
     block = await targetBlock();
   });
@@ -83,6 +85,7 @@ describe("Treasury System Contract", function () {
         constants.VOTE_DELAY, 
         constants.VOTE_PERIOD, 
         constants.PROPOSE_PERIOD, 
+        constants.EXECUTE_RETENTION_PERIOD, 
         constants.COMMITTEE_CONTRACT_ADDRESS))
         .to.revertedWith(revertedMessage.initializer_only_can_call)
     });
@@ -102,6 +105,24 @@ describe("Treasury System Contract", function () {
         .withArgs(proposalId, fixture.committee1.address, constants.VOTE_AGREE, anyValue);
     });
 
+    it("treasury: cancel proposal", async function () {
+      await fixture.supplycontrol.connect(fixture.proposer1).propose(
+        block,
+        constants.ONE_HUNDRED_TOKEN,
+        fixture.otherAccount1.address, 
+        constants.VOTE_TYPE_ADD);
+      await mine(constants.VOTE_DELAY);
+      const proposalId = await fixture.supplycontrol.blockProposal(block);
+      await fixture.supplycontrol.connect(fixture.committee1)
+        .vote(proposalId,constants.VOTE_AGREE);
+      await mine(constants.VOTE_PERIOD);
+      await mine(constants.EXECUTE_RETENTION_PERIOD);
+      await mine(20n);
+      await expect(fixture.supplycontrol.connect(fixture.otherAccount)
+        .cancel(block))
+        .to.be.emit(fixture.supplycontrol,"TreasuryCancel");
+    });
+
     it("treasury: execute release", async function () {
       // before locked balance
       const balanceBefore = await fixture.supplycontrol.getLockedBalance();
@@ -119,6 +140,8 @@ describe("Treasury System Contract", function () {
       await fixture.supplycontrol.connect(fixture.committee1)
         .vote(proposalId,constants.VOTE_AGREE);
       await mine(constants.VOTE_PERIOD);
+      await mine(constants.EXECUTE_RETENTION_PERIOD);
+      await mine(10n);
       await expect(fixture.supplycontrol.connect(fixture.otherAccount).execute(block))
         .to.emit(fixture.supplycontrol, "TreasuryProposalExecuted")
         .withArgs(
@@ -150,6 +173,8 @@ describe("Treasury System Contract", function () {
       await fixture.supplycontrol.connect(fixture.committee1)
         .vote(proposalId,constants.VOTE_AGREE);
       await mine(constants.VOTE_PERIOD);
+      await mine(constants.EXECUTE_RETENTION_PERIOD);
+      await mine(10n);
       await expect(fixture.supplycontrol.connect(fixture.otherAccount).execute(block))
         .to.emit(fixture.supplycontrol, "TreasuryProposalExecuted")
         .withArgs(
@@ -169,6 +194,7 @@ describe("Treasury System Contract", function () {
         constants.VOTE_DELAY, 
         constants.VOTE_PERIOD, 
         constants.PROPOSE_PERIOD, 
+        constants.EXECUTE_RETENTION_PERIOD, 
         [signers[1].address, signers[2].address, signers[3].address, signers[4].address], 
         signers[0].address);
       await contract.committee.connect(fixture.admin).grantProposer(fixture.proposer1.address);
@@ -177,6 +203,7 @@ describe("Treasury System Contract", function () {
         constants.VOTE_DELAY, 
         constants.VOTE_PERIOD, 
         constants.PROPOSE_PERIOD, 
+        constants.EXECUTE_RETENTION_PERIOD, 
         constants.COMMITTEE_CONTRACT_ADDRESS);
       await fixture.supplycontrol.connect(fixture.proposer1).propose(
         block,
@@ -194,6 +221,8 @@ describe("Treasury System Contract", function () {
       await contract.supplycontrol.connect(signers[4])
         .vote(proposalId, constants.VOTE_DIAGREE);
       await mine(constants.VOTE_PERIOD);
+      await mine(constants.EXECUTE_RETENTION_PERIOD);
+      await mine(10n);
       await expect(fixture.supplycontrol.connect(fixture.otherAccount).execute(block))
         .to.emit(fixture.supplycontrol, "TreasuryProposalRejected")
         .withArgs(
@@ -324,5 +353,10 @@ describe("Treasury System Contract", function () {
         .to.revertedWith(revertedMessage.treasury_proposal_not_exist);
     });
 
+    it(revertedMessage.treasury_only_agent_can_call, async function () {
+      await expect(fixture.supplycontrol.connect(fixture.admin).cancel(
+        ZeroHash))
+        .to.revertedWith(revertedMessage.treasury_only_agent_can_call);
+    });
   });
 });
