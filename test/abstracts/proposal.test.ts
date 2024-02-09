@@ -179,7 +179,15 @@ describe("Abstract Proposal Contract", function () {
         });
 
         it("function: cancel proposal", async function () {
-            // TODO
+            await proposalMock.connect(signers[0]).propose(activateBlock, 1);
+            const proposalId = await proposalMock.blockProposal(activateBlock);
+            await mine(constants.VOTE_DELAY);
+            await proposalMock.connect(signers[0]).vote(proposalId, true);
+            await mine(constants.VOTE_PERIOD);
+            await mine(10n);
+            await expect(proposalMock.connect(signers[0])
+                .cancel(activateBlock))
+                .to.be.emit(proposalMock,"LogProposalCanceled");
         });
 
         it("revert: this vote period value already set", async function () {
@@ -312,12 +320,6 @@ describe("Abstract Proposal Contract", function () {
                .to.be.revertedWith(revertedMessage.proposal_not_pending);
         });
 
-        it("revert: proposal not exist", async function () {
-            await expect(proposalMock.connect(signers[0])
-                .execute(activateBlock))
-                .to.be.revertedWith(revertedMessage.proposal_not_exist);
-        });
-
         it("revert: proposal execute in retention period", async function () {
             await proposalMock.connect(signers[0]).propose(activateBlock, 1);
             const proposalId = await proposalMock.blockProposal(activateBlock);
@@ -362,6 +364,54 @@ describe("Abstract Proposal Contract", function () {
         it("revert: propose too future block", async function () {
             await expect(proposalMock.connect(signers[0]).propose(activateBlock + constants.EXCEED_UINT16, 1))
                 .to.be.revertedWith(revertedMessage.proposal_propose_too_future);
+        });
+
+        it("revert: cancel pending proposal -- proposal not pending", async function () {
+            await proposalMock.connect(signers[0]).propose(activateBlock, 1);
+            const proposalId = await proposalMock.blockProposal(activateBlock);
+            await mine(constants.VOTE_DELAY);
+            await proposalMock.connect(signers[0]).vote(proposalId, true);
+            await mine(constants.VOTE_PERIOD);
+            await expect(proposalMock.connect(signers[0])
+            .cancel(activateBlock +1n))
+                .to.be.revertedWith(revertedMessage.proposal_not_pending);
+        });
+
+        it("revert: cancel proposal -- are in voting period", async function () {
+            await proposalMock.connect(signers[0]).propose(activateBlock, 1);
+            const proposalId = await proposalMock.blockProposal(activateBlock);
+            await mine(constants.VOTE_DELAY);
+            await proposalMock.connect(signers[0]).vote(proposalId, true);
+            await expect(proposalMock.connect(signers[0])
+            .cancel(activateBlock))
+                .to.be.revertedWith(revertedMessage.proposal_voting_period);
+        });
+
+        it("revert: cancel proposal -- can't cancel after rentention period", async function () {
+            await proposalMock.connect(signers[0]).propose(activateBlock, 1);
+            const proposalId = await proposalMock.blockProposal(activateBlock);
+            await mine(constants.VOTE_DELAY);
+            await proposalMock.connect(signers[0]).vote(proposalId, true);
+            await mine(constants.VOTE_PERIOD);
+            await mine(constants.EXECUTE_RETENTION_PERIOD);
+            await mine(20n);
+            await expect(proposalMock.connect(signers[0])
+            .cancel(activateBlock))
+                .to.be.revertedWith(revertedMessage.proposal_cancel_after_retention);
+        });
+
+        it("revert: execute canceled proposal -- proposal not pending", async function () {
+            await proposalMock.connect(signers[0]).propose(activateBlock, 1);
+            const proposalId = await proposalMock.blockProposal(activateBlock);
+            await mine(constants.VOTE_DELAY);
+            await proposalMock.connect(signers[0]).vote(proposalId, true);
+            await mine(constants.VOTE_PERIOD);
+            await mine(10n);
+            await proposalMock.connect(signers[0]).cancel(activateBlock);
+            await mine(constants.EXECUTE_RETENTION_PERIOD);
+            await proposalMock.connect(signers[0]).execute(activateBlock);
+            await expect(proposalMock.connect(signers[0]).execute(activateBlock))
+            .to.be.revertedWith(revertedMessage.proposal_not_pending);
         });
     });
 });

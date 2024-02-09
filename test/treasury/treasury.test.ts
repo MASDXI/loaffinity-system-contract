@@ -116,8 +116,7 @@ describe("Treasury System Contract", function () {
       await fixture.supplycontrol.connect(fixture.committee1)
         .vote(proposalId,constants.VOTE_AGREE);
       await mine(constants.VOTE_PERIOD);
-      await mine(constants.EXECUTE_RETENTION_PERIOD);
-      await mine(20n);
+      await mine(10n);
       await expect(fixture.supplycontrol.connect(fixture.otherAccount)
         .cancel(block))
         .to.be.emit(fixture.supplycontrol,"TreasuryCancel");

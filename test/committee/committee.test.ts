@@ -128,8 +128,7 @@ describe("Committee System Contract", function () {
           .vote(proposalId,constants.VOTE_AGREE);
         await fixture.committee.connect(fixture.admin).grantAgent(fixture.otherAccount.address);
         await mine(constants.VOTE_PERIOD);
-        await mine(constants.EXECUTE_RETENTION_PERIOD);
-        await mine(20n);
+        await mine(10n);
         await expect(fixture.committee.connect(fixture.otherAccount)
           .cancel(block))
           .to.be.emit(fixture.committee,"CommitteeCancel")
