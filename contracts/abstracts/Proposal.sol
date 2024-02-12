@@ -53,7 +53,7 @@ abstract contract Proposal is IProposal {
         uint256 blockTimeCache = block.timestamp;
         uint256 blockNumberCache = block.number;
         uint256 blockPeriodCache = (blockNumberCache + votingDeley() + votingPeriod() + executeRetentionPeriod());
-        require(_proposals[proposalId].status == ProposalStatus.DEAFULT, "proposal: proposalId already exists");
+        require(_proposals[proposalId].status == ProposalStatus.DEFAULT, "proposal: proposalId already exists");
         require(blockNumberCache < blockNumber, "proposal: propose past block");
         require(blockPeriodCache < blockNumber,"proposal: invalid blocknumber");
         require(blockNumber < blockPeriodCache + MAX_FUTURE_BLOCK,"proposal: block too future");
@@ -82,7 +82,7 @@ abstract contract Proposal is IProposal {
     }
 
     function _vote(bytes32 proposalId, bool auth) internal virtual {
-        require(_proposals[proposalId].status != ProposalStatus.DEAFULT, "proposal: proposalId not exist");
+        require(_proposals[proposalId].status != ProposalStatus.DEFAULT, "proposal: proposalId not exist");
         require(_votes[msg.sender][proposalId].voteTime == 0, "proposal: not allow to vote twice");
         require(block.number > _proposals[proposalId].startBlock, "proposal: proposal not start");
         require(block.number < _proposals[proposalId].endBlock, "proposal: proposal expired");
@@ -102,7 +102,7 @@ abstract contract Proposal is IProposal {
 
     function _execute(bytes32 proposalId) internal virtual returns (bool success) {
         uint256 blockNumberCache = block.number;
-        require(_proposals[proposalId].status == ProposalStatus.CANCLE ||
+        require(_proposals[proposalId].status == ProposalStatus.CANCEL ||
                 _proposals[proposalId].status == ProposalStatus.PENDING, "proposal: proposal not pending");
         require(_proposals[proposalId].endBlock < blockNumberCache, "proposal: are in voting period");
         require(_proposals[proposalId].activateBlock < blockNumberCache,"proposal: can't execute in retention period");
@@ -139,8 +139,8 @@ abstract contract Proposal is IProposal {
         require(_proposals[proposalId].status == ProposalStatus.PENDING, "proposal: proposal not pending");
         require(_proposals[proposalId].endBlock < blockNumberCache, "proposal: are in voting period");
         require(_proposals[proposalId].endBlock + executeRetentionPeriod() > blockNumberCache,"proposal: can't cancel after rentention period");
-        _proposals[proposalId].status = ProposalStatus.CANCLE;
-        emit LogProposalCanceled(proposalId, block.timestamp, ProposalStatus.CANCLE);
+        _proposals[proposalId].status = ProposalStatus.CANCEL;
+        emit LogProposalCanceled(proposalId, block.timestamp, ProposalStatus.CANCEL);
     }
 
     function threshold() public view override returns (uint8) {

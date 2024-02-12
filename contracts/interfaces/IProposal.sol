@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 interface IProposal {
 
-    enum ProposalStatus { DEAFULT, PENDING, EXECUTE, REJECT, CANCLE }
+    enum ProposalStatus { DEFAULT, PENDING, EXECUTE, REJECT, CANCEL }
 
     struct ProposalInfo {
         address proposer;
