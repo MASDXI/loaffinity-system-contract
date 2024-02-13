@@ -3,11 +3,11 @@ import { loadCommitteContract } from "../helpers/helper"
 
 task("get_committee_count", "check committee number")
   .setAction(async (args, hre) => {
-    const committee = await loadCommitteContract(hre)
+    const committee = await loadCommitteContract(hre);
     try {
         const tx = await committee.getCommitteeCount();
-        console.log(tx)
+        console.log(tx);
     } catch (err) {
-        console.error(err)
+        console.error(err);
     }
 })

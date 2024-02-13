@@ -17,13 +17,16 @@ task("initialize_supply", "init system contract")
         const committeeaddress = String(args.committeeaddress);
         let tx: any
         try {
-            // should handle if sigenrs[0] is not match intili
-            tx = await supplycontrol.initialize(
-                delay, period, proposeperiod, retention, committeeaddress);
-            await tx.wait()
-            const { blockNumber, blockHash, hash } = await tx.getTransaction()
-            console.log(`blockNumber: ${blockNumber}\nblockHash: ${blockHash}\nhash: ${hash}`)
+            if(signers[0].address == process.env.INITIALIZER_ADDRESS){
+                tx = await supplycontrol.connect(signers[0]).initialize(
+                    delay, period, proposeperiod, retention, committeeaddress);
+                await tx.wait()
+                const { blockNumber, blockHash, hash } = await tx.getTransaction();
+                console.log(`blockNumber: ${blockNumber}\nblockHash: ${blockHash}\nhash: ${hash}`);
+            }else{
+                console.log("initializer: onlyInitializer can call");
+            } 
         } catch (err) {
-            console.error(err)
+            console.error(err);
         }
     })

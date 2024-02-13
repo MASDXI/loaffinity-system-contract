@@ -8,11 +8,11 @@ task("check_balance", "check balance of a given address")
   .setAction(async (args, hre) => {
 
     const provider = new JsonRpcProvider(constants.TESTNET_URL);
-    const account = String(args.account)
+    const account = String(args.account);
     try {
         const  balance = await provider.getBalance(account);
-        console.log(balance)
+        console.log(balance);
     } catch (err) {
-        console.error(err)
+        console.error(err);
     }
 })
