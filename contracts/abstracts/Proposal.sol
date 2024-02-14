@@ -50,18 +50,19 @@ abstract contract Proposal is IProposal {
     }
 
     function _proposal(bytes32 proposalId, uint16 nvoter, uint256 blockNumber) internal virtual returns (bytes32) {
-        uint256 blockTimeCache = block.timestamp;
+        address proposerCache = msg.sender;
         uint256 blockNumberCache = block.number;
+        uint256 blockTimeCache = block.timestamp;
         uint256 blockPeriodCache = (blockNumberCache + votingDeley() + votingPeriod() + executeRetentionPeriod());
-        require(_proposals[proposalId].status == ProposalStatus.DEAFULT, "proposal: proposalId already exists");
+        require(_proposals[proposalId].status == ProposalStatus.DEFAULT, "proposal: proposalId already exists");
         require(blockNumberCache < blockNumber, "proposal: propose past block");
         require(blockPeriodCache < blockNumber,"proposal: invalid blocknumber");
         require(blockNumber < blockPeriodCache + MAX_FUTURE_BLOCK,"proposal: block too future");
-        require(_counter[msg.sender] < MAX_PROPOSAL, "proposal: propose max stack");
-        require(blockNumberCache - _latestProposal[msg.sender] >= proposePeriod(), "proposal: propose again later");
+        require(_counter[proposerCache] < MAX_PROPOSAL, "proposal: propose max stack");
+        require(blockNumberCache - _latestProposal[proposerCache] >= proposePeriod(), "proposal: propose again later");
 
         ProposalInfo memory proposal;
-        proposal.proposer = msg.sender;
+        proposal.proposer = proposerCache;
         proposal.nVoter = nvoter;
         proposal.createTime = blockTimeCache;
         proposal.startBlock = blockNumberCache + votingDeley();
@@ -70,10 +71,10 @@ abstract contract Proposal is IProposal {
         proposal.status = ProposalStatus.PENDING;
 
         _proposals[proposalId] = proposal;
-        _counter[msg.sender]++;
-        _latestProposal[msg.sender] = blockNumberCache;
+        _counter[proposerCache]++;
+        _latestProposal[proposerCache] = blockNumberCache;
 
-        emit LogCreateProposal(proposalId, msg.sender, blockTimeCache);
+        emit LogCreateProposal(proposalId, proposerCache, blockTimeCache);
         return proposalId;
     }
 
@@ -82,14 +83,17 @@ abstract contract Proposal is IProposal {
     }
 
     function _vote(bytes32 proposalId, bool auth) internal virtual {
-        require(_proposals[proposalId].status != ProposalStatus.DEAFULT, "proposal: proposalId not exist");
-        require(_votes[msg.sender][proposalId].voteTime == 0, "proposal: not allow to vote twice");
-        require(block.number > _proposals[proposalId].startBlock, "proposal: proposal not start");
-        require(block.number < _proposals[proposalId].endBlock, "proposal: proposal expired");
+        address voterCache = msg.sender;
+        uint256 blockNumberCache = block.number;
+        uint256 blockTimeCache = block.timestamp;
+        require(_proposals[proposalId].status == ProposalStatus.PENDING, "proposal: proposalId not exist");
+        require(_votes[voterCache][proposalId].voteTime == 0, "proposal: not allow to vote twice");
+        require(blockNumberCache > _proposals[proposalId].startBlock, "proposal: proposal not start");
+        require(blockNumberCache < _proposals[proposalId].endBlock, "proposal: proposal expired");
 
-        _votes[msg.sender][proposalId].voteTime = block.timestamp;
-        _votes[msg.sender][proposalId].voter = msg.sender;
-        _votes[msg.sender][proposalId].auth = auth;
+        _votes[voterCache][proposalId].voteTime = blockTimeCache;
+        _votes[voterCache][proposalId].voter = voterCache;
+        _votes[voterCache][proposalId].auth = auth;
 
         if (auth) {
             _proposals[proposalId].accept = _proposals[proposalId].accept + 1;
@@ -97,12 +101,13 @@ abstract contract Proposal is IProposal {
             _proposals[proposalId].reject = _proposals[proposalId].reject + 1;
         }
         
-        emit LogVote(proposalId, msg.sender, auth, block.timestamp);
+        emit LogVote(proposalId, voterCache, auth, blockTimeCache);
     }
 
     function _execute(bytes32 proposalId) internal virtual returns (bool success) {
         uint256 blockNumberCache = block.number;
-        require(_proposals[proposalId].status == ProposalStatus.CANCLE ||
+        uint256 blockTimeCache = block.timestamp;
+        require(_proposals[proposalId].status == ProposalStatus.CANCEL ||
                 _proposals[proposalId].status == ProposalStatus.PENDING, "proposal: proposal not pending");
         require(_proposals[proposalId].endBlock < blockNumberCache, "proposal: are in voting period");
         require(_proposals[proposalId].activateBlock < blockNumberCache,"proposal: can't execute in retention period");
@@ -119,17 +124,17 @@ abstract contract Proposal is IProposal {
             if (acceptCache > rejectCache) {
                 _pass[proposalId] = true;
                 _proposals[proposalId].status = ProposalStatus.EXECUTE;
-                emit LogProposal(proposalId, block.timestamp, ProposalStatus.EXECUTE);
+                emit LogProposal(proposalId, blockTimeCache, ProposalStatus.EXECUTE);
                 success = true;
             }
             if (rejectCache > acceptCache) {
                 _proposals[proposalId].status = ProposalStatus.REJECT;
-                emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
+                emit LogProposal(proposalId, blockTimeCache, ProposalStatus.REJECT);
                 success = false;
             }
         } else {
             _proposals[proposalId].status = ProposalStatus.REJECT;
-            emit LogProposal(proposalId, block.timestamp, ProposalStatus.REJECT);
+            emit LogProposal(proposalId, blockTimeCache, ProposalStatus.REJECT);
             success = false;
         }
     }
@@ -139,8 +144,8 @@ abstract contract Proposal is IProposal {
         require(_proposals[proposalId].status == ProposalStatus.PENDING, "proposal: proposal not pending");
         require(_proposals[proposalId].endBlock < blockNumberCache, "proposal: are in voting period");
         require(_proposals[proposalId].endBlock + executeRetentionPeriod() > blockNumberCache,"proposal: can't cancel after rentention period");
-        _proposals[proposalId].status = ProposalStatus.CANCLE;
-        emit LogProposalCanceled(proposalId, block.timestamp, ProposalStatus.CANCLE);
+        _proposals[proposalId].status = ProposalStatus.CANCEL;
+        emit LogProposalCanceled(proposalId, block.timestamp, ProposalStatus.CANCEL);
     }
 
     function threshold() public view override returns (uint8) {

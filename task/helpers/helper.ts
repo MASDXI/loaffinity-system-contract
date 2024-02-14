@@ -18,6 +18,11 @@ export const loadTxFeeDistributorContract = async (hre: HardhatRuntimeEnvironmen
         "0x0000000000000000000000000000000000000778");
 }
 
+export const constants = { 
+    // should refactor
+    "TESTNET_URL":"http://localhost:8545",
+}
+
 export const getProposerSigner = async (account: SignerWithAddress) => {
 
     // return proposer

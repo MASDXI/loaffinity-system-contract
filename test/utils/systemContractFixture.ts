@@ -46,6 +46,6 @@ export async function setUp(contractName: string, params: any) {
 
 export async function targetBlock() {
   const currentBlock = await ethers.provider.getBlockNumber();
-  const targetBlock = (BigInt(currentBlock) + constants.VOTE_PERIOD + constants.VOTE_DELAY) + 2n;
+  const targetBlock = (BigInt(currentBlock) + constants.VOTE_PERIOD + constants.VOTE_DELAY + constants.EXECUTE_RETENTION_PERIOD) + 2n;
   return targetBlock;
 }
