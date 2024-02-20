@@ -8,10 +8,10 @@ pragma solidity 0.8.17;
 contract GasPriceOracle {
 
     enum PARAMETERS { CEC, CO2P, SCR }
-
     enum FLAG { DISABLE, ENABLE }
 
     event ParameterUpdated(uint256 indexed blockNumber, string indexed params, uint256 value);
+    event ParameterBlockPeriodUpdate(uint32 blockperiod);
     event Enabled();
     event Disabled();
 
@@ -48,6 +48,7 @@ contract GasPriceOracle {
         setBlockPeriod(15);       // decimal 9 _15/(ONE_HOUR * 1000)
         _constant = 278;
         _init = true;
+        _lastUpdatedBlock = block.number;
     }
 
     function Enable() public {
@@ -68,18 +69,25 @@ contract GasPriceOracle {
     }
 
     function setValue(uint32 value1, uint32 value2, uint32 value3) public {
-        require(block.number - getLastUpdatedBlock() >= ONE_YEAR, "GasPriceOracle: It's not yet time to update values.");
+        require(block.number - getLastUpdatedBlock() >= ONE_YEAR,
+            "GasPriceOracle: It's not yet time to update values.");
+
         _CEC = value1;
         _CO2P = value2;
         _SCR = value3;
+        
         emit ParameterUpdated(block.number, _parameterSelector(PARAMETERS.CEC), value1);
         emit ParameterUpdated(block.number, _parameterSelector(PARAMETERS.CO2P), value2);
         emit ParameterUpdated(block.number, _parameterSelector(PARAMETERS.SCR), value3);
+        
+        _lastUpdatedBlock = block.number;
     }
 
     function setBlockPeriod(uint32 blockPeriod) public {
         require(blockPeriod > 0, "GasPriceOracle: block period can't be zero");
         _blockPeriod = blockPeriod;
+
+        emit ParameterBlockPeriodUpdate(blockPeriod);
     }
 
     function getBlockPeriod() public view returns (uint256) {
@@ -98,7 +106,7 @@ contract GasPriceOracle {
         // Calculate validator contribution
         uint256 validatorContribution = _C * _H;
         // Calculate total gas price
-        uint256 totalGasFee = (_K * gasLimit + validatorContribution)* (1 + _SCR) * carbonEmission;
+        uint256 totalGasFee = (_K * gasLimit + validatorContribution) * (1 + _SCR) * carbonEmission;
         return totalGasFee;
     }
 }
