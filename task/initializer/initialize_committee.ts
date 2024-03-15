@@ -16,11 +16,17 @@ task("initialize_committee", "init system contract")
         const retention = BigInt(args.retention);
         const committees = Array(args.committees);
         const proposeperiod = BigInt(args.proposeperiod);
+        const admin = String(args.admin);
         let tx: any
         try {
-            if(signers[0].address == process.env.INITIALIZER_ADDRESS){
+            if(signers[0].address == process.env.INITIALIZER_ADDRESS) {
                 tx = await committee.connect(signers[0]).initialize(
-                    delay, period, proposeperiod, retention, committees, signers[0].address);
+                    delay, 
+                    period, 
+                    proposeperiod, 
+                    retention, 
+                    committees,  
+                    admin ? admin : signers[0].address);
                 await tx.wait();
                 const { blockNumber, blockHash, hash } = await tx.getTransaction();
                 console.log(`blockNumber: ${blockNumber}\nblockHash: ${blockHash}\nhash: ${hash}`);
