@@ -7,9 +7,9 @@ pragma solidity 0.8.17;
 // adding to keep tracking active validator length
 
 import "./abstracts/Initializer.sol";
-import "@openzeppelin/contracts/utils/Pausable.sol";
+import "../interfaces/IGasPriceOracle.sol";
 
-contract GasPriceOracleV1 is IGasPriceOracleV1, Initializer, Pausable {
+contract GasPriceOracleV1 is Initializer, IGasPriceOracle {
     enum PARAMETERS {
         CEC,
         CO2P,
@@ -33,13 +33,13 @@ contract GasPriceOracleV1 is IGasPriceOracleV1, Initializer, Pausable {
         /* Carbon Capture Cost per Ton */
         uint256 carbonCaptureCost;
         /* Sustainability Charge Rate */
-        uint256 chargeRate;
-        /* <require_name> */
-        uint256 c;
+        uint256 sustainabilityChargeRate;
+        /* Ide power consumption on validator node*/
+        uint256 idlePowerConsumption;
         /* Number of Validator in the network */
         uint256 numberOfValidator;
-        /* <require_name> */
-        uint256 k;
+        /* Power consume per gas unit */
+        uint256 powerConsumptionPerGas;
     }
 
     /* Contract configuration */
@@ -50,37 +50,59 @@ contract GasPriceOracleV1 is IGasPriceOracleV1, Initializer, Pausable {
     /* Blockchain environment configuration */
     uint256 private _blockPeriod; // block period in seconds.
 
+    bool public status;
+
     // Example config
-    // _config.carbonEmissionCoefficient = 1; // no decimal
-    // _config.carbonCaptureCost = 344000000; // decimal 9
-    // _config.chargeRate = 1; // no decimal
-    // _config.c = 15748000000; // decimal 9
-    // _config.numberOfValidator = 4; // no decimal
-    // _config.k = 300; // decimal 9
-    // setBlockPeriod(15); // decimal 9 _15/(ONE_HOUR * 1000)
+    // CEC      // _config.carbonEmissionCoefficient = 1; // no decimal
+    // CO2P     //_config.carbonCaptureCost = 344000000; // decimal 9
+    // SCR      // _config.sustainabilityChargeRate = 1; // no decimal
+    // C"       //_config.idlePowerConsumption = 15748000000; // decimal 9
+    // H        // _config.numberOfValidator = 4; // no decimal
+    // K'       // _config.powerConsumptionPerGas = 300; // decimal 9
+    // blocktime // setBlockPeriod(15); // decimal 9 _15/(ONE_HOUR * 1000)
     // _constant = 278;
     function initialize(
         uint256 _carbonEmissionCoefficient,
         uint256 _carbonCaptureCost,
-        uint256 _chargeRate,
-        uint256 _c,
+        uint256 _sustainabilityChargeRate,
+        uint256 _idlePowerConsumption,
         uint256 _numberOfValidator,
-        uint256 _k,
+        uint256 _powerConsumptionPerGas,
         uint32 _blockPeriod
     ) public onlyInitializer {
         _initialized();
         ConfigurationParemeter memory cacheConfig = ConfigurationParemeter(
             _carbonEmissionCoefficient,
             _carbonCaptureCost,
-            _chargeRate,
-            _c,
+            _sustainabilityChargeRate,
+            _idlePowerConsumption,
             _numberOfValidator,
-            _k
+            _powerConsumptionPerGas
         );
         _setConfiguration(cacheConfig);
         _setBlockPeriod(_blockPeriod);
-        _pause();
         _lastUpdatedBlock = block.number;
+    }
+
+    function _configurationValidation(ConfigurationParemeter memory config) private {
+        if (config.carbonEmissionCoefficient == 0) {
+            revert();
+        }
+        if (config.carbonCaptureCost == 0) {
+            revert();
+        }
+        if (config.sustainabilityChargeRate == 0) {
+            revert();
+        }
+        if (config.idlePowerConsumption == 0) {
+            revert();
+        }
+        if (config.numberOfValidator == 0) {
+            revert();
+        }
+        if (config.powerConsumptionPerGas == 0) {
+            revert();
+        }
     }
 
     function getBlockPeriod() public view override returns (uint256) {
@@ -102,7 +124,7 @@ contract GasPriceOracleV1 is IGasPriceOracleV1, Initializer, Pausable {
         // Calculate validator contribution
         uint256 validatorContribution = (_config.c * _config.numberOfValidator);
         // Calculate charge rate
-        uint256 chargeRate = (1 + _config.chargeRate);
+        uint256 chargeRate = (1 + _config.sustainabilityChargeRate);
         // Calculate total transaction fee
         uint256 transactionFee = (_config.k *
             gasLimit +
@@ -123,6 +145,7 @@ contract GasPriceOracleV1 is IGasPriceOracleV1, Initializer, Pausable {
             "GasPriceOracleV1: It's not yet time to update values."
         );
         // @TODO require check new config
+        _configurationValidation(config);
         // should revert before cacheOldConfig for gas saving
 
         ConfigurationParemeter memory cacheOldConfig = _config;
@@ -149,11 +172,11 @@ contract GasPriceOracleV1 is IGasPriceOracleV1, Initializer, Pausable {
     
     // @TODO permission
     function enable() public {
-        _unpause();
+        status = true;
     }
     
     // @TODO permission
     function disable() public {
-        _pause();
+        status = false;
     }
 }

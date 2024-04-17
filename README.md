@@ -94,8 +94,9 @@ npx hardhat is_agent --help
 - Single Root admin for add and remove proposer.
 - Configuration configuration such as voting delay, voting period, and threshold can't be change after contract initialize.
 - Everyblock can contain only one proposal.
+- System Contract Implementaion `SHOULD BE` flexible enough to change
 
 ### TODO
-- [] adding execute retention period (period delay before can execute)
 - [] update and refactor task script
+- [] update and refactor implementation into proxy pattern
 - [] update readme and documentation
