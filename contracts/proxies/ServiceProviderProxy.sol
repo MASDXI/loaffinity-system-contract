@@ -10,15 +10,22 @@ contract ServiceProviderProxy is Proxy, IGasPriceOracle, ICommittee, Initializer
 
     /// @notice system contract not use constructor due it's preload into genesis block
     IServiceProvider private _implementation;
+    // ICommittee private immutable _committee;
     
     bool public status;
 
     // store service provider account
     mapping(address => bool) private _serviceProvider;
 
+    modifier onlyAuthorized() {
+        require(_committee.isAdmin() || _serviceProvider,"");
+        _;
+    }
+
     function initialize(address implementation) public onlyInitializer {
         _initialized();
         _updateImpelemetation(implementation);
+        // _committee = ICommittee(committeeContract);
         _implementation = IServiceProvider(implementation);
     }
 
@@ -37,12 +44,12 @@ contract ServiceProviderProxy is Proxy, IGasPriceOracle, ICommittee, Initializer
         return _implementation.getServiceProvider(merchant);
     }
 
-    function grant(address merchant) external {
+    function grant(address merchant) external onlyAuthorized{
         // require is service provider
         _implementation.grantMerchant(merchant);
     }
 
-    function revoke(address merchant) external {
+    function revoke(address merchant) external onlyAuthorized{
         // require is service provider
         _implementation.revokeMerchant(merchant)
     }

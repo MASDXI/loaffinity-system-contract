@@ -4,8 +4,9 @@ pragma solidity 0.8.17;
 import "../abstracts/Initializer.sol";
 import "../abstracts/Proxy.sol";
 import "../interfaces/IGasPriceOracle.sol";
+impoer "../interfaces/ICommittee.sol";
 
-contract GasPriceOracleProxy is Proxy, IGasPriceOracle, Initializer {
+contract GasPriceOracleProxy is Proxy, ICommittee, IGasPriceOracle, Initializer {
 
     /// @notice system contract not use constructor due it's preload into genesis block
     IGasPriceOracle private _implementation;
@@ -20,6 +21,11 @@ contract GasPriceOracleProxy is Proxy, IGasPriceOracle, Initializer {
     }
 
     Threshold [] private _conf;
+
+    modifier onlyAuthorized() {
+        require(_committee.isAdmin(),"");
+        _;
+    }
 
     function initialize(address implementation) public onlyInitializer {
         _initialized();
