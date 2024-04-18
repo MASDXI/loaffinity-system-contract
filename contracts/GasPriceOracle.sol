@@ -167,14 +167,8 @@ contract GasPriceOracleV1 is IGasPriceOracle {
 
         emit ParameterBlockPeriodUpdate(blockPeriod);
     }
-    
-    // @TODO permission
-    function enable() public {
-        status = true;
-    }
-    
-    // @TODO permission
-    function disable() public {
-        status = false;
+
+    function version() public override returns (uint256) {
+        return 10;
     }
 }

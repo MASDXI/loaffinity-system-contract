@@ -10,7 +10,7 @@ contract ServiceProviderProxy is Proxy, IGasPriceOracle, ICommittee, Initializer
 
     /// @notice system contract not use constructor due it's preload into genesis block
     IServiceProvider private _implementation;
-    // ICommittee private immutable _committee;
+    ICommittee private immutable _committee;
     
     bool public status;
 
@@ -22,10 +22,10 @@ contract ServiceProviderProxy is Proxy, IGasPriceOracle, ICommittee, Initializer
         _;
     }
 
-    function initialize(address implementation) public onlyInitializer {
+    function initialize(address implementation, address committeeContract) public onlyInitializer {
         _initialized();
         _updateImpelemetation(implementation);
-        // _committee = ICommittee(committeeContract);
+        _committee = ICommittee(committeeContract);
         _implementation = IServiceProvider(implementation);
     }
 

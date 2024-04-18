@@ -4,32 +4,34 @@ pragma solidity 0.8.17;
 import "../abstracts/Initializer.sol";
 import "../abstracts/Proxy.sol";
 import "../interfaces/IGasPriceOracle.sol";
-impoer "../interfaces/ICommittee.sol";
+import "../interfaces/ICommittee.sol";
 
 contract GasPriceOracleProxy is Proxy, ICommittee, IGasPriceOracle, Initializer {
 
     /// @notice system contract not use constructor due it's preload into genesis block
     IGasPriceOracle private _implementation;
-    
+    ICommittee private immutable _committee;
+
     bool public status;
 
     enum ROLE { CONSORTIUM, NODE_VALIDATOR, MERCHANT, MOBILE_VALIDATOR }
 
     struct Threshold {
         ROLE role;
-        uint8 ratio;
+        uint8 ratio; // 0-100
     }
 
     Threshold [] private _conf;
 
     modifier onlyAuthorized() {
-        require(_committee.isAdmin(),"");
+        require(_committee.isAdmin(),"only authorized account");
         _;
     }
 
-    function initialize(address implementation) public onlyInitializer {
+    function initialize(address implementation, address committeeContract) public onlyInitializer {
         _initialized();
         _updateImpelemetation(implementation);
+        _committee = ICommittee(committeeContract);
         _implementation = IGasPriceOracle(implementation);
     }
 

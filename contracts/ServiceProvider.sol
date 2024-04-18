@@ -11,12 +11,16 @@ contract ServiceProvider is Initializer, IServiceProvider {
 
     address private _proxy;
 
-    // modifier check is caller is proxy contract
-
-    /// @notice system contract not use constructor due it's preload into genesis block
-
     modifier onlyProxy() {
         require(msg.sender == _proxy,"only proxy can call this ");
+    }
+
+    constructor (address proxyContract) {
+        _proxy = proxyContract;
+    }
+    
+    function version() public override view returns(uint256) {
+        return 10;
     }
 
     function updateProxy(address proxy) external {
@@ -25,12 +29,16 @@ contract ServiceProvider is Initializer, IServiceProvider {
         emit proxyUpdated(proxyCache, proxy);
     }
 
-    function grantMerchant(address account) public {
+    /// @notice only proxy contract can call this function.
+    function grantMerchant(address account) public onlyProxy {
         _merchantRegistry[account] = msg.sender;
+        // emit event
     }
 
-    function revokeMerchant(address account) public {
+    /// @notice only proxy contract can call this function.
+    function revokeMerchant(address account) public onlyProxy {
         _merchantRegistry[account] = address(0);
+        // emit event
     }
 
 }

@@ -5,7 +5,7 @@ abstract contract Proxy {
 
     address private _implemetation;
 
-    // error 
+    // error
 
     // event
 
