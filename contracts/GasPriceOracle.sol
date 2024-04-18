@@ -5,11 +5,9 @@ pragma solidity 0.8.17;
 // adding permission to change parameters
 // adding permission to enable/disable
 // adding to keep tracking active validator length
+import "./interfaces/IGasPriceOracle.sol";
 
-import "./abstracts/Initializer.sol";
-import "../interfaces/IGasPriceOracle.sol";
-
-contract GasPriceOracleV1 is Initializer, IGasPriceOracle {
+contract GasPriceOracleV1 is IGasPriceOracle {
     enum PARAMETERS {
         CEC,
         CO2P,

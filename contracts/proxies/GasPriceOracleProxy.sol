@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.5.0 <0.8.0;
+pragma solidity 0.8.17;
 
-import "./interfaces/IGasPriceOracle.sol";
-import "./abstracts/Intializer.sol";
-import "./abstracts/Proxy.sol";
+import "../abstracts/Initializer.sol";
+import "../abstracts/Proxy.sol";
+import "../interfaces/IGasPriceOracle.sol";
 
-contract GasPriceOracleProxy is Proxy, IGasPriceOracle, Intializer {
+contract GasPriceOracleProxy is Proxy, IGasPriceOracle, Initializer {
 
     /// @notice system contract not use constructor due it's preload into genesis block
     IGasPriceOracle private _implementation;
