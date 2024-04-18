@@ -12,6 +12,9 @@ contract ServiceProviderProxy is Proxy, IGasPriceOracle, Intializer {
     
     bool public status;
 
+    // store service provider account
+    mapping(address => bool) private _serviceProvider;
+
     function initialize(address implementation) public onlyInitializer {
         _initialized();
         _updateImpelemetation(implementation);
@@ -29,5 +32,17 @@ contract ServiceProviderProxy is Proxy, IGasPriceOracle, Intializer {
     }
 
     // ####################################################################################################
+    function getServiceProviderOfMerchant(address merchant) external view returns (address) {
+        return _implementation.getServiceProvider(merchant);
+    }
 
+    function grant(address merchant) external {
+        // require is service provider
+        _implementation.grantMerchant(merchant);
+    }
+
+    function revoke(address merchant) external {
+        // require is service provider
+        _implementation.revokeMerchant(merchant)
+    }
 }

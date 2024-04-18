@@ -12,6 +12,15 @@ contract GasPriceOracleProxy is Proxy, IGasPriceOracle, Intializer {
     
     bool public status;
 
+    enum ROLE { CONSORTIUM, NODE_VALIDATOR, MERCHANT, MOBILE_VALIDATOR }
+
+    struct Threshold {
+        ROLE role;
+        uint8 ratio;
+    }
+
+    Threshold [] private _conf;
+
     function initialize(address implementation) public onlyInitializer {
         _initialized();
         _updateImpelemetation(implementation);
@@ -32,6 +41,20 @@ contract GasPriceOracleProxy is Proxy, IGasPriceOracle, Intializer {
 
     function calculateTransactionFee(uint256 gasLimit) public view override returns (uint256) {
         return _implementation.calculate(gasLimit);
+    }
+
+    function updateThreshold(Threshold [4] memory newThreshold) public {
+        uint8 percent = 0;
+        for (uint8 i = 0; i < 4; i++) {
+            percent += newThreshold[i];
+        }
+        require(percent == 100,"invalid threshold");
+        _conf = newThreshold;
+        emit ThresholdUpdate();
+    }
+
+    function getThreashold() public view override returns (Threshold [] memory) {
+        return _conf;
     }
 
     // @TODO permission
