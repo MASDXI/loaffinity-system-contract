@@ -35,7 +35,7 @@ contract ServiceProviderProxy is Proxy, IGasPriceOracle, ICommittee, Initializer
         super.setImplementation(implementation);
     }
 
-    function version() exteranl view returns (uint256) {
+    function version() external view returns (uint256) {
         return _implementation.version();
     }
 

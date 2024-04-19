@@ -5,9 +5,10 @@ pragma solidity 0.8.17;
 // adding permission to change parameters
 // adding permission to enable/disable
 // adding to keep tracking active validator length
+import "./abstracts/Initializer.sol";
 import "./interfaces/IGasPriceOracle.sol";
 
-contract GasPriceOracleV1 is IGasPriceOracle {
+contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
     enum PARAMETERS {
         CEC,
         CO2P,
@@ -66,7 +67,7 @@ contract GasPriceOracleV1 is IGasPriceOracle {
         uint256 _idlePowerConsumption,
         uint256 _numberOfValidator,
         uint256 _powerConsumptionPerGas,
-        uint32 _blockPeriod
+        uint32 blockPeriod_
     ) public onlyInitializer {
         _initialized();
         ConfigurationParemeter memory cacheConfig = ConfigurationParemeter(

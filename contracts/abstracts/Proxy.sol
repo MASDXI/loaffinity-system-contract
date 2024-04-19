@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.5.0 <0.8.0;
+pragma solidity 0.8.17;
 
 abstract contract Proxy {
 
@@ -7,13 +7,15 @@ abstract contract Proxy {
 
     // error
 
-    // event
+    constructor (address implementation) {
+        _updateImpelemetation(implementation);
+    }
 
     function _updateImpelemetation(address implementation) internal {
-        // if () {
-        //     revert ();
-        // }
         address implemeationCache = _implemetation;
+        if (implementation == _implemetation) {
+            revert;
+        }
         _implemetation = implementation;
         emit ImpelementationContractUpdated(_implemetation, implementation);
     }
