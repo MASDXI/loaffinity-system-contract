@@ -8,7 +8,6 @@ import "../interfaces/ICommittee.sol";
 
 contract ServiceProviderProxy is Proxy, IGasPriceOracle, ICommittee, Initializer {
 
-    /// @notice system contract not use constructor due it's preload into genesis block
     IServiceProvider private _implementation;
     ICommittee private immutable _committee;
     
@@ -22,6 +21,7 @@ contract ServiceProviderProxy is Proxy, IGasPriceOracle, ICommittee, Initializer
         _;
     }
 
+    /// @notice system contract not use constructor due it's preload into genesis block
     function initialize(address implementation, address committeeContract) public onlyInitializer {
         _initialized();
         _updateImpelemetation(implementation);
@@ -39,7 +39,6 @@ contract ServiceProviderProxy is Proxy, IGasPriceOracle, ICommittee, Initializer
         return _implementation.version();
     }
 
-    // ####################################################################################################
     function getServiceProviderOfMerchant(address merchant) external view returns (address) {
         return _implementation.getServiceProvider(merchant);
     }
@@ -47,10 +46,12 @@ contract ServiceProviderProxy is Proxy, IGasPriceOracle, ICommittee, Initializer
     function grant(address merchant) external onlyAuthorized{
         // require is service provider
         _implementation.grantMerchant(merchant);
+        // emit here or emit at actual implementation
     }
 
     function revoke(address merchant) external onlyAuthorized{
         // require is service provider
-        _implementation.revokeMerchant(merchant)
+        _implementation.revokeMerchant(merchant);
+        // emit here or emit at actual implementation
     }
 }

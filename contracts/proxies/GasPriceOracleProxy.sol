@@ -8,7 +8,6 @@ import "../interfaces/ICommittee.sol";
 
 contract GasPriceOracleProxy is Proxy, ICommittee, IGasPriceOracle, Initializer {
 
-    /// @notice system contract not use constructor due it's preload into genesis block
     IGasPriceOracle private _implementation;
     ICommittee private immutable _committee;
 
@@ -28,6 +27,7 @@ contract GasPriceOracleProxy is Proxy, ICommittee, IGasPriceOracle, Initializer 
         _;
     }
 
+    /// @notice system contract not use constructor due it's preload into genesis block
     function initialize(address implementation, address committeeContract) public onlyInitializer {
         _initialized();
         _updateImpelemetation(implementation);
@@ -44,8 +44,6 @@ contract GasPriceOracleProxy is Proxy, ICommittee, IGasPriceOracle, Initializer 
     function version() exteranl view returns (uint256) {
         return _implementation.version();
     }
-
-    // ####################################################################################################
 
     function calculateTransactionFee(uint256 gasLimit) public view override returns (uint256) {
         return _implementation.calculate(gasLimit);
