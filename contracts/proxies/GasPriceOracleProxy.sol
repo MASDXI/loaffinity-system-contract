@@ -9,7 +9,7 @@ import "../interfaces/ICommittee.sol";
 
 contract GasPriceOracleProxy is Proxy, Initializer {
 // contract GasPriceOracleProxy is /*AccessControlEnumerable*/, Proxy, Initializer {
-    ICommittee private immutable _committee;    // pre-loaded contract.
+    ICommittee private _committee;    // pre-loaded contract.
     IGasPriceOracle private _implementation;    // // deployed contract.
 
     enum ROLE { CONSORTIUM, NODE_VALIDATOR, MERCHANT, MOBILE_VALIDATOR }
@@ -18,8 +18,6 @@ contract GasPriceOracleProxy is Proxy, Initializer {
         ROLE role;
         uint8 ratio; // 0-100
     }
-
-    bool public status;
 
     // @TODO create role for who can update configuration on gas price oracle contract?
 
@@ -42,7 +40,7 @@ contract GasPriceOracleProxy is Proxy, Initializer {
     }
 
     // @TODO role permission
-    function setImplementation(address implementation) external override onlyAuthorized {
+    function setImplementation(address implementation) public override onlyAuthorized {
         _implementation = IGasPriceOracle(implementation);
         super.setImplementation(implementation);
     }
@@ -55,27 +53,25 @@ contract GasPriceOracleProxy is Proxy, Initializer {
         return _implementation.calculate(gasLimit);
     }
 
-    function updateThreshold(Threshold [4] memory newThreshold) public {
+    function updateThreshold(Threshold [3] memory newThreshold) public {
         uint8 percent = 0;
         for (uint8 i = 0; i < 4; i++) {
-            percent += newThreshold[i];
+            percent += newThreshold[i].ratio;
         }
         require(percent == 100,"invalid threshold");
-        _conf = newThreshold;
+        // _conf = newThreshold;
         emit ThresholdUpdate();
     }
 
-    function getThreashold() public view override returns (Threshold [] memory) {
-        return _conf;
+    function status() public view returns (bool) {
+        if (_implementation.status()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    // @TODO permission
-    function enable() public {
-        status = true;
-    }
-    
-    // @TODO permission
-    function disable() public {
-        status = false;
+    function getThreashold() public view returns (Threshold [] memory) {
+        return _conf;
     }
 }

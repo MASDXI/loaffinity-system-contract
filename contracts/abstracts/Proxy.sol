@@ -2,7 +2,7 @@
 pragma solidity 0.8.17;
 
 abstract contract Proxy {
-    event ImpelementationContractUpdated(address targetAddress);
+    event ImpelementationContractUpdated(address oldAddress, address newAddress);
 
     address private _implementation;
 

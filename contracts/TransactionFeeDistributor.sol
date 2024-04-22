@@ -5,7 +5,6 @@ import "./abstracts/NativeTransfer.sol";
 import "./interfaces/ITransactionFeeDistributor.sol";
 
 contract TransactionFeeDistributor is ITransactionFeeDistributor,  NativeTransfer {
-
     mapping(address => address) private _registry;
 
     address private _treasury;
@@ -35,7 +34,7 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor,  NativeTransfe
     /**
      * @param gasUsed gasUsed of transaction.
      * @param gasPrice gasPrice of tranaction.
-     * @return transactionCost cost of transaction
+     * @return transactionCost cost of transaction.
      * @notice constant 10 came from tranasction processor in core blockchain that deduct
      * 10 percent of each transaction fee to transaction fee distributor contract address.
      */ 

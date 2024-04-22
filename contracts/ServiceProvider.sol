@@ -6,7 +6,6 @@ import "./interfaces/IServiceProvider.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 contract ServiceProvider is AccessControlEnumerable, Initializer, IServiceProvider {
-
     /// @notice store merchant as key and return service provider as value.
     mapping(address => address) private _registry;
 
@@ -26,7 +25,8 @@ contract ServiceProvider is AccessControlEnumerable, Initializer, IServiceProvid
         _proxy = proxyContract;
     }
     
-    function version() public override view returns(uint256) {
+    /// @custom:override
+    function version() public pure override returns(uint256) {
         return 10;
     }
 
@@ -36,16 +36,19 @@ contract ServiceProvider is AccessControlEnumerable, Initializer, IServiceProvid
         emit proxyUpdated(proxyCache, proxy);
     }
 
-    function getServiceProvider(address merchant) public view returns (address) {
+    /// @custom:override
+    function getServiceProvider(address merchant) public view override returns (address) {
         return _registry[merchant];
     }
 
-    function grantMerchant(address merchant, address callee) public onlyProxy {
+    /// @custom:override
+    function grantMerchant(address merchant, address callee) public override onlyProxy {
         _registry[merchant] = callee;
         _grantRole(MERCHANT_ROLE, merchant);
     }
 
-    function revokeMerchant(address merchant, address callee) public onlyProxy {
+    /// @custom:override
+    function revokeMerchant(address merchant, address callee) public override onlyProxy {
         require( _registry[merchant] == callee,"serviceprovider:");
         _registry[merchant] = address(0);
         _revokeRole(MERCHANT_ROLE, merchant);

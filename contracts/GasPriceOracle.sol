@@ -9,19 +9,10 @@ import "./interfaces/IGasPriceOracle.sol";
 // it's require adding permission to enable/disable
 // it's require adding to keep tracking active validator length
 contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
-    enum PARAMETERS {
-        CEC,
-        CO2P,
-        SCR
-    }
-
-    event ParameterUpdated(
-        uint256 indexed blockNumber,
-        string indexed params,
-        uint256 value
-    );
-
-    event ParameterBlockPeriodUpdate(uint32 blockperiod);
+    event ParameterBlockPeriodUpdate(uint256 blockperiod);
+    event ParameterConfigurationUpdated(
+        ConfigurationParemeter oldConfig,
+        ConfigurationParemeter netConfig);
 
     uint32 private constant ONE_YEAR = 31_536_000; // 1 year in seconds.
     uint32 private constant ONE_HOUR = 3_600; // 1 hour in seconds.
@@ -47,19 +38,20 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
     uint256 private _lastUpdatedBlock;
 
     /* Blockchain environment configuration */
-    uint256 private _blockPeriod; // block period in seconds.
+    uint256 private _blocktime; // block period in seconds.
 
-    bool public status;
+    /* enable disable status*/
+    bool private _status;
 
     // Example config
-    // CEC      // _config.carbonEmissionCoefficient = 1; // no decimal
-    // CO2P     //_config.carbonCaptureCost = 344000000; // decimal 9
-    // SCR      // _config.sustainabilityChargeRate = 1; // no decimal
-    // C"       //_config.idlePowerConsumption = 15748000000; // decimal 9
-    // H        // _config.numberOfValidator = 4; // no decimal
-    // K'       // _config.powerConsumptionPerGas = 300; // decimal 9
-    // blocktime // setBlockPeriod(15); // decimal 9 _15/(ONE_HOUR * 1000)
-    // _constant = 278;
+    // CEC          // _config.carbonEmissionCoefficient = 1;       // decimal 0
+    // CO2P         // _config.carbonCaptureCost = 344000000;       // decimal 9
+    // SCR          // _config.sustainabilityChargeRate = 1;        // decimal 0
+    // C"           // _config.idlePowerConsumption = 15748000000;  // decimal 9
+    // H            // _config.numberOfValidator = 4;               // decimal 0
+    // K'           // _config.powerConsumptionPerGas = 300;        // decimal 9
+    // blocktime    // setBlockPeriod(15);                          // decimal 0
+    // dampling     // _constant = 278;
     constructor (
         uint256 _carbonEmissionCoefficient,
         uint256 _carbonCaptureCost,
@@ -67,7 +59,7 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
         uint256 _idlePowerConsumption,
         uint256 _numberOfValidator,
         uint256 _powerConsumptionPerGas,
-        uint256 blockPeriod_) {
+        uint256 _blockPeriod) {
         ConfigurationParemeter memory cacheConfig = ConfigurationParemeter(
             _carbonEmissionCoefficient,
             _carbonCaptureCost,
@@ -81,7 +73,7 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
         _lastUpdatedBlock = block.number;
     }
 
-    function _configurationValidation(ConfigurationParemeter memory config) private {
+    function _configurationValidation(ConfigurationParemeter memory config) private pure {
         if (config.carbonEmissionCoefficient == 0) {
             revert();
         }
@@ -103,32 +95,11 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
     }
 
     function getBlockPeriod() public view returns (uint256) {
-        return _blockPeriod;
+        return _blocktime;
     }
 
     function getLastUpdatedBlock() public view returns (uint256) {
         return _lastUpdatedBlock;
-    }
-
-    function calculateTransactionFee(
-        uint256 gasLimit
-    ) public view returns (uint256) {
-        // Carbon Emission Kg/kWh
-        // uint256 carbonEmission = (_CEC * _blockPeriod /*_CO2P * *//(ONE_HOUR * 1000));
-        // Calculate carbon emission
-        uint256 carbonEmission = (_config.carbonEmissionCoefficient *
-            _blockPeriod) * _constant;
-        // Calculate validator contribution
-        uint256 validatorContribution = (_config.idlePowerConsumption * _config.numberOfValidator);
-        // Calculate charge rate
-        uint256 chargeRate = (1 + _config.sustainabilityChargeRate);
-        // Calculate total transaction fee
-        uint256 transactionFee = (_config.powerConsumptionPerGas *
-            gasLimit +
-            validatorContribution) *
-            chargeRate *
-            carbonEmission;
-        return transactionFee;
     }
 
     // @TODO permission
@@ -143,11 +114,11 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
         );
         // @TODO require check new config
         _configurationValidation(config);
-        // should revert before cacheOldConfig for gas saving
+        // @TODO should revert before cacheOldConfig for gas saving.
         ConfigurationParemeter memory cacheOldConfig = _config;
         _config = config;
         _lastUpdatedBlock = blockNumberCache;
-        // emit configurationUpdated(cacheOldConfig, config);
+        emit ParameterConfigurationUpdated(cacheOldConfig, config);
     }
 
     // @TODO require permission
@@ -157,21 +128,49 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
             "GasPriceOracleV1: block period can't be zero"
         );
         require(
-            _blockPeriod != blockPeriod,
+            _blocktime != blockPeriod,
             "GasPriceOracleV1: block period value exist"
         );
-        _blockPeriod = blockPeriod;
+        _blocktime = blockPeriod;
         emit ParameterBlockPeriodUpdate(blockPeriod);
     }
 
     /// @custom:override
-    function calculate(uint256 gasUsed) public view returns (uint256) {
-        // @TODO
-        return 0;
+    function calculate(uint256 gas) public view returns (uint256) {
+        // Carbon Emission Kg/kWh
+        // uint256 carbonEmission = (_CEC * _blockPeriod /*_CO2P * *//(ONE_HOUR * 1000));
+        // Calculate carbon emission
+        uint256 carbonEmission = (_config.carbonEmissionCoefficient *
+            _blocktime) * _constant;
+        // Calculate validator contribution
+        uint256 validatorContribution = (_config.idlePowerConsumption * _config.numberOfValidator);
+        // Calculate charge rate
+        uint256 chargeRate = (1 + _config.sustainabilityChargeRate);
+        // Calculate total transaction fee
+        uint256 transactionFee = (_config.powerConsumptionPerGas *
+            gas +
+            validatorContribution) *
+            chargeRate *
+            carbonEmission;
+        return transactionFee;
     }
-    
+
     /// @custom:override
     function version() public pure override returns (uint256) {
         return 10;
+    }
+    
+    /// @custom:override
+    function status() public view override returns (bool) {
+        return _status;
+    }
+
+    // @TODO invoke from proxy?
+    function toggle() public {
+        if (!_status) {
+            _status = true;
+        } else {
+            _status = false;
+        }
     }
 }

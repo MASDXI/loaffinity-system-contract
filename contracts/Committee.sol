@@ -88,18 +88,22 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         return getRoleMemberCount(PROPOSER_ROLE);
     }
 
+    /// @custom:override
     function isAdmin(address account) public override view returns (bool) {
         return hasRole(ROOT_ADMIN_ROLE, account);
     }
 
+    /// @custom:override
     function isCommittee(address account) public override view returns (bool) {
         return hasRole(CONSORTIUM_COMMITTEE_ROLE, account);
     }
 
+    /// @custom:override
     function isProposer(address account) public override view returns (bool) {
         return hasRole(PROPOSER_ROLE, account);
     }
 
+    /// @custom:override
     function isAgent(address account) public override view returns (bool) {
         return hasRole(EXECUTOR_AGENT_ROLE, account);
     }
@@ -170,6 +174,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         return blockNumber;
     }
 
+    /// @custom:override
     function vote(bytes32 proposalId, bool auth) external override onlyCommittee {
         _vote(proposalId, auth);
         emit CommitteeVoted(proposalId, msg.sender, auth, block.timestamp);

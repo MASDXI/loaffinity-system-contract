@@ -8,10 +8,10 @@ import "../interfaces/ICommittee.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 contract ServiceProviderProxy is AccessControlEnumerable, Proxy, Initializer {
-    ICommittee private immutable _committee;    // pre-loaded contract.
+    ICommittee private _committee;    // pre-loaded contract.
     IServiceProvider private _implementation;   // deployed contract.
     
-    bool public status;
+    // bool public status;
 
     // store service provider account
     bytes32 public constant SERVICE_PROVIDER_ROLE = keccak256("SERVICE_PROVIDER_ROLE");
@@ -35,7 +35,7 @@ contract ServiceProviderProxy is AccessControlEnumerable, Proxy, Initializer {
     }
 
     // @TODO role permission
-    function setImplementation(address implementation) external override onlyAdmin {
+    function setImplementation(address implementation) public override onlyAdmin {
         _implementation = IServiceProvider(implementation);
         super.setImplementation(implementation);
     }

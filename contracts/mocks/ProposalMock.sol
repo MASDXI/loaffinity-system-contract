@@ -33,6 +33,7 @@ contract ProposalMock is Proposal {
         return blockNumber;
     }
 
+    
     function vote(bytes32 proposalId, bool auth) external override {
         _vote(proposalId, auth);
     }

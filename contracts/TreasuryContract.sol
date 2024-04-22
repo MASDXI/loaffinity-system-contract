@@ -9,7 +9,6 @@ import "./interfaces/ITreasury.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
-
     uint256 private _lockedBalance;
     ICommittee private _commiteeContract;
     mapping(bytes32 => ProposalSupplyInfo) private _supplyProposals; 
@@ -129,6 +128,7 @@ contract TreasuryContract is ITreasury ,Proposal, Initializer, NativeTransfer {
         return blockNumber;
     }
 
+    /// @custom:override
     function vote(bytes32 proposalId, bool auth) external override onlyCommittee {
         _vote(proposalId, auth);
         emit TreasuryVoted(proposalId, msg.sender, auth, block.timestamp);

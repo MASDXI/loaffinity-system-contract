@@ -7,7 +7,7 @@
     "clean": "npx hardhat clean && rm -rf build cache coverage coverage.json",
     "compile": "npx hardhat run scripts/generateInitializer.ts && npx hardhat compile",
     "coverage": "yarn compile && npx hardhat coverage",
-    "build": "yarn clean && yarn compile && yarn test && npx hardhat run scripts/build.ts",
+    "build": "yarn clean && yarn compile && yarn test",
     "size": "npx hardhat size-contracts",
     "test": "yarn compile && npx hardhat test"
   },
