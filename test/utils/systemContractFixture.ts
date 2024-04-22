@@ -26,17 +26,37 @@ export async function setSystemContractFixture() {
   await setBalance(constants.INITIALIZER_ADDRESS, constants.ONE_HUNDRED_TOKEN);
   await setBalance(constants.TREASURY_CONTRACT_ADDRESS, constants.ONE_TRILLION_TOKEN);
 
-  // set contract code to preload contract address.
-  await setCode(constants.TREASURY_CONTRACT_ADDRESS, constants.TREASURY_CONTRACT_BIN);
+  // set contract code to pre-load contract address.
   await setCode(constants.COMMITTEE_CONTRACT_ADDRESS, constants.COMMITEE_CONTRACT_BIN);
+  await setCode(constants.GASPRICE_ORACLE_PROXY_CONTRACT_ADDRESS, constants.GASPRICE_ORACLE_PROXY_CONTRACT_ADDRESS);
+  await setCode(constants.SERVICE_PROVIER_PROXY_CONTRACT_ADDRESS, constants.SERVICE_PROVIER_PROXY_CONTRACT_BIN);
+  await setCode(constants.TREASURY_CONTRACT_ADDRESS, constants.TREASURY_CONTRACT_BIN);
 
   // load contract from to address
-  const treasury = await ethers.getContractAt("TreasuryContract",
-    constants.TREASURY_CONTRACT_ADDRESS);
   const committee = await ethers.getContractAt("Committee",
     constants.COMMITTEE_CONTRACT_ADDRESS);
+  const gaspriceoracleproxy = await ethers.getContractAt("TreasuryContract",
+    constants.GASPRICE_ORACLE_PROXY_CONTRACT_ADDRESS);
+  const serviceproviderproxy = await ethers.getContractAt("TreasuryContract",
+    constants.SERVICE_PROVIER_PROXY_CONTRACT_ADDRESS);
+  const treasury = await ethers.getContractAt("TreasuryContract",
+  constants.TREASURY_CONTRACT_ADDRESS);
+  // skip first 200 blocks
   await mine(200);
-  return { committee, admin , committee1, committee2, committee3, proposer1 , proposer2 , otherAccount, otherAccount1, initializerCallerSigner, treasury };
+  return { admin, 
+      committee, 
+      committee1, 
+      committee2, 
+      committee3, 
+      gaspriceoracleproxy, 
+      proposer1, 
+      proposer2,
+      otherAccount, 
+      otherAccount1, 
+      initializerCallerSigner, 
+      serviceproviderproxy, 
+      treasury
+    };
 }
 
 export async function setUp(contractName: string, params: any) {
