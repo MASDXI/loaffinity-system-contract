@@ -1,13 +1,19 @@
 import { ZeroAddress, ethers } from "ethers"
-import { deployedBytecode as SupplyControlBin } from "../../artifacts/contracts/TreasuryContract.sol/TreasuryContract.json"
 import { deployedBytecode as CommitteeBin } from "../../artifacts/contracts/Committee.sol/Committee.json"
+import { deployedBytecode as GasPriceOracleProxyBin } from "../../artifacts/contracts/GasPriceOracle.sol/GasPriceOracleV1.json"
+import { deployedBytecode as ServiceProviderProxyBin } from "../../artifacts/contracts/ServiceProvider.sol/ServiceProvider.json"
+import { deployedBytecode as TreasuryBin } from "../../artifacts/contracts/TreasuryContract.sol/TreasuryContract.json"
+
 
 const constants = { 
-    // Contract addresses
+    // Initializer address
     "INITIALIZER_ADDRESS": process.env.INITIALIZER_ADDRESS ? 
     ethers.getAddress(process.env.INITIALIZER_ADDRESS) : ZeroAddress,
+    // Pre-load Contract addresses
     "COMMITTEE_CONTRACT_ADDRESS":  "0x0000000000000000000000000000000000000776",
     "TREASURY_CONTRACT_ADDRESS": "0x0000000000000000000000000000000000000777",
+    "GASPRICE_ORACLE_PROXY_CONTRACT_ADDRESS": "0x0000000000000000000000000000000000000778",
+    "SERVICE_PROVIER_PROXY_CONTRACT_ADDRESS": "0x0000000000000000000000000000000000000779",
     "DISTRIBUTOR_CONTRACT_ADDRESS": "0x0000000000000000000000000000000000000778",
     "RELEASE_TARGET_ADDESS": "0x000000000000000000000000000000000000DEAD",
     // Ether amounts
@@ -47,8 +53,10 @@ const constants = {
     "CONSORTIUM_COMMITTEE_ROLE": "0xd8725ad0546b527f07ff9abf58639cd7f503a88de7b6b734a0035c5b0cb513cd",
     "EXECUTOR_AGENT_ROLE": "0xc134067449ddffbed769e2d3e5df17c9e61b02187dc779624a59c82dd6325496",
     // Contract Binaries
-    "SUPPLY_CONTRACT_BIN": SupplyControlBin,
     "COMMITEE_CONTRACT_BIN": CommitteeBin,
+    "GASPRICE_ORACLE_PROXY_CONTRACT_BIN": GasPriceOracleProxyBin,
+    "SERVICE_PROVIER_PROXY_CONTRACT_BIN": ServiceProviderProxyBin,
+    "TREASURY_CONTRACT_BIN": TreasuryBin
 }
 
 export { constants };

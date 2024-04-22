@@ -1,5 +1,5 @@
 import { task } from "hardhat/config"
-import { loadCommitteContract, loadSupplyControlContract } from "../helpers/helper";
+import { loadCommitteContract, loadTreasuryContract } from "../helpers/helper";
 
 task("vote", "vote proposal")
   .addParam("proposal", "destination ")
@@ -7,7 +7,7 @@ task("vote", "vote proposal")
   .addParam("contract","0:committe 1:supply")
   .setAction(async (args, hre) => {
     const committee = await loadCommitteContract(hre);
-    const supplycontrol = await loadSupplyControlContract(hre);
+    const treasury = await loadTreasuryContract(hre);
     const signers = await hre.ethers.getSigners();
     const proposal = String(args.proposal);
     const auth = Boolean(args.auth);
@@ -35,9 +35,9 @@ task("vote", "vote proposal")
       }
         case 1: {
           try{
-            if(await supplycontrol.isInit()){
+            if(await treasury.isInit()){
               if(await committee.isCommittee(signers[0].address)){
-                res = await supplycontrol.vote(proposal, auth);
+                res = await treasury.vote(proposal, auth);
                 await res.wait();
                 res = await res.getTransaction();
                 console.log(`blockNumber: ${res.blockNumber}\nblockHash: ${res.blockHash}\nhash: ${res.hash}`);

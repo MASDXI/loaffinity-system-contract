@@ -27,16 +27,16 @@ export async function setSystemContractFixture() {
   await setBalance(constants.TREASURY_CONTRACT_ADDRESS, constants.ONE_TRILLION_TOKEN);
 
   // set contract code to preload contract address.
-  await setCode(constants.TREASURY_CONTRACT_ADDRESS, constants.SUPPLY_CONTRACT_BIN);
+  await setCode(constants.TREASURY_CONTRACT_ADDRESS, constants.TREASURY_CONTRACT_BIN);
   await setCode(constants.COMMITTEE_CONTRACT_ADDRESS, constants.COMMITEE_CONTRACT_BIN);
 
   // load contract from to address
-  const supplycontrol = await ethers.getContractAt("TreasuryContract",
+  const treasury = await ethers.getContractAt("TreasuryContract",
     constants.TREASURY_CONTRACT_ADDRESS);
   const committee = await ethers.getContractAt("Committee",
     constants.COMMITTEE_CONTRACT_ADDRESS);
   await mine(200);
-  return { committee, admin , committee1, committee2, committee3, proposer1 , proposer2 , otherAccount, otherAccount1, initializerCallerSigner, supplycontrol };
+  return { committee, admin , committee1, committee2, committee3, proposer1 , proposer2 , otherAccount, otherAccount1, initializerCallerSigner, treasury };
 }
 
 export async function setUp(contractName: string, params: any) {

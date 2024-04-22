@@ -8,13 +8,13 @@ export const loadCommitteContract = async (hre: HardhatRuntimeEnvironment) => {
         "0x0000000000000000000000000000000000000776");
 }
 
-export const loadSupplyControlContract = async (hre: HardhatRuntimeEnvironment) => {
+export const loadTreasuryContract = async (hre: HardhatRuntimeEnvironment) => {
     return await hre.ethers.getContractAt("TreasuryContract", 
         "0x0000000000000000000000000000000000000777");
 }
 
 export const loadTxFeeDistributorContract = async (hre: HardhatRuntimeEnvironment) => {
-    return await hre.ethers.getContractAt("SupplyControl", 
+    return await hre.ethers.getContractAt("treasury", 
         "0x0000000000000000000000000000000000000778");
 }
 

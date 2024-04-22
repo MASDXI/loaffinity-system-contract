@@ -1,6 +1,6 @@
 import { task } from "hardhat/config"
 import { ethers } from "ethers";
-import { loadCommitteContract, loadSupplyControlContract } from "../helpers/helper"
+import { loadCommitteContract, loadTreasuryContract } from "../helpers/helper"
 
 task("propose_supply", "propose new supply proposal")
   .addParam("account", "destination address")
@@ -9,7 +9,7 @@ task("propose_supply", "propose new supply proposal")
   .addParam("blocknumber", "target block to execute")
   .setAction(async (args, hre) => {
     const committee = await loadCommitteContract(hre);
-    const supplycontrol = await loadSupplyControlContract(hre);
+    const treasury = await loadTreasuryContract(hre);
     const signers = await hre.ethers.getSigners();
     const account = String(args.account);
     const amount = String(args.amount);
@@ -22,9 +22,9 @@ task("propose_supply", "propose new supply proposal")
     console.log(`PrepareTransaction`);
     console.log(`account: ${account}\namount: ${amount}\nproposalType: ${proposalType}\nblockNumber: ${blockTarget}`);
     try {
-      if(await supplycontrol.isInit()){
+      if(await treasury.isInit()){
         if(await committee.isProposer(signers[0].address)){
-          const res: any = await supplycontrol.propose(blockTarget, amount, account, proposalType);
+          const res: any = await treasury.propose(blockTarget, amount, account, proposalType);
           await res.wait();
           const { blockNumber, blockHash, hash } = await res.getTransaction();
           console.log(`blockNumber: ${blockNumber}\nblockHash: ${blockHash}\nhash: ${hash}`);

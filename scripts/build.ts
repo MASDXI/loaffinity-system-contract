@@ -1,13 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 import committeeArtifact from "../artifacts/contracts/Committee.sol/Committee.json"
-import supplyControlArtifact from "../artifacts/contracts/TreasuryContract.sol/TreasuryContract.json"
+import treasuryArtifact from "../artifacts/contracts/TreasuryContract.sol/TreasuryContract.json"
 
 async function main() {
   // Write deployedBytecode to a file
   const outputDir = './build'; // Update with your desired output directory
   const directoryPath = './artifacts/contracts'
-  const contracts = [committeeArtifact, supplyControlArtifact]
+  const contracts = [committeeArtifact, treasuryArtifact]
 
   // Check if the output directory exists, and create it if it doesn't
   if (!fs.existsSync(outputDir)) {

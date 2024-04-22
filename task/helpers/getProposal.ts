@@ -1,5 +1,5 @@
 import { task } from "hardhat/config"
-import { loadSupplyControlContract, loadCommitteContract } from "./helper"
+import { loadTreasuryContract, loadCommitteContract } from "./helper"
 import { BytesLike } from "ethers"
 
 task("get_proposal_id_by_blocknumber", "get proposal id by given blocknumber")
@@ -16,8 +16,8 @@ task("get_proposal_id_by_blocknumber", "get proposal id by given blocknumber")
         console.log(ret);
         break;
       case 1:
-        const supplycontrol = await loadSupplyControlContract(hre);
-        ret = await supplycontrol.blockProposal(block);
+        const treasury = await loadTreasuryContract(hre);
+        ret = await treasury.blockProposal(block);
         console.log(ret);
         break;
       default:
@@ -40,8 +40,8 @@ task("get_proposal_by_proposalid", "get proposal by given proposal id")
         console.log(ret);
         break;
       case 1:
-        const supplycontrol = await loadSupplyControlContract(hre);
-        ret = await supplycontrol.getProposalSupplyInfoByProposalId(proposalid);
+        const treasury = await loadTreasuryContract(hre);
+        ret = await treasury.getProposalSupplyInfoByProposalId(proposalid);
         console.log(ret);
         break;
     }
@@ -61,8 +61,8 @@ task("get_proposal_by_proposalid", "get proposal by given proposal id")
         console.log(ret)
         break;
       case 1:
-        const supplycontrol = await loadSupplyControlContract(hre);
-        ret = await supplycontrol.isProposalPassed(proposalid);
+        const treasury = await loadTreasuryContract(hre);
+        ret = await treasury.isProposalPassed(proposalid);
         console.log(ret);
         break;
     }
@@ -82,8 +82,8 @@ task("get_proposal_by_blocknumber", "get proposal by given blocknumber")
         console.log(ret)
         break;
       case 1:
-        const supplycontrol = await loadSupplyControlContract(hre)
-        ret = await supplycontrol.getProposalSupplyInfoByBlockNumber(block);
+        const treasury = await loadTreasuryContract(hre)
+        ret = await treasury.getProposalSupplyInfoByBlockNumber(block);
         console.log(ret)
         break;
     }

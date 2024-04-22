@@ -1,5 +1,5 @@
 import { task } from "hardhat/config"
-import { loadSupplyControlContract } from "../helpers/helper";
+import { loadTreasuryContract } from "../helpers/helper";
 
 task("initialize_supply", "init system contract")
     .addParam("delay", "voteDelay_")
@@ -8,7 +8,7 @@ task("initialize_supply", "init system contract")
     .addParam("retention", "retentionPeriod_")
     .addParam("committeeaddress", "address committee contract")
     .setAction(async (args, hre) => {
-        const supplycontrol = await loadSupplyControlContract(hre);
+        const treasury = await loadTreasuryContract(hre);
         const signers = await hre.ethers.getSigners();
         const delay = BigInt(args.delay);
         const period = BigInt(args.period);
@@ -18,7 +18,7 @@ task("initialize_supply", "init system contract")
         let tx: any
         try {
             if(signers[0].address == process.env.INITIALIZER_ADDRESS){
-                tx = await supplycontrol.connect(signers[0]).initialize(
+                tx = await treasury.connect(signers[0]).initialize(
                     delay, period, proposeperiod, retention, committeeaddress);
                 await tx.wait()
                 const { blockNumber, blockHash, hash } = await tx.getTransaction();
