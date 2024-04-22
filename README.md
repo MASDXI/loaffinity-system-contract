@@ -10,7 +10,10 @@ Loaffinity system contract is smart contract pre-loaded at genesis block of the 
 ### Setup Repository
 
 ```shell
-git clone <repository>
+# github repository
+git clone https://github.com/nextclan/loaffinity-system-contract.git
+# gitlab repository
+git clone https://gitlab.com/nextclan/loaffinity-system-contract.git
 ```
 
 ```shell
