@@ -5,7 +5,7 @@ import { revertedMessage } from "../utils/reverted";
 
 async function setup() {
     const target =  "0x00000000000000000000000000000000000000EF";
-    const contract = await ethers.deployContract("ProxyMock",target);
+    const contract = await ethers.deployContract("ProxyMock", target);
     const accounts = await ethers.getSigners();
     return { contract, accounts };
 }

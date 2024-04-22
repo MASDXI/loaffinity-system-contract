@@ -1,6 +1,6 @@
 # Loaffinity System Contract
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+Loaffinity system contract is smart contract pre-loaded at genesis block of the blockchain network, system contract serve specifiy function to extend capibities of core blockchain. it's basically adopt pattern like [open governance](https://polkadot.network/features/opengov/) some parameter on blockchain can be changed directly through the smart contract level without requiring to do `HARDFORK` for update the network parameter.
 
 ### Prerequisite
 
@@ -85,11 +85,11 @@ npx hardhat is_agent --help
 
 ### Building System Contract
 1. Make sure you have set the value in `.env` file
-2. Using command `yarn compile` to compile smart contract
-3. Copy deployedBytecode output after run `yarn build` to and place to genesis.json
-4. when start the network if wanted to activate the contract you should using hardtask activate contract from example above
+2. Using command `yarn compile` to compile smart contract valid initalizer will be auto generate from `Intializer.sol.template`
+3. Copy deployedBytecode output after run `yarn compile` or `yarn compile` and place to your `genesis.json`
+4. when start the network if wanted to activate the contract you should using hardhat task activate contract from example above
 
-### Noted Issue
+### Noted Issue and Risk Appetite
 - Proposer have majority and right to create proposal by their own, avoid Proposer spamming proposal to future block potentially DoS contract.
 - Single Root admin for add and remove proposer.
 - Configuration configuration such as voting delay, voting period, and threshold can't be change after contract initialize.
@@ -97,6 +97,8 @@ npx hardhat is_agent --help
 - System Contract Implementaion `SHOULD BE` flexible enough to change
 
 ### TODO
-- [] update and refactor task script
-- [] update and refactor implementation into proxy pattern
+- [] refactor limit root admin valid till given block height `n`
+- [] refactor implementation into proxy pattern
+- [] refactor hardhat deploy script
+- [] refactor hardhat task script
 - [] update readme and documentation
