@@ -2,7 +2,6 @@
 pragma solidity 0.8.17;
 
 interface ITreasury {
-
     enum ProposalType { REMOVED, RELEASED } // LOCKED => REMOVED
 
     struct ProposalSupplyInfo {
@@ -26,5 +25,4 @@ interface ITreasury {
     event TreasuryCancel(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time); // add
     event TreasuryProposalExecuted(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
     event TreasuryProposalRejected(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
-
 }

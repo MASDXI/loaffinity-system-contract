@@ -5,7 +5,6 @@ import "../abstracts/TransactionTransport.sol";
 import "../interfaces/ITransactionFeeDistributor.sol";
 
 contract TransactioTransportMock is TransactionTransport {
-
     uint256 number;
 
     constructor (ITransactionFeeDistributor _new) {
@@ -15,5 +14,4 @@ contract TransactioTransportMock is TransactionTransport {
     function set(uint256 value) public calculatorGasUsed {
         number = value;
     }
-
 }

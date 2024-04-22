@@ -69,5 +69,4 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor,  NativeTransfe
         delete _registry[merchant];
         return true;
     }
-
 }

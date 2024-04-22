@@ -4,7 +4,6 @@ pragma solidity 0.8.17;
 import "../abstracts/Proposal.sol";
 
 contract ProposalMock is Proposal {
-
     mapping(uint256 => bytes32) public blockProposal;
 
     constructor (uint256 voteDelay_, uint256 votePeriod_, uint8 threshold_, uint32 proposePeriod_, uint32 executeRetentionPeriod_) {

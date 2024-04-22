@@ -50,5 +50,4 @@ contract ServiceProvider is AccessControlEnumerable, Initializer, IServiceProvid
         _registry[merchant] = address(0);
         _revokeRole(MERCHANT_ROLE, merchant);
     }
-
 }
