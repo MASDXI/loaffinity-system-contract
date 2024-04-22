@@ -5,8 +5,10 @@ import "../abstracts/Initializer.sol";
 import "../abstracts/Proxy.sol";
 import "../interfaces/IGasPriceOracle.sol";
 import "../interfaces/ICommittee.sol";
+// import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 contract GasPriceOracleProxy is Proxy, Initializer {
+// contract GasPriceOracleProxy is /*AccessControlEnumerable*/, Proxy, Initializer {
     ICommittee private immutable _committee;    // pre-loaded contract.
     IGasPriceOracle private _implementation;    // // deployed contract.
 
@@ -18,6 +20,8 @@ contract GasPriceOracleProxy is Proxy, Initializer {
     }
 
     bool public status;
+
+    // @TODO create role for who can update configuration on gas price oracle contract?
 
     Threshold [] private _conf;
 

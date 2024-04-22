@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-// @TODO
-// adding permission to change parameters
-// adding permission to enable/disable
-// adding to keep tracking active validator length
 import "./abstracts/Initializer.sol";
 import "./interfaces/IGasPriceOracle.sol";
 
+// @TODO this is simple implementation of gas price oracle contract.
+// it's require adding permission to change parameters
+// it's require adding permission to enable/disable
+// it's require adding to keep tracking active validator length
 contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
     enum PARAMETERS {
         CEC,
@@ -51,25 +51,14 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
 
     bool public status;
 
-    // Example config
-    // CEC      // _config.carbonEmissionCoefficient = 1; // no decimal
-    // CO2P     //_config.carbonCaptureCost = 344000000; // decimal 9
-    // SCR      // _config.sustainabilityChargeRate = 1; // no decimal
-    // C"       //_config.idlePowerConsumption = 15748000000; // decimal 9
-    // H        // _config.numberOfValidator = 4; // no decimal
-    // K'       // _config.powerConsumptionPerGas = 300; // decimal 9
-    // blocktime // setBlockPeriod(15); // decimal 9 _15/(ONE_HOUR * 1000)
-    // _constant = 278;
-    function initialize(
+    constructor (
         uint256 _carbonEmissionCoefficient,
         uint256 _carbonCaptureCost,
         uint256 _sustainabilityChargeRate,
         uint256 _idlePowerConsumption,
         uint256 _numberOfValidator,
         uint256 _powerConsumptionPerGas,
-        uint256 blockPeriod_
-    ) public onlyInitializer {
-        _initialized();
+        uint256 blockPeriod_) {
         ConfigurationParemeter memory cacheConfig = ConfigurationParemeter(
             _carbonEmissionCoefficient,
             _carbonCaptureCost,
@@ -82,6 +71,38 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
         setBlockPeriod(_blockPeriod);
         _lastUpdatedBlock = block.number;
     }
+
+    // Example config
+    // CEC      // _config.carbonEmissionCoefficient = 1; // no decimal
+    // CO2P     //_config.carbonCaptureCost = 344000000; // decimal 9
+    // SCR      // _config.sustainabilityChargeRate = 1; // no decimal
+    // C"       //_config.idlePowerConsumption = 15748000000; // decimal 9
+    // H        // _config.numberOfValidator = 4; // no decimal
+    // K'       // _config.powerConsumptionPerGas = 300; // decimal 9
+    // blocktime // setBlockPeriod(15); // decimal 9 _15/(ONE_HOUR * 1000)
+    // _constant = 278;
+    // function initialize(
+    //     uint256 _carbonEmissionCoefficient,
+    //     uint256 _carbonCaptureCost,
+    //     uint256 _sustainabilityChargeRate,
+    //     uint256 _idlePowerConsumption,
+    //     uint256 _numberOfValidator,
+    //     uint256 _powerConsumptionPerGas,
+    //     uint256 blockPeriod_
+    // ) public onlyInitializer {
+    //     _initialized();
+    //     ConfigurationParemeter memory cacheConfig = ConfigurationParemeter(
+    //         _carbonEmissionCoefficient,
+    //         _carbonCaptureCost,
+    //         _sustainabilityChargeRate,
+    //         _idlePowerConsumption,
+    //         _numberOfValidator,
+    //         _powerConsumptionPerGas
+    //     );
+    //     setConfiguration(cacheConfig);
+    //     setBlockPeriod(_blockPeriod);
+    //     _lastUpdatedBlock = block.number;
+    // }
 
     function _configurationValidation(ConfigurationParemeter memory config) private {
         if (config.carbonEmissionCoefficient == 0) {
@@ -169,6 +190,19 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
         emit ParameterBlockPeriodUpdate(blockPeriod);
     }
 
+    /// @custom:override
+    function calculate(uint256 gasUsed) returns (uint256) {
+        // @TODO
+        return 0;
+    }
+
+    /// @custom:override
+    function calculate(bytes memory encodePayload) returns (uint256) {
+        // @TODO
+        return 0;
+    }
+
+    /// @custom:override
     function version() public pure override returns (uint256) {
         return 10;
     }
