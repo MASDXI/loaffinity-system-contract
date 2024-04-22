@@ -7,8 +7,8 @@ interface IServiceProvider {
     event revokedMerchant(address indexed serviceProvider, address indexed merchant);
 
     function version() external view returns(uint256);
-    function getMerchant() external view returns(uint256);
-    function grantMerchant(address account) external;
-    function revokeMerchant(address account) external;
+    function getServiceProvider(address merchant) external view returns(address);
+    function grantMerchant(address merchant, address callee) external;
+    function revokeMerchant(address merchant, address callee) external;
 
 }

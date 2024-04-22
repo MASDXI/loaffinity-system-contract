@@ -5,6 +5,8 @@ import "../abstracts/Proxy.sol";
 
 contract ProxyMock is Proxy {
 
-    constructor (address target) Proxy(target) {}
+    constructor (address target) {
+        _updateImpelemetation(target);
+    }
     
 }

@@ -3,28 +3,22 @@ pragma solidity 0.8.17;
 
 abstract contract Proxy {
 
+    event ImpelementationContractUpdated(address targetAddress);
+
     address private _implemetation;
-
-    // error
-
-    constructor (address implementation) {
-        _updateImpelemetation(implementation);
-    }
 
     function _updateImpelemetation(address implementation) internal {
         address implemeationCache = _implemetation;
-        if (implementation == _implemetation) {
-            revert;
-        }
+        require(_implemetation != implementation,"proxy: can't set same implemention");
         _implemetation = implementation;
         emit ImpelementationContractUpdated(_implemetation, implementation);
     }
 
-    function getImplemetation() external returns (address) {
+    function getImplemetation() public returns (address) {
         return _implemetation;
     }
 
-    function setImplementation(address implementation) external virtual override {
+    function setImplementation(address implementation) public virtual {
         _updateImpelemetation(implementation);
     }
 

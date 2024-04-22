@@ -5,23 +5,28 @@ import "../abstracts/Initializer.sol";
 import "../abstracts/Proxy.sol";
 import "../interfaces/IServiceProvider.sol";
 import "../interfaces/ICommittee.sol";
+import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
-contract ServiceProviderProxy is Proxy, IGasPriceOracle, ICommittee, Initializer {
-
-    IServiceProvider private _implementation;
-    ICommittee private immutable _committee;
+contract ServiceProviderProxy is AccessControlEnumerable, Proxy, Initializer {
+    ICommittee private immutable _committee;    // pre-loaded contract.
+    IServiceProvider private _implementation;   // deployed contract.
     
     bool public status;
 
     // store service provider account
-    mapping(address => bool) private _serviceProvider;
+    bytes32 public constant SERVICE_PROVIDER_ROLE = keccak256("SERVICE_PROVIDER_ROLE");
 
-    modifier onlyAuthorized() {
-        require(_committee.isAdmin() || _serviceProvider,"");
+    modifier onlyAdmin() {
+        require(_committee.isAdmin(msg.sender),"serviceproviderproxy:");
         _;
     }
 
-    /// @notice system contract not use constructor due it's preload into genesis block
+    modifier onlyAuthorized() {
+        require(_committee.isAdmin(msg.sender) || hasRole(SERVICE_PROVIDER_ROLE, msg.sender),"serviceproviderproxy:");
+        _;
+    }
+
+    /// @notice system contract not use constructor due it's preload into genesis block.
     function initialize(address implementation, address committeeContract) public onlyInitializer {
         _initialized();
         _updateImpelemetation(implementation);
@@ -30,8 +35,8 @@ contract ServiceProviderProxy is Proxy, IGasPriceOracle, ICommittee, Initializer
     }
 
     // @TODO role permission
-    function setImplementation(address implemetation) external override {
-        _implementation = IServiceProvider(implemetation);
+    function setImplementation(address implementation) external override onlyAdmin {
+        _implementation = IServiceProvider(implementation);
         super.setImplementation(implementation);
     }
 
@@ -43,15 +48,11 @@ contract ServiceProviderProxy is Proxy, IGasPriceOracle, ICommittee, Initializer
         return _implementation.getServiceProvider(merchant);
     }
 
-    function grant(address merchant) external onlyAuthorized{
-        // require is service provider
-        _implementation.grantMerchant(merchant);
-        // emit here or emit at actual implementation
+    function grantMerchant(address merchant) external onlyAuthorized {
+        _implementation.grantMerchant(merchant, msg.sender);
     }
 
-    function revoke(address merchant) external onlyAuthorized{
-        // require is service provider
-        _implementation.revokeMerchant(merchant);
-        // emit here or emit at actual implementation
+    function revokeMerchant(address merchant) external onlyAuthorized {
+        _implementation.revokeMerchant(merchant, msg.sender);
     }
 }

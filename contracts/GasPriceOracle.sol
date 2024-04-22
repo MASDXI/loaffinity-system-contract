@@ -67,7 +67,7 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
         uint256 _idlePowerConsumption,
         uint256 _numberOfValidator,
         uint256 _powerConsumptionPerGas,
-        uint32 blockPeriod_
+        uint256 blockPeriod_
     ) public onlyInitializer {
         _initialized();
         ConfigurationParemeter memory cacheConfig = ConfigurationParemeter(
@@ -78,8 +78,8 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
             _numberOfValidator,
             _powerConsumptionPerGas
         );
-        _setConfiguration(cacheConfig);
-        _setBlockPeriod(_blockPeriod);
+        setConfiguration(cacheConfig);
+        setBlockPeriod(_blockPeriod);
         _lastUpdatedBlock = block.number;
     }
 
@@ -114,18 +114,18 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
 
     function calculateTransactionFee(
         uint256 gasLimit
-    ) public view override returns (uint256) {
+    ) public view returns (uint256) {
         // Carbon Emission Kg/kWh
         // uint256 carbonEmission = (_CEC * _blockPeriod /*_CO2P * *//(ONE_HOUR * 1000));
         // Calculate carbon emission
         uint256 carbonEmission = (_config.carbonEmissionCoefficient *
             _blockPeriod) * _constant;
         // Calculate validator contribution
-        uint256 validatorContribution = (_config.c * _config.numberOfValidator);
+        uint256 validatorContribution = (_config.idlePowerConsumption * _config.numberOfValidator);
         // Calculate charge rate
         uint256 chargeRate = (1 + _config.sustainabilityChargeRate);
         // Calculate total transaction fee
-        uint256 transactionFee = (_config.k *
+        uint256 transactionFee = (_config.powerConsumptionPerGas *
             gasLimit +
             validatorContribution) *
             chargeRate *
@@ -151,11 +151,11 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
         _config = config;
         _lastUpdatedBlock = blockNumberCache;
 
-        emit configurationUpdated(cacheOldConfig, config);
+        // emit configurationUpdated(cacheOldConfig, config);
     }
 
     // @TODO permission
-    function setBlockPeriod(uint32 blockPeriod) public {
+    function setBlockPeriod(uint256 blockPeriod) public {
         require(
             blockPeriod > 0,
             "GasPriceOracleV1: block period can't be zero"
@@ -169,7 +169,7 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
         emit ParameterBlockPeriodUpdate(blockPeriod);
     }
 
-    function version() public override returns (uint256) {
+    function version() public pure override returns (uint256) {
         return 10;
     }
 }

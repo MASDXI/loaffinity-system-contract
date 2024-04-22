@@ -17,7 +17,7 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
     mapping(uint256 => bytes32) public blockProposal;
 
     modifier onlyAdmin() {
-        require(hasRole(ROOT_ADMIN_ROLE, msg.sender),"committee: onlyAdmin can call");
+        require(isAdmin(msg.sender),"committee: onlyAdmin can call");
         _;
     }
 
@@ -86,6 +86,10 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
 
     function getProposerCount() external view returns (uint256) {
         return getRoleMemberCount(PROPOSER_ROLE);
+    }
+
+    function isAdmin(address account) public override view returns (bool) {
+        return hasRole(ROOT_ADMIN_ROLE, account);
     }
 
     function isCommittee(address account) public override view returns (bool) {

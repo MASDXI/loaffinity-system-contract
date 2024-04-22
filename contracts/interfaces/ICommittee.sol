@@ -25,6 +25,7 @@ interface ICommittee {
     event CommitteeProposalExecuted(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 time);
     event CommitteeProposalRejected(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 time);
 
+    function isAdmin(address account) external view returns(bool);
     function isAgent(address account) external view returns(bool);
     function isCommittee(address account) external view returns(bool);
     function isProposer(address account) external view returns(bool);
