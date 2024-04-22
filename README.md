@@ -8,18 +8,19 @@ Loaffinity system contract is smart contract pre-loaded at genesis block of the 
 - [yarn](https://yarnpkg.com/)
 
 ### Setup Repository
-
+You can set up repository on your local development envirotment following step below.  
+Clone repository to your machine
 ```shell
 # github repository
 git clone https://github.com/nextclan/loaffinity-system-contract.git
 # gitlab repository
 git clone https://gitlab.com/nextclan/loaffinity-system-contract.git
 ```
-
+Change work directory
 ```shell
 cd loaffinity-system-contract/
 ```
-
+Installing dependencies
 ```shell
 yarn install
 ```
@@ -37,7 +38,7 @@ yarn coverage
 yarn size
 yarn test
 ```
-### Script for interact with system contract
+you can see what action perform in each command in `./package.json`
 
 
 ```
@@ -53,14 +54,17 @@ propose period <type:uint32> <0 - (2^32-1)>
     period between propose proposal
 retention period <type:uint32> <0 - (2^32-1)>
     period for cancelation after vote end (emergency use)
+```
 
+#### Proposal Behavior
+```
                              "vote_start"            "vote_end"                 "execute_proposal"
 Proposal:1 |<-----vote_delay----->|<-----vote_period----->|<-----rentention_period----->|
 Proposal:2 |<---propose_period--->|<-----vote_delay----->|<-----vote_period----->|<-----rentention_period----->|
 Proposal:3                        |<---propose_period--->|<-----vote_delay----->|<-----vote_period----->|<-----rentention_period----->|
 ```
 
-
+### Script for interact with system contract
 ``` shell
 # Initialized System Contract
 npx hardhat initialized --network "dev"
@@ -79,11 +83,25 @@ npx hardhat propose_supply --help
 # Grant Command
 npx hardhat grant_agent --help
 npx hardhat grant_proposer --help
+npx hardhat grant_merchant --help
+npx hardhat grant_serviceprovider --help
 
 # Role Command
 npx hardhat is_committee --help
 npx hardhat is_proposer --help
 npx hardhat is_agent --help
+
+# Proxy Command
+npx hardhat serviceprovider --help // implementation contract change
+npx hardhat gaspriceoracle --help  // implementation contract change
+npx hardhat gaspriceoracle --help  // update ratio/threshold
+```
+
+### Script for deploy contract
+
+```
+yarn deploy:contract:gaspriceoracle --network <network>
+yarn deploy:contract:serviceprovider --network <network>
 ```
 
 ### Building System Contract
@@ -97,7 +115,8 @@ npx hardhat is_agent --help
 - Single Root admin for add and remove proposer.
 - Configuration configuration such as voting delay, voting period, and threshold can't be change after contract initialize.
 - Everyblock can contain only one proposal.
-- System Contract Implementaion `SHOULD BE` flexible enough to change
+- System Contract Implementaion `SHOULD BE` flexible enough to change.
+- Smart Contract use storage upgrade cause to avoid storage corrupt and meke contract unusable.
 
 ### TODO
 - [] refactor limit root admin valid till given block height `n`
