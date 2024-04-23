@@ -35,9 +35,9 @@ export async function setSystemContractFixture() {
   // load contract from to address
   const committee = await ethers.getContractAt("Committee",
     constants.COMMITTEE_CONTRACT_ADDRESS);
-  const gaspriceoracleproxy = await ethers.getContractAt("TreasuryContract",
+  const gaspriceoracleproxy = await ethers.getContractAt("GasPriceOracleProxy",
     constants.GASPRICE_ORACLE_PROXY_CONTRACT_ADDRESS);
-  const serviceproviderproxy = await ethers.getContractAt("TreasuryContract",
+  const serviceproviderproxy = await ethers.getContractAt("ServiceProviderProxy",
     constants.SERVICE_PROVIER_PROXY_CONTRACT_ADDRESS);
   const treasury = await ethers.getContractAt("TreasuryContract",
   constants.TREASURY_CONTRACT_ADDRESS);

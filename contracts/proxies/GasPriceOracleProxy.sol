@@ -32,7 +32,7 @@ contract GasPriceOracleProxy is Proxy, Initializer {
     }
 
     /// @notice system contract not use constructor due it's preload into genesis block.
-    function initialize(address implementation, address committeeContract) public onlyInitializer {
+    function initialize(address implementation, address committeeContract) external onlyInitializer {
         _initialized();
         _updateImpelemetation(implementation);
         _committee = ICommittee(committeeContract);

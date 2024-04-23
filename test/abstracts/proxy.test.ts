@@ -29,14 +29,14 @@ describe("Abstract Proxy Contract", function () {
     });
     
     describe("ProxyMock Contract", async function () {
-        it("Proxy: getImplemetation", async function () {
-            const implemetation = await proxyMock.getImplemetation();
+        it("Proxy: getImplementation", async function () {
+            const implemetation = await proxyMock.getImplementation();
             expect(implemetation).to.equal(v1);
         });
 
         it("Proxy: setImplementation", async function () {
             await proxyMock.setImplementation(v2);
-            const implemetation = await proxyMock.getImplemetation();
+            const implemetation = await proxyMock.getImplementation();
             expect(implemetation).to.equal(v2);
         });
 

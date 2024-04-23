@@ -7,7 +7,7 @@ abstract contract Initializer {
 
     event Initialized();
     
-    address private constant _initializer = 0x0000000000000000000000000000000000000000;
+    address private constant _initializer = 0x000000000000000000000000000000000000000F;
 
     modifier onlyInitializer() {
         require(msg.sender == _initializer,"initializer: onlyInitializer can call");

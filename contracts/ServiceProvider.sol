@@ -26,7 +26,7 @@ contract ServiceProvider is AccessControlEnumerable, Initializer, IServiceProvid
     }
     
     /// @custom:override
-    function version() public pure override returns(uint256) {
+    function version() public view override returns (uint256) {
         return 10;
     }
 

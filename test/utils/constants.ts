@@ -1,7 +1,7 @@
 import { ZeroAddress, ethers } from "ethers"
 import { deployedBytecode as CommitteeBin } from "../../artifacts/contracts/Committee.sol/Committee.json"
-import { deployedBytecode as GasPriceOracleProxyBin } from "../../artifacts/contracts/GasPriceOracle.sol/GasPriceOracleV1.json"
-import { deployedBytecode as ServiceProviderProxyBin } from "../../artifacts/contracts/ServiceProvider.sol/ServiceProvider.json"
+import { deployedBytecode as GasPriceOracleProxyBin } from "../../artifacts/contracts/proxies/GasPriceOracleProxy.sol/GasPriceOracleProxy.json"
+import { deployedBytecode as ServiceProviderProxyBin } from "../../artifacts/contracts/proxies/ServiceProviderProxy.sol/ServiceProviderProxy.json"
 import { deployedBytecode as TreasuryBin } from "../../artifacts/contracts/TreasuryContract.sol/TreasuryContract.json"
 
 

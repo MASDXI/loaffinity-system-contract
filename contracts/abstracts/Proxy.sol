@@ -17,7 +17,7 @@ abstract contract Proxy {
         emit ImpelementationContractUpdated(implemeationCache, implementation);
     }
 
-    function getImplemetation() public view returns (address) {
+    function getImplementation() public view returns (address) {
         return _implementation;
     }
 
