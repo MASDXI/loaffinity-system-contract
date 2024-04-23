@@ -54,5 +54,25 @@ describe("GasPrice Oracle Proxy System Contract", function () {
             const implementation = await fixture.gaspriceoracleproxy.getImplementation();
             expect(implementation).to.equal(await v1.getAddress());
         });
+
+        it("Gas Price Oracle Proxy: setImplementation", async function () {
+            //TODO
+        });
+
+        it("Gas Price Oracle Proxy: version", async function () {
+            //TODO
+        });
+
+        it("Gas Price Oracle Proxy: calculateTransactionFee", async function () {
+            //TODO
+        });
+
+        it("Gas Price Oracle Proxy: getThreashold", async function () {
+            // TODO
+        });
+
+        it("Gas Price Oracle Proxy: status", async function () {
+            // TODO
+        });
     });
 });

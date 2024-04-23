@@ -60,5 +60,27 @@ describe("Service Provider Proxy System Contract", function () {
             expect(implementation).to.equal(await v2.getAddress());
         });
 
+        it("Service Provider Proxy: getImplementation", async function () {
+            // TODO
+        });
+
+        it("Service Provider Proxy: grantServiceProvier", async function () {
+            // TODO
+        });
+        
+        it("Service Provider Proxy: revokeServiceProvider", async function () {
+            // TODO
+        });
+
+        it("Service Provider Proxy: grantMerchant", async function () {
+            // TODO
+        });
+
+        it("Service Provider Proxy: revokeMerchant", async function () {
+            // TODO
+        });
+
+
+
     });
 });
