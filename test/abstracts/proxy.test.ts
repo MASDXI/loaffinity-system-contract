@@ -1,58 +1,61 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import { ZeroAddress } from "ethers";
 import { constants } from "../utils/constants";
 import { revertedMessage } from "../utils/reverted";
 
 async function setup() {
-    const target =  "0x00000000000000000000000000000000000000EF";
-    const contract = await ethers.deployContract("ProxyMock", target);
+    // read target from constant file
+    const targetV1 = ethers.getAddress("0x00000000000000000000000000000000000000E1");
+    const targetV2 = ethers.getAddress("0x00000000000000000000000000000000000000E2");
+    const contract = await ethers.deployContract("ProxyMock", [targetV1]);
     const accounts = await ethers.getSigners();
-    return { contract, accounts };
+    return { contract, accounts, targetV1, targetV2 };
 }
 
 describe("Abstract Proxy Contract", function () {
     
     let proxyMock: any;
     let signers: any;
-    let initializer: any
+    let v1: any;
+    let v2: any;
 
     beforeEach(async function () {
-        const { contract, accounts } = await setup();
+        const { contract, accounts, targetV1, targetV2 } = await setup();
         proxyMock = contract;
         signers = accounts;
+        v1 = targetV1;
+        v2 = targetV2;
     });
     
     describe("ProxyMock Contract", async function () {
-        it("Proxy: isinit false", async function () {
-            const status = await proxyMock.isInit();
-            expect(status).to.equal(false);
+        it("Proxy: getImplemetation", async function () {
+            const implemetation = await proxyMock.getImplemetation();
+            expect(implemetation).to.equal(v1);
         });
 
-        it("Proxy: isinit true", async function () {
-            await proxyMock.connect(initializer).init();
-            const status = await proxyMock.isInit();
-            expect(status).to.equal(true);
+        it("Proxy: setImplementation", async function () {
+            await proxyMock.setImplementation(v2);
+            const implemetation = await proxyMock.getImplemetation();
+            expect(implemetation).to.equal(v2);
         });
 
-        it("Proxy: is initializer true", async function () {
-            const output = await proxyMock.getImplemetation();
-            expect(output).to.equal(true);
+        // revert file
+        it(revertedMessage.proxy_set_zero_address, async function () {
+            await expect(proxyMock.setImplementation(ZeroAddress))
+                .to.revertedWith(revertedMessage.proxy_set_zero_address);
         });
 
-        it("Proxy: is initializer false", async function () {
-            const output = await proxyMock.isIntializer(signers[0].address);
-            expect(output).to.equal(false);
-        });
-
-        it(revertedMessage.initializer_already_initialized, async function () {
-            await proxyMock.setImplementation(initializer).init();
-            await expect(proxyMock.connect(initializer).init())
-                .to.revertedWith(revertedMessage.initializer_already_initialized);
+        it(revertedMessage.proxy_already_exists, async function () {
+            await proxyMock.setImplementation(v2);
+            await expect(proxyMock.setImplementation(v2))
+                .to.revertedWith(revertedMessage.proxy_already_exists);
         });
 
         it("Proxy: events", async function () {
-            await expect(proxyMock.connect(initializer).init())
-                .to.emit(proxyMock,"Proxy");
+            await expect(proxyMock.setImplementation(v2))
+                .to.emit(proxyMock,"ImpelementationContractUpdated")
+                .withArgs(v1,v2);
         });
     });
 });

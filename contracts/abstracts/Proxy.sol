@@ -7,16 +7,17 @@ abstract contract Proxy {
     address private _implementation;
 
     function _updateImpelemetation(address implementation) internal {
+        require(implementation != address(0),"proxy: can't set to zero address");
         address implemeationCache = _implementation;
         require(
-            _implementation != implementation,
+            implemeationCache != implementation,
             "proxy: can't set same implemention"
         );
         _implementation = implementation;
-        emit ImpelementationContractUpdated(_implementation, implementation);
+        emit ImpelementationContractUpdated(implemeationCache, implementation);
     }
 
-    function getImplemetation() public returns (address) {
+    function getImplemetation() public view returns (address) {
         return _implementation;
     }
 

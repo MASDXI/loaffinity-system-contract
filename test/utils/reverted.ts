@@ -22,6 +22,9 @@ export const revertedMessage = {
     proposal_voting_period: "proposal: are in voting period",
     proposal_execute_retention_period: "proposal: can't execute in retention period",
     proposal_cancel_after_retention: "proposal: can't cancel after rentention period",
+    // abstract proxy contract
+    proxy_set_zero_address: "proxy: can't set to zero address",
+    proxy_already_exists: "proxy: can't set same implemention",
     // abstract initializer contract
     initializer_already_initialized: "initializer: already init",
     initializer_only_can_call: "initializer: onlyInitializer can call",
