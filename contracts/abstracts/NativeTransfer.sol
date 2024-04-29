@@ -2,7 +2,6 @@
 pragma solidity 0.8.17;
 
 abstract contract NativeTransfer {
-
     error TransferZeroAmount();
     error TransferExceedBalance(uint256 amount, uint256 balance);
 
@@ -25,4 +24,4 @@ abstract contract NativeTransfer {
             }
         }
     }
-} 
+}

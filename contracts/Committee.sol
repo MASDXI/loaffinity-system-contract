@@ -6,33 +6,39 @@ import "./abstracts/Initializer.sol";
 import "./interfaces/ICommittee.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
-contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer {
-
+contract Committee is
+    AccessControlEnumerable,
+    ICommittee,
+    Proposal,
+    Initializer
+{
     bytes32 public constant ROOT_ADMIN_ROLE = keccak256("ROOT_ADMIN_ROLE");
-    bytes32 public constant CONSORTIUM_COMMITTEE_ROLE = keccak256("CONSORTIUM_COMMITTEE_ROLE");
+    bytes32 public constant CONSORTIUM_COMMITTEE_ROLE =
+        keccak256("CONSORTIUM_COMMITTEE_ROLE");
     bytes32 public constant PROPOSER_ROLE = keccak256("PROPOSER_ROLE");
-    bytes32 public constant EXECUTOR_AGENT_ROLE = keccak256("EXECUTOR_AGENT_ROLE");
+    bytes32 public constant EXECUTOR_AGENT_ROLE =
+        keccak256("EXECUTOR_AGENT_ROLE");
 
-    mapping(bytes32 => ProposalCommitteeInfo) private _committeeProposals; 
+    mapping(bytes32 => ProposalCommitteeInfo) private _committeeProposals;
     mapping(uint256 => bytes32) public blockProposal;
 
     modifier onlyAdmin() {
-        require(isAdmin(msg.sender),"committee: onlyAdmin can call");
+        require(isAdmin(msg.sender), "committee: onlyAdmin can call");
         _;
     }
 
     modifier onlyCommittee() {
-        require(isCommittee(msg.sender),"committee: onlyCommittee can call");
+        require(isCommittee(msg.sender), "committee: onlyCommittee can call");
         _;
     }
 
     modifier onlyAgent() {
-        require(isAgent(msg.sender),"committee: onlyAgent can call");
+        require(isAgent(msg.sender), "committee: onlyAgent can call");
         _;
     }
 
     modifier onlyProposer() {
-        require(isProposer(msg.sender),"committee: onlyProposer can call");
+        require(isProposer(msg.sender), "committee: onlyProposer can call");
         _;
     }
 
@@ -49,9 +55,9 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         uint256 votePeriod_,
         uint32 proposePeriod_,
         uint32 retentionPeriod_, // add
-        address [] calldata committees_, 
+        address[] calldata committees_,
         address admin_
-        ) external onlyInitializer {
+    ) external onlyInitializer {
         uint256 committeeLen = committees_.length;
         _initialized();
         _setupRole(ROOT_ADMIN_ROLE, admin_);
@@ -66,17 +72,23 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         _setExecuteRetentionPeriod(retentionPeriod_); // add
     }
 
-    function _getProposal(bytes32 proposalId) private view returns (ProposalCommitteeInfo memory) {
+    function _getProposal(
+        bytes32 proposalId
+    ) private view returns (ProposalCommitteeInfo memory) {
         ProposalCommitteeInfo memory data = _committeeProposals[proposalId];
         require(data.blockNumber != 0, "committee: proposal not exist");
         return data;
     }
 
-    function getProposalCommitteeInfoByProposalId(bytes32 proposalId) public view returns (ProposalCommitteeInfo memory) {
+    function getProposalCommitteeInfoByProposalId(
+        bytes32 proposalId
+    ) public view returns (ProposalCommitteeInfo memory) {
         return _getProposal(proposalId);
     }
 
-    function getProposalCommitteeInfoByBlockNumber(uint256 blockNumber) public view returns (ProposalCommitteeInfo memory) {
+    function getProposalCommitteeInfoByBlockNumber(
+        uint256 blockNumber
+    ) public view returns (ProposalCommitteeInfo memory) {
         return _getProposal(blockProposal[blockNumber]);
     }
 
@@ -89,22 +101,22 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
     }
 
     /// @custom:override
-    function isAdmin(address account) public override view returns (bool) {
+    function isAdmin(address account) public view override returns (bool) {
         return hasRole(ROOT_ADMIN_ROLE, account);
     }
 
     /// @custom:override
-    function isCommittee(address account) public override view returns (bool) {
+    function isCommittee(address account) public view override returns (bool) {
         return hasRole(CONSORTIUM_COMMITTEE_ROLE, account);
     }
 
     /// @custom:override
-    function isProposer(address account) public override view returns (bool) {
+    function isProposer(address account) public view override returns (bool) {
         return hasRole(PROPOSER_ROLE, account);
     }
 
     /// @custom:override
-    function isAgent(address account) public override view returns (bool) {
+    function isAgent(address account) public view override returns (bool) {
         return hasRole(EXECUTOR_AGENT_ROLE, account);
     }
 
@@ -112,16 +124,27 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         uint256 blockNumber,
         address account,
         ProposalType proposeType
-    ) public onlyProposer returns(bool) {
+    ) public onlyProposer returns (bool) {
         require(account != address(0), "committee: propose zero address");
         if (proposeType == ProposalType.ADD) {
-            require(!isCommittee(account), "committee: propose add existing committee");
+            require(
+                !isCommittee(account),
+                "committee: propose add existing committee"
+            );
         } else {
-            require(isCommittee(account), "committee: propose remove not exist committee"); // typo commitee
+            require(
+                isCommittee(account),
+                "committee: propose remove not exist committee"
+            ); // typo commitee
         }
-        require(blockProposal[blockNumber] == bytes32(0),"committee: blocknumber has propose");
+        require(
+            blockProposal[blockNumber] == bytes32(0),
+            "committee: blocknumber has propose"
+        );
 
-        bytes32 proposalId = keccak256(abi.encode(msg.sender, account, proposeType, blockNumber));
+        bytes32 proposalId = keccak256(
+            abi.encode(msg.sender, account, proposeType, blockNumber)
+        );
         _proposal(proposalId, uint16(getCommitteeCount()), blockNumber);
 
         blockProposal[blockNumber] = proposalId;
@@ -129,63 +152,103 @@ contract Committee is AccessControlEnumerable, ICommittee, Proposal, Initializer
         _committeeProposals[proposalId].committee = account;
         _committeeProposals[proposalId].blockNumber = blockNumber;
         _committeeProposals[proposalId].proposeType = proposeType;
-        
-        emit CommitteeProposalProposed(proposalId, msg.sender, account, proposeType, blockNumber, block.timestamp);
+
+        emit CommitteeProposalProposed(
+            proposalId,
+            msg.sender,
+            account,
+            proposeType,
+            blockNumber,
+            block.timestamp
+        );
 
         return true;
     }
 
     function grantAgent(address account) public onlyAdmin {
-        require(!isAgent(account),"committee: grant exist agent address");
+        require(!isAgent(account), "committee: grant exist agent address");
         _grantRole(EXECUTOR_AGENT_ROLE, account);
     }
 
     function revokeAgent(address account) public onlyAdmin {
-        require(isAgent(account),"committee: revoke non agent address");
+        require(isAgent(account), "committee: revoke non agent address");
         _revokeRole(EXECUTOR_AGENT_ROLE, account);
     }
 
     function grantProposer(address account) public onlyAdmin {
-        require(!isProposer(account),"committee: grant exist proposer address");
+        require(
+            !isProposer(account),
+            "committee: grant exist proposer address"
+        );
         _grantRole(PROPOSER_ROLE, account);
     }
 
     function revokeProposer(address account) public onlyAdmin {
-        require(isProposer(account),"committee: revoke non proposer address");
+        require(isProposer(account), "committee: revoke non proposer address");
         _revokeRole(PROPOSER_ROLE, account);
     }
-    
-    function execute(uint256 blockNumber) public payable onlyAgent returns (uint256) {
-        ProposalCommitteeInfo memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
+
+    function execute(
+        uint256 blockNumber
+    ) public payable onlyAgent returns (uint256) {
+        ProposalCommitteeInfo
+            memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
         bytes32 IdCache = blockProposal[blockNumber];
-        (bool callback) = _execute(IdCache);
+        bool callback = _execute(IdCache);
         uint256 timeCache = block.timestamp;
         if (callback) {
             if (data.proposeType == ProposalType.ADD) {
                 _grantRole(CONSORTIUM_COMMITTEE_ROLE, data.committee);
-                emit CommitteeProposalExecuted(IdCache, ProposalType.ADD, data.committee, timeCache);
+                emit CommitteeProposalExecuted(
+                    IdCache,
+                    ProposalType.ADD,
+                    data.committee,
+                    timeCache
+                );
             } else {
                 _revokeRole(CONSORTIUM_COMMITTEE_ROLE, data.committee);
-                emit CommitteeProposalExecuted(IdCache, ProposalType.REMOVE, data.committee, timeCache);
+                emit CommitteeProposalExecuted(
+                    IdCache,
+                    ProposalType.REMOVE,
+                    data.committee,
+                    timeCache
+                );
             }
         } else {
-            emit CommitteeProposalRejected(IdCache, data.proposeType, data.committee, timeCache);
+            emit CommitteeProposalRejected(
+                IdCache,
+                data.proposeType,
+                data.committee,
+                timeCache
+            );
         }
         return blockNumber;
     }
 
     /// @custom:override
-    function vote(bytes32 proposalId, bool auth) external override onlyCommittee {
+    function vote(
+        bytes32 proposalId,
+        bool auth
+    ) external override onlyCommittee {
         _vote(proposalId, auth);
         emit CommitteeVoted(proposalId, msg.sender, auth, block.timestamp);
     }
 
-    function cancel(uint256 blockNumber) public payable onlyAgent returns (uint256) { // add
-        ProposalCommitteeInfo memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
+    function cancel(
+        uint256 blockNumber
+    ) public payable onlyAgent returns (uint256) {
+        // add
+        ProposalCommitteeInfo
+            memory data = getProposalCommitteeInfoByBlockNumber(blockNumber);
         uint256 timeCache = block.timestamp;
-        bytes32 IdCache =  blockProposal[blockNumber];
+        bytes32 IdCache = blockProposal[blockNumber];
         _cancelProposal(IdCache);
-        emit CommitteeCancel(IdCache, data.proposeType, data.committee, timeCache);
+        emit CommitteeCancel(
+            IdCache,
+            data.proposeType,
+            data.committee,
+            timeCache
+        );
         return blockNumber;
     }
 }

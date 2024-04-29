@@ -2,20 +2,23 @@
 pragma solidity 0.8.17;
 
 abstract contract Initializer {
-
     bool private _init = false;
 
     event Initialized();
-    
-    address private constant _initializer = <intializer-address>;
+
+    address private constant _initializer =
+        <intializer-address>;
 
     modifier onlyInitializer() {
-        require(msg.sender == _initializer,"initializer: onlyInitializer can call");
+        require(
+            msg.sender == _initializer,
+            "initializer: onlyInitializer can call"
+        );
         _;
     }
 
     function _initialized() internal {
-        require(!isInit(),"initializer: already init");
+        require(!isInit(), "initializer: already init");
         _init = true;
         emit Initialized();
     }

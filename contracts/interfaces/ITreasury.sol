@@ -2,7 +2,10 @@
 pragma solidity 0.8.17;
 
 interface ITreasury {
-    enum ProposalType { REMOVED, RELEASED } // LOCKED => REMOVED
+    enum ProposalType {
+        REMOVED,
+        RELEASED
+    } // LOCKED => REMOVED
 
     struct ProposalSupplyInfo {
         address proposer;
@@ -11,18 +14,42 @@ interface ITreasury {
         uint256 blockNumber;
         ProposalType proposeType;
     }
-    
-    event TreasuryProposalProposed(
-        bytes32 indexed proposalId, 
-        address indexed proposer, 
-        address indexed recipient, 
-        ProposalType proposalType,
-        uint256 amount, 
-        uint256 targetBlock, 
-        uint256 time);
 
-    event TreasuryVoted(bytes32 indexed proposalId, address indexed voter, bool auth, uint256 time);
-    event TreasuryCancel(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time); // add
-    event TreasuryProposalExecuted(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
-    event TreasuryProposalRejected(bytes32 proposalId, ProposalType proposalType, address indexed account, uint256 amount, uint256 time);
+    event TreasuryProposalProposed(
+        bytes32 indexed proposalId,
+        address indexed proposer,
+        address indexed recipient,
+        ProposalType proposalType,
+        uint256 amount,
+        uint256 targetBlock,
+        uint256 time
+    );
+
+    event TreasuryVoted(
+        bytes32 indexed proposalId,
+        address indexed voter,
+        bool auth,
+        uint256 time
+    );
+    event TreasuryCancel(
+        bytes32 proposalId,
+        ProposalType proposalType,
+        address indexed account,
+        uint256 amount,
+        uint256 time
+    ); // add
+    event TreasuryProposalExecuted(
+        bytes32 proposalId,
+        ProposalType proposalType,
+        address indexed account,
+        uint256 amount,
+        uint256 time
+    );
+    event TreasuryProposalRejected(
+        bytes32 proposalId,
+        ProposalType proposalType,
+        address indexed account,
+        uint256 amount,
+        uint256 time
+    );
 }

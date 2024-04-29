@@ -12,7 +12,8 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
     event ParameterBlockPeriodUpdate(uint256 blockperiod);
     event ParameterConfigurationUpdated(
         ConfigurationParemeter oldConfig,
-        ConfigurationParemeter netConfig);
+        ConfigurationParemeter netConfig
+    );
 
     uint32 private constant ONE_YEAR = 31_536_000; // 1 year in seconds.
     uint32 private constant ONE_HOUR = 3_600; // 1 hour in seconds.
@@ -52,14 +53,15 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
     // K'           // _config.powerConsumptionPerGas = 300;        // decimal 9
     // blocktime    // setBlockPeriod(15);                          // decimal 0
     // dampling     // _constant = 278;
-    constructor (
+    constructor(
         uint256 _carbonEmissionCoefficient,
         uint256 _carbonCaptureCost,
         uint256 _sustainabilityChargeRate,
         uint256 _idlePowerConsumption,
         uint256 _numberOfValidator,
         uint256 _powerConsumptionPerGas,
-        uint256 _blockPeriod) {
+        uint256 _blockPeriod
+    ) {
         ConfigurationParemeter memory cacheConfig = ConfigurationParemeter(
             _carbonEmissionCoefficient,
             _carbonCaptureCost,
@@ -73,7 +75,9 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
         _lastUpdatedBlock = block.number;
     }
 
-    function _configurationValidation(ConfigurationParemeter memory config) private pure {
+    function _configurationValidation(
+        ConfigurationParemeter memory config
+    ) private pure {
         if (config.carbonEmissionCoefficient == 0) {
             revert();
         }
@@ -103,9 +107,7 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
     }
 
     // @TODO permission
-    function setConfiguration(
-        ConfigurationParemeter memory config
-    ) public {
+    function setConfiguration(ConfigurationParemeter memory config) public {
         // Annaul Update Parameter
         uint256 blockNumberCache = block.number;
         require(
@@ -143,7 +145,8 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
         uint256 carbonEmission = (_config.carbonEmissionCoefficient *
             _blocktime) * _constant;
         // Calculate validator contribution
-        uint256 validatorContribution = (_config.idlePowerConsumption * _config.numberOfValidator);
+        uint256 validatorContribution = (_config.idlePowerConsumption *
+            _config.numberOfValidator);
         // Calculate charge rate
         uint256 chargeRate = (1 + _config.sustainabilityChargeRate);
         // Calculate total transaction fee
@@ -159,7 +162,7 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
     function version() public pure override returns (uint256) {
         return 10;
     }
-    
+
     /// @custom:override
     function status() public view override returns (bool) {
         return _status;

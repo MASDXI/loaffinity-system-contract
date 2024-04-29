@@ -5,7 +5,11 @@ import "./abstracts/Initializer.sol";
 import "./interfaces/IServiceProvider.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
-contract ServiceProvider is AccessControlEnumerable, Initializer, IServiceProvider {
+contract ServiceProvider is
+    AccessControlEnumerable,
+    Initializer,
+    IServiceProvider
+{
     /// @notice store merchant as key and return service provider as value.
     mapping(address => address) private _registry;
 
@@ -21,10 +25,10 @@ contract ServiceProvider is AccessControlEnumerable, Initializer, IServiceProvid
     }
 
     /// @notice point to system contract service provider proxy
-    constructor (address proxyContract) {
+    constructor(address proxyContract) {
         _proxy = proxyContract;
     }
-    
+
     /// @custom:override
     function version() public view override returns (uint256) {
         return 10;
@@ -37,19 +41,27 @@ contract ServiceProvider is AccessControlEnumerable, Initializer, IServiceProvid
     }
 
     /// @custom:override
-    function getServiceProvider(address merchant) public view override returns (address) {
+    function getServiceProvider(
+        address merchant
+    ) public view override returns (address) {
         return _registry[merchant];
     }
 
     /// @custom:override
-    function grantMerchant(address merchant, address callee) public override onlyProxy {
+    function grantMerchant(
+        address merchant,
+        address callee
+    ) public override onlyProxy {
         _registry[merchant] = callee;
         _grantRole(MERCHANT_ROLE, merchant);
     }
 
     /// @custom:override
-    function revokeMerchant(address merchant, address callee) public override onlyProxy {
-        require( _registry[merchant] == callee,"serviceprovider:");
+    function revokeMerchant(
+        address merchant,
+        address callee
+    ) public override onlyProxy {
+        require(_registry[merchant] == callee, "serviceprovider:");
         _registry[merchant] = address(0);
         _revokeRole(MERCHANT_ROLE, merchant);
     }

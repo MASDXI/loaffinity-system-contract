@@ -7,7 +7,7 @@ import "../interfaces/ITransactionFeeDistributor.sol";
 contract TransactioTransportMock is TransactionTransport {
     uint256 number;
 
-    constructor (ITransactionFeeDistributor _new) {
+    constructor(ITransactionFeeDistributor _new) {
         _setTxFeeDistributor(_new);
     }
 

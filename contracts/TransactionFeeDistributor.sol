@@ -4,7 +4,10 @@ pragma solidity 0.8.17;
 import "./abstracts/NativeTransfer.sol";
 import "./interfaces/ITransactionFeeDistributor.sol";
 
-contract TransactionFeeDistributor is ITransactionFeeDistributor,  NativeTransfer {
+contract TransactionFeeDistributor is
+    ITransactionFeeDistributor,
+    NativeTransfer
+{
     mapping(address => address) private _registry;
 
     address private _treasury;
@@ -16,7 +19,7 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor,  NativeTransfe
      * @param gasPrice gasPrice of transaction.
      */
     function submitTxGasUsed(uint256 gasUsed, uint256 gasPrice) external {
-        // research gas calculate not perfect. 
+        // research gas calculate not perfect.
         // should add additional gasUsed from _transferEther()?
         address addressCache = _registry[msg.sender];
         uint256 amount = calculate(gasUsed, gasPrice);
@@ -37,10 +40,14 @@ contract TransactionFeeDistributor is ITransactionFeeDistributor,  NativeTransfe
      * @return transactionCost cost of transaction.
      * @notice constant 10 came from tranasction processor in core blockchain that deduct
      * 10 percent of each transaction fee to transaction fee distributor contract address.
-     */ 
-    function calculate(uint256 gasUsed, uint256 gasPrice) public view returns (uint256 transactionCost) {
+     */
+    function calculate(
+        uint256 gasUsed,
+        uint256 gasPrice
+    ) public view returns (uint256 transactionCost) {
         if (gasPrice != 0) {
-            uint256 percentageAmount = ((gasUsed * gasPrice ) * 10 /** constant */) / 100;
+            uint256 percentageAmount = ((gasUsed * gasPrice) *
+                10 /** constant */) / 100;
             transactionCost = (percentageAmount * _percentage) / 100;
             return transactionCost;
         } else {

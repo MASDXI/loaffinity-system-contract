@@ -2,12 +2,18 @@
 pragma solidity 0.8.17;
 
 abstract contract Proxy {
-    event ImpelementationContractUpdated(address oldAddress, address newAddress);
+    event ImpelementationContractUpdated(
+        address oldAddress,
+        address newAddress
+    );
 
     address private _implementation;
 
     function _updateImpelemetation(address implementation) internal {
-        require(implementation != address(0),"proxy: can't set to zero address");
+        require(
+            implementation != address(0),
+            "proxy: can't set to zero address"
+        );
         address implemeationCache = _implementation;
         require(
             implemeationCache != implementation,

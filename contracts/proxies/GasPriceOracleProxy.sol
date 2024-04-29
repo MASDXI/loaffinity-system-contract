@@ -8,11 +8,16 @@ import "../interfaces/ICommittee.sol";
 // import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 contract GasPriceOracleProxy is Proxy, Initializer {
-// contract GasPriceOracleProxy is /*AccessControlEnumerable*/, Proxy, Initializer {
-    ICommittee private _committee;    // pre-loaded contract.
-    IGasPriceOracle private _implementation;    // // deployed contract.
+    // contract GasPriceOracleProxy is /*AccessControlEnumerable*/, Proxy, Initializer {
+    ICommittee private _committee; // pre-loaded contract.
+    IGasPriceOracle private _implementation; // deployed contract.
 
-    enum ROLE { CONSORTIUM, NODE_VALIDATOR, MERCHANT, MOBILE_VALIDATOR }
+    enum ROLE {
+        CONSORTIUM,
+        NODE_VALIDATOR,
+        MERCHANT,
+        MOBILE_VALIDATOR
+    }
 
     struct Threshold {
         ROLE role;
@@ -21,18 +26,24 @@ contract GasPriceOracleProxy is Proxy, Initializer {
 
     // @TODO create role for who can update configuration on gas price oracle contract?
 
-    Threshold [] private _conf;
+    Threshold[] private _conf;
 
     event ThresholdUpdate();
 
     modifier onlyAuthorized() {
         // root admin?
-        require(_committee.isAdmin(msg.sender),"gasPriceOracleProxy: only authorized account can call");
+        require(
+            _committee.isAdmin(msg.sender),
+            "gasPriceOracleProxy: only authorized account can call"
+        );
         _;
     }
 
     /// @notice system contract not use constructor due it's preload into genesis block.
-    function initialize(address implementation, address committeeContract) external onlyInitializer {
+    function initialize(
+        address implementation,
+        address committeeContract
+    ) external onlyInitializer {
         _initialized();
         _updateImpelemetation(implementation);
         _committee = ICommittee(committeeContract);
@@ -40,7 +51,9 @@ contract GasPriceOracleProxy is Proxy, Initializer {
     }
 
     // @TODO role permission
-    function setImplementation(address implementation) public override onlyAuthorized {
+    function setImplementation(
+        address implementation
+    ) public override onlyAuthorized {
         _implementation = IGasPriceOracle(implementation);
         super.setImplementation(implementation);
     }
@@ -49,16 +62,18 @@ contract GasPriceOracleProxy is Proxy, Initializer {
         return _implementation.version();
     }
 
-    function calculateTransactionFee(uint256 gasLimit) external view returns (uint256) {
+    function calculateTransactionFee(
+        uint256 gasLimit
+    ) external view returns (uint256) {
         return _implementation.calculate(gasLimit);
     }
 
-    function updateThreshold(Threshold [3] memory newThreshold) public {
+    function updateThreshold(Threshold[3] memory newThreshold) public {
         uint8 percent = 0;
         for (uint8 i = 0; i < 4; i++) {
             percent += newThreshold[i].ratio;
         }
-        require(percent == 100,"invalid threshold");
+        require(percent == 100, "invalid threshold");
         // _conf = newThreshold;
         emit ThresholdUpdate();
     }
@@ -71,7 +86,7 @@ contract GasPriceOracleProxy is Proxy, Initializer {
         }
     }
 
-    function getThreashold() public view returns (Threshold [] memory) {
+    function getThreashold() public view returns (Threshold[] memory) {
         return _conf;
     }
 }

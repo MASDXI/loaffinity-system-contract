@@ -8,26 +8,34 @@ import "../interfaces/ICommittee.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 contract ServiceProviderProxy is AccessControlEnumerable, Proxy, Initializer {
-    ICommittee private _committee;    // pre-loaded contract.
-    IServiceProvider private _implementation;   // deployed contract.
-    
+    ICommittee private _committee; // pre-loaded contract.
+    IServiceProvider private _implementation; // deployed contract.
+
     // bool public status;
 
     // store service provider account
-    bytes32 public constant SERVICE_PROVIDER_ROLE = keccak256("SERVICE_PROVIDER_ROLE");
+    bytes32 public constant SERVICE_PROVIDER_ROLE =
+        keccak256("SERVICE_PROVIDER_ROLE");
 
     modifier onlyAdmin() {
-        require(_committee.isAdmin(msg.sender),"serviceproviderproxy:");
+        require(_committee.isAdmin(msg.sender), "serviceproviderproxy:");
         _;
     }
 
     modifier onlyAuthorized() {
-        require(_committee.isAdmin(msg.sender) || hasRole(SERVICE_PROVIDER_ROLE, msg.sender),"serviceproviderproxy:");
+        require(
+            _committee.isAdmin(msg.sender) ||
+                hasRole(SERVICE_PROVIDER_ROLE, msg.sender),
+            "serviceproviderproxy:"
+        );
         _;
     }
 
     /// @notice system contract not use constructor due it's preload into genesis block.
-    function initialize(address implementation, address committeeContract) external onlyInitializer {
+    function initialize(
+        address implementation,
+        address committeeContract
+    ) external onlyInitializer {
         _initialized();
         _updateImpelemetation(implementation);
         _committee = ICommittee(committeeContract);
@@ -35,7 +43,9 @@ contract ServiceProviderProxy is AccessControlEnumerable, Proxy, Initializer {
     }
 
     // @TODO role permission
-    function setImplementation(address implementation) public override onlyAdmin {
+    function setImplementation(
+        address implementation
+    ) public override onlyAdmin {
         _implementation = IServiceProvider(implementation);
         super.setImplementation(implementation);
     }
@@ -44,7 +54,9 @@ contract ServiceProviderProxy is AccessControlEnumerable, Proxy, Initializer {
         return _implementation.version();
     }
 
-    function getServiceProviderOfMerchant(address merchant) external view returns (address) {
+    function getServiceProviderOfMerchant(
+        address merchant
+    ) external view returns (address) {
         return _implementation.getServiceProvider(merchant);
     }
 

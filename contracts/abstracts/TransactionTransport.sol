@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "../interfaces/ITransactionFeeDistributor.sol" ;
+import "../interfaces/ITransactionFeeDistributor.sol";
 
 abstract contract TransactionTransport {
-
     event TransportUpdated(ITransactionFeeDistributor distributor);
 
     // interface
@@ -13,7 +12,7 @@ abstract contract TransactionTransport {
     // reference: https://ethereum.github.io/yellowpaper/paper.pdf
     uint16 private constant Gtransaction = 21_000;
 
-    modifier calculatorGasUsed {
+    modifier calculatorGasUsed() {
         uint256 gasCache = gasleft();
         _;
         // caching transaction cost
@@ -22,12 +21,19 @@ abstract contract TransactionTransport {
     }
 
     function _setTxFeeDistributor(ITransactionFeeDistributor _new) internal {
-        require(_new != txfeedistributor(),"transaction: tx feedistributor already set");
+        require(
+            _new != txfeedistributor(),
+            "transaction: tx feedistributor already set"
+        );
         _txfeedistributor = _new;
         emit TransportUpdated(_new);
     }
 
-    function txfeedistributor() public view returns (ITransactionFeeDistributor) {
+    function txfeedistributor()
+        public
+        view
+        returns (ITransactionFeeDistributor)
+    {
         return _txfeedistributor;
     }
 }
