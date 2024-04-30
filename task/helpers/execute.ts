@@ -10,7 +10,8 @@ task("execute", "execute proposal")
     const blocknumber = String(args.blocknumber);
     const contract = Number(args.contract);
     const signers = await hre.ethers.getSigners();
-    let res: any
+    // TODO change type any to specific type
+    let res: any;
     switch (contract) {
         case 0: { 
           try{

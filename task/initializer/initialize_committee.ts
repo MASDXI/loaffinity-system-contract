@@ -17,6 +17,7 @@ task("initialize_committee", "init system contract")
         const committees = Array(args.committees);
         const proposeperiod = BigInt(args.proposeperiod);
         const admin = String(args.admin);
+        // TODO change type any to specific type
         let tx: any
         try {
             if(signers[0].address == process.env.INITIALIZER_ADDRESS) {

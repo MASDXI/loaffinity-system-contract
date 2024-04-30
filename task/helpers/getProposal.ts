@@ -72,8 +72,9 @@ task("get_proposal_by_blocknumber", "get proposal by given blocknumber")
   .addParam("block", "destination address")
   .addParam("contract","0:committe 1:supply")
   .setAction(async (args, hre) => {
-    const block = BigInt(args.block)
-    const contract = Number(args.contract)
+    const block = BigInt(args.block);
+    const contract = Number(args.contract);
+    // TODO change type any to specific type
     let ret: any
     switch (contract) {
       case 0:

@@ -9,7 +9,8 @@ task("grant_agent", "grant an agent")
     const account = String(args.account);
     const action = Number(args.action);
     const signers = await hre.ethers.getSigners();
-    const adminHash = await committee.ROOT_ADMIN_ROLE();    
+    const adminHash = await committee.ROOT_ADMIN_ROLE();
+    // TODO change type any to specific type
     let res : any
     switch(action) { 
         case 0: { 

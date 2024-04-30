@@ -15,6 +15,7 @@ task("initialize_supply", "init system contract")
         const proposeperiod = BigInt(args.proposeperiod);
         const retention = BigInt(args.retention);
         const committeeaddress = String(args.committeeaddress);
+        // TODO change type any to specific type
         let tx: any
         try {
             if(signers[0].address == process.env.INITIALIZER_ADDRESS){

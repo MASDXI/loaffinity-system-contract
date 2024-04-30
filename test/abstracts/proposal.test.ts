@@ -4,6 +4,8 @@ import { mine } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { constants } from "../utils/constants"
 import { revertedMessage } from "../utils/reverted";
+import { ProposalMock } from "../../typechain-types";
+import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 
 async function setup(voteDelay: BigInt, votePeriod: BigInt, threshold: BigInt, proposePeriod: BigInt, executeRetentionPeriod: BigInt) {
     const contract = await ethers.deployContract(
@@ -15,9 +17,9 @@ async function setup(voteDelay: BigInt, votePeriod: BigInt, threshold: BigInt, p
 
 describe("Abstract Proposal Contract", function () {
 
-    let proposalMock: any;
-    let signers: any;
-    let activateBlock: any;
+    let proposalMock: ProposalMock;
+    let signers: HardhatEthersSigner[];
+    let activateBlock: bigint;
 
     beforeEach(async function () {
         const { contract, accounts } = await setup(

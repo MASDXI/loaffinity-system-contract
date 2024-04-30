@@ -20,6 +20,7 @@ task("propose_committee", "propose new committee proposal")
     try {
       if(await committee.isInit()){
         if(await committee.isProposer(signers[0].address)){
+            // TODO change type any to specific type
             const tx: any = await committee.propose(blockTarget, account, proposalType);
             await tx.wait();
             const { blockNumber, blockHash, hash } = await tx.getTransaction();

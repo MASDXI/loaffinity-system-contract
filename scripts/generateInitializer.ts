@@ -1,11 +1,11 @@
 import * as fs from 'fs/promises';
-import { ZeroAddress, ethers } from 'ethers';
+import { AddressLike, ZeroAddress, ethers } from 'ethers';
 import { PathLike } from 'fs';
 
 const solidityFilePath = './contracts/abstracts/Initializer.sol.template';
 const newAddress = process.env.INITIALIZER_ADDRESS || ZeroAddress;
 
-function isValidEthereumAddress(address: any) {
+function isValidEthereumAddress(address: AddressLike) {
   return ethers.isAddress(address);
 }
 

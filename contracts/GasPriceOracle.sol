@@ -37,6 +37,7 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
     ConfigurationParemeter private _config;
     uint256 private _constant;
     uint256 private _lastUpdatedBlock;
+    address private _proxy;
 
     /* Blockchain environment configuration */
     uint256 private _blocktime; // block period in seconds.
@@ -60,7 +61,9 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
         uint256 _idlePowerConsumption,
         uint256 _numberOfValidator,
         uint256 _powerConsumptionPerGas,
-        uint256 _blockPeriod
+        uint256 _blockPeriod,
+        uint256 _dampling,
+        address proxyContract
     ) {
         ConfigurationParemeter memory cacheConfig = ConfigurationParemeter(
             _carbonEmissionCoefficient,
@@ -70,9 +73,11 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
             _numberOfValidator,
             _powerConsumptionPerGas
         );
-        setConfiguration(cacheConfig);
+        _updateConfiguration(cacheConfig);
         setBlockPeriod(_blockPeriod);
+        _constant = _dampling;
         _lastUpdatedBlock = block.number;
+        _proxy = proxyContract;
     }
 
     function _configurationValidation(
@@ -114,12 +119,16 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
             blockNumberCache - getLastUpdatedBlock() >= ONE_YEAR,
             "GasPriceOracleV1: It's not yet time to update values."
         );
+        _updateConfiguration(config);
+    }
+
+    function _updateConfiguration(ConfigurationParemeter memory config) public {
         // @TODO require check new config
         _configurationValidation(config);
         // @TODO should revert before cacheOldConfig for gas saving.
         ConfigurationParemeter memory cacheOldConfig = _config;
         _config = config;
-        _lastUpdatedBlock = blockNumberCache;
+        _lastUpdatedBlock = block.number;
         emit ParameterConfigurationUpdated(cacheOldConfig, config);
     }
 
@@ -142,8 +151,8 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
         // Carbon Emission Kg/kWh
         // uint256 carbonEmission = (_CEC * _blockPeriod /*_CO2P * *//(ONE_HOUR * 1000));
         // Calculate carbon emission
-        uint256 carbonEmission = (_config.carbonEmissionCoefficient *
-            _blocktime) * _constant;
+        uint256 carbonEmission = (_config.carbonEmissionCoefficient * 
+            _blocktime) * _config.carbonCaptureCost * _constant;
         // Calculate validator contribution
         uint256 validatorContribution = (_config.idlePowerConsumption *
             _config.numberOfValidator);

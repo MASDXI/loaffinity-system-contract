@@ -28,7 +28,7 @@ export async function setSystemContractFixture() {
 
   // set contract code to pre-load contract address.
   await setCode(constants.COMMITTEE_CONTRACT_ADDRESS, constants.COMMITEE_CONTRACT_BIN);
-  await setCode(constants.GASPRICE_ORACLE_PROXY_CONTRACT_ADDRESS, constants.GASPRICE_ORACLE_PROXY_CONTRACT_ADDRESS);
+  await setCode(constants.GASPRICE_ORACLE_PROXY_CONTRACT_ADDRESS, constants.GASPRICE_ORACLE_PROXY_CONTRACT_BIN);
   await setCode(constants.SERVICE_PROVIER_PROXY_CONTRACT_ADDRESS, constants.SERVICE_PROVIER_PROXY_CONTRACT_BIN);
   await setCode(constants.TREASURY_CONTRACT_ADDRESS, constants.TREASURY_CONTRACT_BIN);
 

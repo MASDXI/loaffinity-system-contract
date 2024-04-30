@@ -10,6 +10,8 @@ import { constants } from "../utils/constants"
 import { setSystemContractFixture, targetBlock } from "../utils/systemContractFixture"
 import { revertedMessage } from "../utils/reverted";
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
+import { ServiceProvider } from "../../typechain-types";
+import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 
 async function setup() {
     const initAccount = await ethers.getImpersonatedSigner(constants.INITIALIZER_ADDRESS);
@@ -22,16 +24,19 @@ async function setup() {
 }
 
 describe("Service Provider Proxy System Contract", function () {
+    // TODO change type any to specific type
     let fixture: any;
-    let initializer: any;
+    let initializer: HardhatEthersSigner;
     let block: bigint;
-    let signers: any;
+    let signers: HardhatEthersSigner[];
+    let v1: ServiceProvider;
 
     beforeEach(async function () {
         fixture = await loadFixture(setSystemContractFixture);
         const { initAccount, accounts, implementation } = await setup();
         signers = accounts;
         initializer = initAccount;
+        v1= implementation
         await fixture.committee.connect(initializer).initialize(
           constants.VOTE_DELAY, 
           constants.VOTE_PERIOD, 
@@ -61,7 +66,8 @@ describe("Service Provider Proxy System Contract", function () {
         });
 
         it("Service Provider Proxy: getImplementation", async function () {
-            // TODO
+            const implementation = await fixture.serviceproviderproxy.getImplementation();
+            expect(implementation).to.equal(await v1.getAddress());
         });
 
         it("Service Provider Proxy: grantServiceProvier", async function () {

@@ -62,6 +62,10 @@ contract GasPriceOracleProxy is Proxy, Initializer {
         return _implementation.version();
     }
 
+    function paused() external view returns (bool) {
+        return _implementation.status();
+    }
+
     function calculateTransactionFee(
         uint256 gasLimit
     ) external view returns (uint256) {

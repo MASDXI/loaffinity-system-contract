@@ -2,6 +2,8 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { setBalance } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { constants } from "../utils/constants";
+import { NativeTransferMock } from "../../typechain-types";
+import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 
 async function setup() {
     const contract = await ethers.deployContract("NativeTransferMock");
@@ -12,8 +14,8 @@ async function setup() {
 
 describe("Abstract NativeTransfer Contract", function () {
 
-    let nativeTransferMock: any;
-    let signers: any;
+    let nativeTransferMock: NativeTransferMock;
+    let signers: HardhatEthersSigner[];
     const mockAddress: string = "0x1000000000000000000000000000000000000000";
 
     beforeEach(async function () {

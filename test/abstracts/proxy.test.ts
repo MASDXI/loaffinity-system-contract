@@ -1,8 +1,10 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { ZeroAddress } from "ethers";
+import { AddressLike, ZeroAddress } from "ethers";
 import { constants } from "../utils/constants";
 import { revertedMessage } from "../utils/reverted";
+import { ProxyMock } from "../../typechain-types";
+import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 
 async function setup() {
     // read target from constant file
@@ -15,10 +17,10 @@ async function setup() {
 
 describe("Abstract Proxy Contract", function () {
     
-    let proxyMock: any;
-    let signers: any;
-    let v1: any;
-    let v2: any;
+    let proxyMock: ProxyMock;
+    let signers: HardhatEthersSigner[];
+    let v1: AddressLike;
+    let v2: AddressLike;
 
     beforeEach(async function () {
         const { contract, accounts, targetV1, targetV2 } = await setup();

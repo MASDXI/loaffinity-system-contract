@@ -56,7 +56,27 @@ const constants = {
     "COMMITEE_CONTRACT_BIN": CommitteeBin,
     "GASPRICE_ORACLE_PROXY_CONTRACT_BIN": GasPriceOracleProxyBin,
     "SERVICE_PROVIER_PROXY_CONTRACT_BIN": ServiceProviderProxyBin,
-    "TREASURY_CONTRACT_BIN": TreasuryBin
+    "TREASURY_CONTRACT_BIN": TreasuryBin,
+    "GASPRICE_CONFIG": {
+        "V1": {
+            "CARBON_EMISSION_COEFFICIENT": process.env.CARBON_EMISSION_COEFFICIENT ? 
+                process.env.CARBON_EMISSION_COEFFICIENT : 1n,
+            "CARBON_CAPTURE_COST": process.env.CARBON_CAPTURE_COST ?
+                process.env.CARBON_CAPTURE_COST : 344000000n,
+            "SUSTAINABILITIT_CHARGE_RATE": process.env.SUSTAINABILITIT_CHARGE_RATE ?
+                process.env.SUSTAINABILITIT_CHARGE_RATE : 1n,
+            "IDLE_POWER_CONSUMPTION": process.env.IDLE_POWER_CONSUMPTION ?
+                process.env.IDLE_POWER_CONSUMPTION : 15748000000n,
+            "NUMBER_OF_VALIDATOR": process.env.NUMBER_OF_VALIDATOR ?
+                process.env.NUMBER_OF_VALIDATOR : 4n,
+            "POWER_CONSUMPTION_PER_GAS": process.env.POWER_CONSUMPTION_PER_GAS ?
+                process.env.POWER_CONSUMPTION_PER_GAS : 300n,
+            "BLOCK_PERIOD": process.env.BLOCK_PERIOD ?
+                process.env.BLOCK_PERIOD : 15n,
+            "CONSTANT": process.env.CONSTANT ?
+                process.env.CONSTANT : 278n
+        }
+    }
 }
 
 export { constants };

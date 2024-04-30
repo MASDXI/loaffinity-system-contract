@@ -3,6 +3,8 @@ import { ethers } from "hardhat";
 import { setBalance } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { constants } from "../utils/constants";
 import { revertedMessage } from "../utils/reverted";
+import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
+import { InitializedMock } from "../../typechain-types";
 
 async function setup() {
     const contract = await ethers.deployContract("InitializedMock");
@@ -14,9 +16,9 @@ async function setup() {
 
 describe("Abstract Initialized Contract", function () {
     
-    let initializedMock: any;
-    let signers: any;
-    let initializer: any
+    let initializedMock: InitializedMock;
+    let signers: HardhatEthersSigner[];
+    let initializer: HardhatEthersSigner;
 
     beforeEach(async function () {
         const { contract, accounts, initAccount } = await setup();

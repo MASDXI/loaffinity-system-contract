@@ -24,6 +24,7 @@ task("propose_supply", "propose new supply proposal")
     try {
       if(await treasury.isInit()){
         if(await committee.isProposer(signers[0].address)){
+          // TODO change type any to specific type
           const res: any = await treasury.propose(blockTarget, amount, account, proposalType);
           await res.wait();
           const { blockNumber, blockHash, hash } = await res.getTransaction();

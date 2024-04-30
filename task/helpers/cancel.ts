@@ -10,7 +10,7 @@ task("cancel", "cancel proposal")
     const blocknumber = String(args.blocknumber);
     const contract = Number(args.contract);
     const signers = await hre.ethers.getSigners();
-    let res: any
+    let res: any;
     switch (contract) {
       case 0: { 
         try{

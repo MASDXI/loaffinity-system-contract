@@ -6,6 +6,7 @@ import { loadFixture, setBalance, mine } from "@nomicfoundation/hardhat-toolbox/
 import { constants } from "../utils/constants"
 import { revertedMessage } from "../utils/reverted";
 import { setSystemContractFixture, targetBlock } from "../utils/systemContractFixture"
+import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 
 async function setup() {
   const initAccount = await ethers.getImpersonatedSigner(constants.INITIALIZER_ADDRESS);
@@ -15,10 +16,10 @@ async function setup() {
 }
 
 describe("Treasury System Contract", function () {
-
+  // TODO change type any to specific type
   let fixture: any;
-  let signers: any;
-  let initializer: any;
+  let signers: HardhatEthersSigner[];
+  let initializer: HardhatEthersSigner;
   let block: bigint;
 
   beforeEach(async function () {

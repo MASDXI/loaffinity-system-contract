@@ -10,6 +10,7 @@ task("grant_proposer", "propose new committee proposal")
     const signers = await hre.ethers.getSigners();
     const action = Number(args.action);
     const adminHash = await committee.ROOT_ADMIN_ROLE();      
+    // TODO change type any to specific type
     let res : any
     switch(action) { 
         case 0: { 
