@@ -12,16 +12,16 @@ task("vote", "vote proposal")
     const proposal = String(args.proposal);
     const auth = Boolean(args.auth);
     const contract = Number(args.contract);
-    let res: any
+    let respone: any
     switch (contract) {
       case 0: { 
         try{
           if(await committee.isInit()){
             if(await committee.isCommittee(signers[0].address)){
-              res = await committee.vote(proposal, auth);
-              await res.wait();
-              res = await res.getTransaction();
-              console.log(`blockNumber: ${res.blockNumber}\nblockHash: ${res.blockHash}\nhash: ${res.hash}`);
+              respone = await committee.vote(proposal, auth);
+              await respone.wait();
+              respone = await respone.getTransaction();
+              console.log(`blockNumber: ${respone.blockNumber}\nblockHash: ${respone.blockHash}\nhash: ${respone.hash}`);
             } else{
               console.log("committee: onlyCommittee can call")
             }
@@ -37,10 +37,10 @@ task("vote", "vote proposal")
           try{
             if(await treasury.isInit()){
               if(await committee.isCommittee(signers[0].address)){
-                res = await treasury.vote(proposal, auth);
-                await res.wait();
-                res = await res.getTransaction();
-                console.log(`blockNumber: ${res.blockNumber}\nblockHash: ${res.blockHash}\nhash: ${res.hash}`);
+                respone = await treasury.vote(proposal, auth);
+                await respone.wait();
+                respone = await respone.getTransaction();
+                console.log(`blockNumber: ${respone.blockNumber}\nblockHash: ${respone.blockHash}\nhash: ${respone.hash}`);
               } else{
                 console.log("committee: onlyCommittee can call")
               }

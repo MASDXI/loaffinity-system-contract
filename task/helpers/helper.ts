@@ -2,30 +2,31 @@
 // import { ethers } from "ethers";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { constants as test }  from "../../test/utils/constants";
 
 export const loadCommitteContract = async (hre: HardhatRuntimeEnvironment) => {
     return await hre.ethers.getContractAt("Committee", 
-        "0x0000000000000000000000000000000000000776");
+        test.COMMITTEE_CONTRACT_ADDRESS);
 }
 
 export const loadTreasuryContract = async (hre: HardhatRuntimeEnvironment) => {
     return await hre.ethers.getContractAt("TreasuryContract", 
-        "0x0000000000000000000000000000000000000777");
+        test.TREASURY_CONTRACT_ADDRESS);
 }
 
 export const loadGasPriceOracleProxyContract = async (hre: HardhatRuntimeEnvironment) => {
     return await hre.ethers.getContractAt("GasPriceOracleProxy",
-        "0x0000000000000000000000000000000000000777");
+        test.GASPRICE_ORACLE_PROXY_CONTRACT_ADDRESS);
 }
 
 export const loadServiceProviderProxyContract = async (hre: HardhatRuntimeEnvironment) => {
     return await hre.ethers.getContractAt("ServiceProviderProxy",
-        "0x0000000000000000000000000000000000000777");
+        test.SERVICE_PROVIER_PROXY_CONTRACT_ADDRESS);
 }
 
 export const loadTxFeeDistributorContract = async (hre: HardhatRuntimeEnvironment) => {
-    return await hre.ethers.getContractAt("treasury", 
-        "0x0000000000000000000000000000000000000778");
+    return await hre.ethers.getContractAt("TransactionFeeDistributor", 
+        "0x0000000000000000000000000000000000000fff");
 }
 
 export const constants = { 

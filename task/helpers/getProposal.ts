@@ -8,17 +8,17 @@ task("get_proposal_id_by_blocknumber", "get proposal id by given blocknumber")
   .setAction(async (args, hre) => {
     const block = BigInt(args.block);
     const contract = Number(args.contract);
-    let ret: any
+    let response: string
     switch (contract) {
       case 0:
         const committee = await loadCommitteContract(hre);
-        ret = await committee.blockProposal(block);
-        console.log(ret);
+        response = await committee.blockProposal(block);
+        console.log(response);
         break;
       case 1:
         const treasury = await loadTreasuryContract(hre);
-        ret = await treasury.blockProposal(block);
-        console.log(ret);
+        response = await treasury.blockProposal(block);
+        console.log(response);
         break;
       default:
         console.log("Invalid contract type");
@@ -32,17 +32,17 @@ task("get_proposal_by_proposalid", "get proposal by given proposal id")
   .setAction(async (args, hre) => {
     const proposalid: BytesLike = (args.proposalid);
     const contract = Number(args.contract);
-    let ret: any
+    let response: any
     switch (contract) {
       case 0:
         const committe = await loadCommitteContract(hre);
-        ret = await committe.getProposalCommitteeInfoByProposalId(proposalid);
-        console.log(ret);
+        response = await committe.getProposalCommitteeInfoByProposalId(proposalid);
+        console.log(response);
         break;
       case 1:
         const treasury = await loadTreasuryContract(hre);
-        ret = await treasury.getProposalSupplyInfoByProposalId(proposalid);
-        console.log(ret);
+        response = await treasury.getProposalSupplyInfoByProposalId(proposalid);
+        console.log(response);
         break;
     }
   })
@@ -53,17 +53,17 @@ task("get_proposal_by_proposalid", "get proposal by given proposal id")
   .setAction(async (args, hre) => {
     const proposalid: BytesLike = (args.proposalid);
     const contract = Number(args.contract);
-    let ret
+    let response: boolean
     switch (contract) {
       case 0:
         const committe = await loadCommitteContract(hre);
-        ret = await committe.isProposalPassed(proposalid);
-        console.log(ret)
+        response = await committe.isProposalPassed(proposalid);
+        console.log(response)
         break;
       case 1:
         const treasury = await loadTreasuryContract(hre);
-        ret = await treasury.isProposalPassed(proposalid);
-        console.log(ret);
+        response = await treasury.isProposalPassed(proposalid);
+        console.log(response);
         break;
     }
   })
@@ -75,17 +75,17 @@ task("get_proposal_by_blocknumber", "get proposal by given blocknumber")
     const block = BigInt(args.block);
     const contract = Number(args.contract);
     // TODO change type any to specific type
-    let ret: any
+    let response: any
     switch (contract) {
       case 0:
         const committe = await loadCommitteContract(hre)
-        ret = await committe.getProposalCommitteeInfoByBlockNumber(block);
-        console.log(ret)
+        response = await committe.getProposalCommitteeInfoByBlockNumber(block);
+        console.log(response)
         break;
       case 1:
         const treasury = await loadTreasuryContract(hre)
-        ret = await treasury.getProposalSupplyInfoByBlockNumber(block);
-        console.log(ret)
+        response = await treasury.getProposalSupplyInfoByBlockNumber(block);
+        console.log(response)
         break;
     }
   })
