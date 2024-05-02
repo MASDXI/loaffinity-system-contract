@@ -13,7 +13,7 @@ const setImplementation = async (
         tx = await contract.setImplementation(implementaion);
         await tx.wait();
         txReceipt = await tx.getTransaction();
-        console.log("tx complete");
+        console.log(`blockNumber: ${txReceipt?.blockNumber}\nblockHash: ${txReceipt?.blockHash}\nhash: ${txReceipt?.hash}`);
     } catch (error) {
         console.log(error);
     }
@@ -41,5 +41,6 @@ task("change_implementation", "upgrade smart contract by change implementation l
     .setAction(async (args, hre) => {
         const contract = Number(args.contract);
         const implementation = String(args.implementation);
+        // signers check first
         await setImplemetationSelector(contract,implementation, hre);
     })

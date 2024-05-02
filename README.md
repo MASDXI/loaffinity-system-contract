@@ -112,7 +112,7 @@ More detail about deployment command can found [here](./docs/deployment.md)
 
 ### TODO
 - [] refactor limit root admin valid till given block height `n`
-- [] refactor implementation into proxy pattern
 - [] refactor hardhat deploy script
 - [] refactor hardhat task script
+    - [] avoid duplicate code by reuse function and handler
 - [] update readme and documentation
