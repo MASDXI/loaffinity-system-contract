@@ -7,7 +7,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { ZeroAddress, ZeroHash, ethers as eth } from "ethers";
 import { constants } from "../utils/constants"
-import { setSystemContractFixture, targetBlock } from "../utils/systemContractFixture"
+import { setSystemContractFixture, targetBlock, SystemContractsFixture } from "../utils/systemContractFixture"
 import { revertedMessage } from "../utils/reverted";
 import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { gasLogicV1 } from "../helpers/gasPriceOracleV1";
@@ -35,7 +35,7 @@ async function setup() {
 
 describe("GasPrice Oracle Proxy System Contract", function () {
     // TODO change type any to specific type
-    let fixture: any;
+    let fixture: SystemContractsFixture;
     let initializer: HardhatEthersSigner;
     let block: bigint;
     let signers: HardhatEthersSigner[];
@@ -60,7 +60,12 @@ describe("GasPrice Oracle Proxy System Contract", function () {
         await fixture.committee.connect(fixture.admin).grantProposer(fixture.proposer1);
         await fixture.gaspriceoracleproxy.connect(initializer).initialize(
             await implementation.getAddress(),
-            constants.COMMITTEE_CONTRACT_ADDRESS);
+            constants.COMMITTEE_CONTRACT_ADDRESS,
+            {"consortiumRatio": 50n,
+             "nodeValidatorRatio": 25n,
+             "merchantRatio": 25n,
+             "mobileValidatorRatio": 0n
+            });
         block = await targetBlock();
     });
 
@@ -108,8 +113,9 @@ describe("GasPrice Oracle Proxy System Contract", function () {
             expect(calculatedGasFee).to.equal(preCalculateTransactionFee);
         });
 
-        it("Gas Price Oracle Proxy: getThreashold", async function () {
-            // TODO
+        it("Gas Price Oracle Proxy: getThreshold", async function () {
+            const threshold = await fixture.gaspriceoracleproxy.getThreshold();
+            expect(threshold).to.equal([ 0n, 0n, 0n, 0n ]);
         });
 
         it("Gas Price Oracle Proxy: status 'false'", async function () {

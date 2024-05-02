@@ -13,6 +13,16 @@ export const loadTreasuryContract = async (hre: HardhatRuntimeEnvironment) => {
         "0x0000000000000000000000000000000000000777");
 }
 
+export const loadGasPriceOracleProxyContract = async (hre: HardhatRuntimeEnvironment) => {
+    return await hre.ethers.getContractAt("GasPriceOracleProxy",
+        "0x0000000000000000000000000000000000000777");
+}
+
+export const loadServiceProviderProxyContract = async (hre: HardhatRuntimeEnvironment) => {
+    return await hre.ethers.getContractAt("ServiceProviderProxy",
+        "0x0000000000000000000000000000000000000777");
+}
+
 export const loadTxFeeDistributorContract = async (hre: HardhatRuntimeEnvironment) => {
     return await hre.ethers.getContractAt("treasury", 
         "0x0000000000000000000000000000000000000778");

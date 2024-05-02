@@ -74,7 +74,17 @@ const constants = {
             "BLOCK_PERIOD": process.env.BLOCK_PERIOD ?
                 process.env.BLOCK_PERIOD : 15n,
             "CONSTANT": process.env.CONSTANT ?
-                process.env.CONSTANT : 278n
+                process.env.CONSTANT : 278n,
+            "THRESHOLD": {
+                "CONSORTIUM": process.env.BLOCK_PERIOD ?
+                    process.env.BLOCK_PERIOD: 50n,
+                "NODE_VALIDATOR": process.env.BLOCK_PERIOD ?
+                    process.env.BLOCK_PERIOD: 25n,
+                "MERCHANT": process.env.BLOCK_PERIOD ?
+                    process.env.BLOCK_PERIOD: 25n,
+                "MOBILE_VALIDATOR": process.env.BLOCK_PERIOD ? 
+                    process.env.BLOCK_PERIOD: 0n
+            }
         }
     }
 }

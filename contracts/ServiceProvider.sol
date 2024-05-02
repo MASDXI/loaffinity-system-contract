@@ -43,7 +43,7 @@ contract ServiceProvider is
     /// @custom:override
     function getServiceProvider(
         address merchant
-    ) public view override returns (address) {
+    ) external view override returns (address) {
         return _registry[merchant];
     }
 
@@ -51,7 +51,7 @@ contract ServiceProvider is
     function grantMerchant(
         address merchant,
         address callee
-    ) public override onlyProxy {
+    ) external override onlyProxy {
         _registry[merchant] = callee;
         _grantRole(MERCHANT_ROLE, merchant);
     }
@@ -60,7 +60,7 @@ contract ServiceProvider is
     function revokeMerchant(
         address merchant,
         address callee
-    ) public override onlyProxy {
+    ) external override onlyProxy {
         require(_registry[merchant] == callee, "serviceprovider:");
         _registry[merchant] = address(0);
         _revokeRole(MERCHANT_ROLE, merchant);

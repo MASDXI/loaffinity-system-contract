@@ -6,6 +6,7 @@ task("initialize_supply", "init system contract")
     .addParam("period", "votePeriod_")
     .addParam("proposeperiod", "proposePeriod_")
     .addParam("retention", "retentionPeriod_")
+    // change it to optional cause committee contract preload in genesis json
     .addParam("committeeaddress", "address committee contract")
     .setAction(async (args, hre) => {
         const treasury = await loadTreasuryContract(hre);

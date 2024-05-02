@@ -12,23 +12,18 @@ contract GasPriceOracleProxy is Proxy, Initializer {
     ICommittee private _committee; // pre-loaded contract.
     IGasPriceOracle private _implementation; // deployed contract.
 
-    enum ROLE {
-        CONSORTIUM,
-        NODE_VALIDATOR,
-        MERCHANT,
-        MOBILE_VALIDATOR
-    }
-
     struct Threshold {
-        ROLE role;
-        uint8 ratio; // 0-100
+        uint8 consortiumRatio;
+        uint8 nodeValidatorRatio;
+        uint8 merchantRatio;
+        uint8 mobileValidatorRatio;
     }
 
     // @TODO create role for who can update configuration on gas price oracle contract?
 
-    Threshold[] private _conf;
+    Threshold private _threshold;
 
-    event ThresholdUpdate();
+    // event ThresholdUpdate(ROLE role, uint8 value);
 
     modifier onlyAuthorized() {
         // root admin?
@@ -42,10 +37,12 @@ contract GasPriceOracleProxy is Proxy, Initializer {
     /// @notice system contract not use constructor due it's preload into genesis block.
     function initialize(
         address implementation,
-        address committeeContract
+        address committeeContract,
+        Threshold calldata configuration
     ) external onlyInitializer {
         _initialized();
         _updateImpelemetation(implementation);
+        updateThreshold(configuration);
         _committee = ICommittee(committeeContract);
         _implementation = IGasPriceOracle(implementation);
     }
@@ -58,6 +55,12 @@ contract GasPriceOracleProxy is Proxy, Initializer {
         super.setImplementation(implementation);
     }
 
+    function calculateTransactionFee(
+        uint256 gasLimit
+    ) external view returns (uint256) {
+        return _implementation.calculate(gasLimit);
+    }
+
     function version() external view returns (uint256) {
         return _implementation.version();
     }
@@ -66,23 +69,20 @@ contract GasPriceOracleProxy is Proxy, Initializer {
         return _implementation.status();
     }
 
-    function calculateTransactionFee(
-        uint256 gasLimit
-    ) external view returns (uint256) {
-        return _implementation.calculate(gasLimit);
+    // @TODO role permission
+    function updateThreshold(Threshold calldata threshold) public {
+        // validation input
+        uint8 temp;
+        temp += threshold.consortiumRatio;
+        temp += threshold.nodeValidatorRatio;
+        temp += threshold.merchantRatio;
+        temp += threshold.mobileValidatorRatio;
+        require(temp == 100,"");
+        _threshold = threshold;
+        // emit ThresholdUpdated(_threshold, threshold);
     }
 
-    function updateThreshold(Threshold[3] memory newThreshold) public {
-        uint8 percent = 0;
-        for (uint8 i = 0; i < 4; i++) {
-            percent += newThreshold[i].ratio;
-        }
-        require(percent == 100, "invalid threshold");
-        // _conf = newThreshold;
-        emit ThresholdUpdate();
-    }
-
-    function status() public view returns (bool) {
+    function status() external view returns (bool) {
         if (_implementation.status()) {
             return true;
         } else {
@@ -90,7 +90,7 @@ contract GasPriceOracleProxy is Proxy, Initializer {
         }
     }
 
-    function getThreashold() public view returns (Threshold[] memory) {
-        return _conf;
+    function getThreshold() external view returns (Threshold memory) {
+        return _threshold;
     }
 }

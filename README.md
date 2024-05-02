@@ -1,6 +1,7 @@
-# Loaffinity System Contract
+# Loaffinity System Smart Contract
 
-Loaffinity system contract is smart contract pre-loaded at genesis block of the blockchain network, system contract serve specifiy function to extend capibities of core blockchain. it's basically adopt pattern like [open governance](https://polkadot.network/features/opengov/) some parameter on blockchain can be changed directly through the smart contract level without requiring to do `HARDFORK` for update the network parameter.
+Loaffinity system smart contract is smart contract pre-loaded at genesis block of the blockchain network, system smart contract serve specifiy function to extend capibities of core blockchain.  
+It's basically adopt pattern like [open governance](https://polkadot.network/features/opengov/) some parameter on blockchain can be changed directly through the smart contract level without requiring to do `HARDFORK` for update the network parameter.
 
 ### Prerequisite
 
@@ -41,32 +42,9 @@ yarn test
 you can see what action perform in each command in `./package.json`
 
 
-```
-Proposal Abstract Contract
-
-vote delay <type:uint256> <blocknumber>
-    freeze period before vote start
-vote period <type:uint256> <blocknumber>
-    active vote period
-vote threshold <type:uint8> <50 - 100>
-    threshold of vote
-propose period <type:uint32> <0 - (2^32-1)>
-    period between propose proposal
-retention period <type:uint32> <0 - (2^32-1)>
-    period for cancelation after vote end (emergency use)
-```
-
-#### Proposal Behavior
-```
-                             "vote_start"            "vote_end"                 "execute_proposal"
-Proposal:1 |<-----vote_delay----->|<-----vote_period----->|<-----rentention_period----->|
-Proposal:2 |<---propose_period--->|<-----vote_delay----->|<-----vote_period----->|<-----rentention_period----->|
-Proposal:3                        |<---propose_period--->|<-----vote_delay----->|<-----vote_period----->|<-----rentention_period----->|
-```
-
-### Script for interact with system contract
+### Script for interact with system smart contract
 ``` shell
-# Initialized System Contract
+# Initialized System Smart Contract
 npx hardhat initialized --network "dev"
 npx hardhat initialized --network "testnet"
 npx hardaht initialized --network "mainnet"
@@ -96,6 +74,7 @@ npx hardhat serviceprovider --help // implementation contract change
 npx hardhat gaspriceoracle --help  // implementation contract change
 npx hardhat gaspriceoracle --help  // update ratio/threshold
 ```
+More detail about task command can found [here](./docs/task.md)
 
 ### Script for deploy contract
 
@@ -103,8 +82,9 @@ npx hardhat gaspriceoracle --help  // update ratio/threshold
 yarn deploy:contract:gaspriceoracle --network <network>
 yarn deploy:contract:serviceprovider --network <network>
 ```
+More detail about deployment command can found [here](./docs/deployment.md)
 
-### Building System Contract
+### Building System Smart Contract
 1. Make sure you have set the value in `.env` file
 2. Using command `yarn compile` to compile smart contract valid initalizer will be auto generate from `Intializer.sol.template`
 3. Copy deployedBytecode output after run `yarn compile` or `yarn compile` and place to your `genesis.json`
@@ -114,9 +94,19 @@ yarn deploy:contract:serviceprovider --network <network>
 - Proposer have majority and right to create proposal by their own, avoid Proposer spamming proposal to future block potentially DoS contract.
 - Single Root admin for add and remove proposer.
 - Configuration configuration such as voting delay, voting period, and threshold can't be change after contract initialize.
-- Everyblock can contain only one proposal.
-- System Contract Implementaion `SHOULD BE` flexible enough to change.
-- Smart Contract use storage upgrade cause to avoid storage corrupt and meke contract unusable.
+- Everyblock can contain only one proposal at that time.
+- System Smart Contract not use storage upgrade cause to avoid storage corrupt and meke system smart contract unusable and breaking entrie network.
+
+### Rational
+1. System Smart Contract following the [EIP-1352](https://eips.ethereum.org/EIPS/eip-1352)  
+    - `CommitteeContract` reserve address `0x0000000000000000000000000000000000000776`
+    - `TreasuryContract` reserve address `0x0000000000000000000000000000000000000776`
+    - `GasPriceOracleProxy` reserve address `0x0000000000000000000000000000000000000776`
+    - `ServiceProviderProxy` reserve address `0x0000000000000000000000000000000000000776`  
+    ** `TransactionFeeDistributor` not implemented yet
+    - `TransactionFeeDistributor` reserve address `0x0000000000000000000000000000000000000776`
+2. System Smart Contract Implementaion of `GasPriceOracleProxy` and `ServiceProviderProxy` can be upgrade using proxy pattern see [interface](./docs/proxyinterface.md)
+3. System Smart Contract proposal are not rely on `block.timestamp` see [proposal behavior](./docs/proposal.md/#proposal-behavior)
 
 ### TODO
 - [] refactor limit root admin valid till given block height `n`

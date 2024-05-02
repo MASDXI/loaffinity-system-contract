@@ -52,7 +52,7 @@ contract TreasuryContract is ITreasury, Proposal, Initializer, NativeTransfer {
         uint256 voteDelay_,
         uint256 votePeriod_,
         uint32 proposePeriod_,
-        uint32 retentionPeriod_, // add
+        uint32 retentionPeriod_,
         ICommittee commiteeContractAddress_
     ) external onlyInitializer {
         _initialized();
@@ -61,7 +61,7 @@ contract TreasuryContract is ITreasury, Proposal, Initializer, NativeTransfer {
         _setVotePeriod(votePeriod_);
         _setVoteThreshold(75);
         _setProposePeriod(proposePeriod_);
-        _setExecuteRetentionPeriod(retentionPeriod_); // add
+        _setExecuteRetentionPeriod(retentionPeriod_);
     }
 
     function _getProposal(
@@ -200,7 +200,6 @@ contract TreasuryContract is ITreasury, Proposal, Initializer, NativeTransfer {
     function cancel(
         uint256 blockNumber
     ) public payable onlyAgent returns (uint256) {
-        // add
         ProposalSupplyInfo memory data = getProposalSupplyInfoByBlockNumber(
             blockNumber
         );

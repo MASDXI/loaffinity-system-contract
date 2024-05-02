@@ -37,7 +37,7 @@ interface ITreasury {
         address indexed account,
         uint256 amount,
         uint256 time
-    ); // add
+    );
     event TreasuryProposalExecuted(
         bytes32 proposalId,
         ProposalType proposalType,

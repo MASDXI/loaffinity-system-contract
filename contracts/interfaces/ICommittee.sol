@@ -34,7 +34,7 @@ interface ICommittee {
         ProposalType proposalType,
         address indexed account,
         uint256 time
-    ); // add
+    );
     event CommitteeProposalExecuted(
         bytes32 proposalId,
         ProposalType proposalType,

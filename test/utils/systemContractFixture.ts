@@ -8,8 +8,26 @@ import {
   setCode,
 } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { constants } from "./constants"
+import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
+import { Committee, GasPriceOracleProxy, ServiceProviderProxy, TreasuryContract } from "../../typechain-types";
 
-export async function setSystemContractFixture() {
+export interface SystemContractsFixture {
+  admin: HardhatEthersSigner;
+  committee: Committee;
+  committee1: HardhatEthersSigner;
+  committee2: HardhatEthersSigner;
+  committee3: HardhatEthersSigner;
+  gaspriceoracleproxy: GasPriceOracleProxy;
+  proposer1: HardhatEthersSigner;
+  proposer2: HardhatEthersSigner;
+  otherAccount: HardhatEthersSigner;
+  otherAccount1: HardhatEthersSigner;
+  initializerCallerSigner: HardhatEthersSigner;
+  serviceproviderproxy: ServiceProviderProxy;
+  treasury: TreasuryContract;
+}
+
+export async function setSystemContractFixture(): Promise<SystemContractsFixture> {
   // Contracts are deployed using the first signer/account by default.
   const [admin, 
     committee1, 
@@ -44,7 +62,7 @@ export async function setSystemContractFixture() {
   // skip first 200 blocks
   await mine(200);
   return { admin, 
-      committee, 
+      committee,
       committee1, 
       committee2, 
       committee3, 
