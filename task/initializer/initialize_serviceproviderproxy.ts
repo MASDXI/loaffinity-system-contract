@@ -1,5 +1,6 @@
 import { task } from "hardhat/config"
 import { loadServiceProviderProxyContract } from "../helpers/helper";
+import { ContractTransactionResponse, TransactionResponse } from "ethers";
 
 task("initialize_service_provider_proxy", "init system contract")
     .addParam("implementaion","implementation")
@@ -11,13 +12,14 @@ task("initialize_service_provider_proxy", "init system contract")
         const implementaion = String(args.implementaion);
         const committeeaddress = String(args.committeeContract);
         // TODO change type any to specific type
-        let tx: any;
+        let tx: ContractTransactionResponse;
+        let txReceipt: TransactionResponse | null;
         try {
             if(signers[0].address == process.env.INITIALIZER_ADDRESS){
                 tx = await proxy.connect(signers[0]).initialize(implementaion, committeeaddress);
                 await tx.wait();
-                const { blockNumber, blockHash, hash } = await tx.getTransaction();
-                console.log(`blockNumber: ${blockNumber}\nblockHash: ${blockHash}\nhash: ${hash}`);
+                txReceipt = await tx.getTransaction();
+                console.log(`blockNumber: ${txReceipt?.blockNumber}\nblockHash: ${txReceipt?.blockHash}\nhash: ${txReceipt?.hash}`);
             }else{
                 console.log("initializer: onlyInitializer can call");
             } 

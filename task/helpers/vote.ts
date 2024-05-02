@@ -1,6 +1,7 @@
 import { task } from "hardhat/config"
 import { loadCommitteContract, loadTreasuryContract } from "../helpers/helper";
 
+// TODO avoid code duplicate
 task("vote", "vote proposal")
   .addParam("proposal", "destination ")
   .addParam("auth", "auth")

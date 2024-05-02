@@ -1,5 +1,6 @@
 import { task } from "hardhat/config"
 import { loadCommitteContract} from "../helpers/helper";
+import { ContractTransactionResponse, TransactionResponse } from "ethers";
 
 task("initialize_committee", "init system contract")
     .addParam("delay", "voteDelay_")
@@ -18,7 +19,8 @@ task("initialize_committee", "init system contract")
         const proposeperiod = BigInt(args.proposeperiod);
         const admin = String(args.admin);
         // TODO change type any to specific type
-        let tx: any;
+        let tx: ContractTransactionResponse;
+        let txReceipt: TransactionResponse | null;
         try {
             if(signers[0].address == process.env.INITIALIZER_ADDRESS) {
                 tx = await committee.connect(signers[0]).initialize(
@@ -29,8 +31,8 @@ task("initialize_committee", "init system contract")
                     committees,  
                     admin ? admin : signers[0].address);
                 await tx.wait();
-                const { blockNumber, blockHash, hash } = await tx.getTransaction();
-                console.log(`blockNumber: ${blockNumber}\nblockHash: ${blockHash}\nhash: ${hash}`);
+                txReceipt = await tx.getTransaction();
+                console.log(`blockNumber: ${txReceipt?.blockNumber}\nblockHash: ${txReceipt?.blockHash}\nhash: ${txReceipt?.hash}`);
             }else{
                 console.log("initializer: onlyInitializer can call")
             } 

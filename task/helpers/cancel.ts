@@ -1,6 +1,7 @@
 import { task } from "hardhat/config"
 import { loadCommitteContract, loadTreasuryContract } from "../helpers/helper";
 
+// TODO avoid code duplicate
 task("cancel", "cancel proposal")
   .addParam("blocknumber", "blockNumber ")
   .addParam("contract","0:committe 1:supply")
