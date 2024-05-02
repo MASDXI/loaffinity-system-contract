@@ -18,7 +18,7 @@ task("initialize_committee", "init system contract")
         const proposeperiod = BigInt(args.proposeperiod);
         const admin = String(args.admin);
         // TODO change type any to specific type
-        let tx: any
+        let tx: any;
         try {
             if(signers[0].address == process.env.INITIALIZER_ADDRESS) {
                 tx = await committee.connect(signers[0]).initialize(
@@ -35,6 +35,7 @@ task("initialize_committee", "init system contract")
                 console.log("initializer: onlyInitializer can call")
             } 
         } catch (err) {
+            // TODO move error to error selector
             console.error(err);
         }
     })

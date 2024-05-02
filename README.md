@@ -99,12 +99,14 @@ More detail about deployment command can found [here](./docs/deployment.md)
 
 ### Rational
 1. System Smart Contract following the [EIP-1352](https://eips.ethereum.org/EIPS/eip-1352)  
-    - `CommitteeContract` reserve address `0x0000000000000000000000000000000000000776`
-    - `TreasuryContract` reserve address `0x0000000000000000000000000000000000000776`
-    - `GasPriceOracleProxy` reserve address `0x0000000000000000000000000000000000000776`
-    - `ServiceProviderProxy` reserve address `0x0000000000000000000000000000000000000776`  
-    ** `TransactionFeeDistributor` not implemented yet
-    - `TransactionFeeDistributor` reserve address `0x0000000000000000000000000000000000000776`
+    | System Smart Contract         | Reserve Address                              |
+    |-------------------------------|--------------------------------------------- |
+    | `CommitteeContract`           | `0x0000000000000000000000000000000000000776` |
+    | `TreasuryContract`            | `0x0000000000000000000000000000000000000777` |
+    | `GasPriceOracleProxy`         | `0x0000000000000000000000000000000000000778` |
+    | `ServiceProviderProxy`        | `0x0000000000000000000000000000000000000779` |
+    | `TransactionFeeDistributor`   | `0x0000000000000000000000000000000000000780` |
+    ##### ** `TransactionFeeDistributor` system smart contract not implemented yet
 2. System Smart Contract Implementaion of `GasPriceOracleProxy` and `ServiceProviderProxy` can be upgrade using proxy pattern see [interface](./docs/proxyinterface.md)
 3. System Smart Contract proposal are not rely on `block.timestamp` see [proposal behavior](./docs/proposal.md/#proposal-behavior)
 

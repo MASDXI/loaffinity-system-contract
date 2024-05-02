@@ -3,12 +3,43 @@ import { loadGasPriceOracleProxyContract, loadTreasuryContract } from "../helper
 
 task("initialize_gasprice_oracle_proxy", "init system contract")
     .addParam("implementaion","implementation")
-    .addParam("configuration","configuration")
+    .addParam("consortiumRatio","consortiumRatio")
+    .addParam("nodeValidatorRatio","nodeValidatorRatio")
+    .addParam("merchantRatio","merchantRatio")
+    .addParam("mobileValidatorRatio","mobileValidatorRatio")
     // change it to optional cause committee contract preload in genesis json
-    .addParam("committeeContract")
+    .addParam("committeeContract","address committee contract")
     .setAction(async (args, hre) => {
         const proxy = await loadGasPriceOracleProxyContract(hre);
-        const signer = await hre.ethers.getSigners();
-        // parameters
+        const signers = await hre.ethers.getSigners();
+        const implementaion = String(args.implementaion);
+        const committeeaddress = String(args.committeeContract);
+        const consortiumRatio = BigInt(args.consortiumRatio);
+        const nodeValidatorRatio = BigInt(args.nodeValidatorRatio);
+        const merchantRatio = BigInt(args.merchantRatio);
+        const mobileValidatorRatio = BigInt(args.mobileValidatorRatio);
+        const config = {
+            "consortiumRatio": consortiumRatio,
+            "nodeValidatorRatio": nodeValidatorRatio,
+            "merchantRatio": merchantRatio,
+            "mobileValidatorRatio": mobileValidatorRatio
+        }
+        // TODO validate input config
+        // TODO change type any to specific type
+        let tx: any;
+        try {
+            if(signers[0].address == process.env.INITIALIZER_ADDRESS){
+                tx = await proxy.connect(signers[0]).initialize(
+                    implementaion, committeeaddress, config);
+                await tx.wait();
+                const { blockNumber, blockHash, hash } = await tx.getTransaction();
+                console.log(`blockNumber: ${blockNumber}\nblockHash: ${blockHash}\nhash: ${hash}`);
+            }else{
+                console.log("initializer: onlyInitializer can call");
+            } 
+        } catch (err) {
+            // TODO move error to error selector
+            console.error(err);
+        }
     })
 
