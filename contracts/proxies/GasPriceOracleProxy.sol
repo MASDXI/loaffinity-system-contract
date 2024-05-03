@@ -77,7 +77,7 @@ contract GasPriceOracleProxy is Proxy, Initializer {
         temp += threshold.nodeValidatorRatio;
         temp += threshold.merchantRatio;
         temp += threshold.mobileValidatorRatio;
-        require(temp == 100,"");
+        require(temp == 100,"gasPriceOracleProxy: invalid threshold");
         _threshold = threshold;
         // emit ThresholdUpdated(_threshold, threshold);
     }
