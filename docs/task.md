@@ -51,23 +51,23 @@ but for the section `Role` are publicly and can be call by any.
 ---
 perform `READ` data from the smart contract similar to `/GET`
 #### Example Command
-- function isAgent(`<agent:address>`) → `<status:bool`
+- function isAgent(`<agent:address>`) → `<status:boolean>`
     ``` bash
     npx hardhat is_agent "agent"
     ``` 
-- function isCommittee(`<committee:address>`) → `<status:bool>`
+- function isCommittee(`<committee:address>`) → `<status:boolean>`
     ``` bash
     npx hardhat is_committee "committee"
     ``` 
-- function isMerchant(`<merchant:address>`) → `<status:bool>`
+- function isMerchant(`<merchant:address>`) → `<status:boolean>`
     ``` bash
     npx hardhat is_merchant "merchant"
     ``` 
-- function isProposer(`<proposer:address>`) → `<status:bool>`
+- function isProposer(`<proposer:address>`) → `<status:boolean>`
     ``` bash
     npx hardhat is_proposer "proposer"
     ``` 
-- function isServiceProvider(`<serviceprovider:address`) → `<status:bool>`
+- function isServiceProvider(`<serviceprovider:address`) → `<status:boolean>`
     ``` bash
     npx hardhat is_proposer "proposer"
     ``` 
@@ -128,6 +128,10 @@ Command section `Update Config Command` can call by the `ROOT_ADMIN` only which 
 #### Read Config Command
 perform `READ` data from the smart contract similar to `/GET`
 #### Example Command
+- function setImplementation(`smratcontarct:address`) → `<null>`
+- function updateThreshold(`threshold:Object<Threshold>`) → `<null>`
+- function status() → `<status:boolean>`
+- function calculateTransactionFee() → `<gasFee:number>`
 #### Help Command
 ``` bash
 npx hardhat serviceprovider --help // implementation contract change // TODO

@@ -82,14 +82,6 @@ contract GasPriceOracleProxy is Proxy, Initializer {
         // emit ThresholdUpdated(_threshold, threshold);
     }
 
-    function status() external view returns (bool) {
-        if (_implementation.status()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     function getThreshold() external view returns (Threshold memory) {
         return _threshold;
     }

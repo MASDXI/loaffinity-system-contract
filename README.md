@@ -61,10 +61,10 @@ More detail about deployment command can found [here](./docs/deployment.md)
 4. When start the network if wanted to activate the contract you should using hardhat task activate contract from example above
 
 ### Noted Issue and Risk Appetite
-- Proposer have majority and right to create proposal by their own, avoid Proposer spamming proposal to future block potentially DoS contract.
-- Single Root admin for add and remove proposer.
-- Configuration configuration such as voting delay, voting period, and threshold can't be change after contract initialize.
-- Everyblock can contain only one proposal at that time.
+- System Smart Contract proposer have majority and right to create proposal by their own, avoid Proposer spamming proposal to future block potentially DoS contract.
+- System Smart Contract has single root admin for add and remove proposer.
+- System Smart Contract configuration such as voting delay, voting period, and threshold can't be change after contract initialize.
+- System Samrt Contract can contain only one proposal per block.
 - System Smart Contract not use storage upgrade cause to avoid storage corrupt and meke system smart contract unusable and breaking entrie network.
 
 ### Rational
@@ -81,6 +81,8 @@ More detail about deployment command can found [here](./docs/deployment.md)
     ##### ** `AllowlistRegistry` system smart contract not implemented yet
 2. System Smart Contract Implementaion of `GasPriceOracleProxy` and `ServiceProviderProxy` can be upgrade using proxy pattern see [interface](./docs/proxyinterface.md)
 3. System Smart Contract proposal are not rely on `block.timestamp` see [proposal behavior](./docs/proposal.md/#proposal-behavior)
+
+### Disclamer
 
 ### TODO
 - [] refactor limit root admin valid till given block height `n`

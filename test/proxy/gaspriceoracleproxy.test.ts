@@ -61,10 +61,10 @@ describe("GasPrice Oracle Proxy System Contract", function () {
         await fixture.gaspriceoracleproxy.connect(initializer).initialize(
             await implementation.getAddress(),
             constants.COMMITTEE_CONTRACT_ADDRESS,
-            {"consortiumRatio": 50n,
-             "nodeValidatorRatio": 25n,
-             "merchantRatio": 25n,
-             "mobileValidatorRatio": 0n
+            {"consortiumRatio": v1Config.THRESHOLD.CONSORTIUM,
+             "nodeValidatorRatio": v1Config.THRESHOLD.NODE_VALIDATOR,
+             "merchantRatio":  v1Config.THRESHOLD.MERCHANT,
+             "mobileValidatorRatio":  v1Config.THRESHOLD.MOBILE_VALIDATOR
             });
         block = await targetBlock();
     });
@@ -115,7 +115,10 @@ describe("GasPrice Oracle Proxy System Contract", function () {
 
         it("Gas Price Oracle Proxy: getThreshold", async function () {
             const threshold = await fixture.gaspriceoracleproxy.getThreshold();
-            expect(threshold).to.equal([ 0n, 0n, 0n, 0n ]);
+            expect(threshold.consortiumRatio).to.equal(v1Config.THRESHOLD.CONSORTIUM);
+            expect(threshold.nodeValidatorRatio).to.equal(v1Config.THRESHOLD.NODE_VALIDATOR);
+            expect(threshold.merchantRatio).to.equal(v1Config.THRESHOLD.MERCHANT);
+            expect(threshold.mobileValidatorRatio).to.equal(v1Config.THRESHOLD.MOBILE_VALIDATOR);
         });
 
         it("Gas Price Oracle Proxy: status 'false'", async function () {
