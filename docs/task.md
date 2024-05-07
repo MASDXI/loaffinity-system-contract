@@ -128,26 +128,37 @@ Command section `Update Config Command` can call by the `ROOT_ADMIN` only which 
 #### Read Config Command
 perform `READ` data from the smart contract similar to `/GET`
 #### Example Command
-- function setImplementation(`smratcontarct:address`) → `<null>`
-- function updateThreshold(`threshold:Object<Threshold>`) → `<null>`
 - function status() → `<status:boolean>`
-- function calculateTransactionFee() → `<gasFee:number>`
+    ``` bash
+    npx hardhat status
+    ``` 
+- function calculateTransactionFee(`<gaslimit:number>`) → `<gasFee:number>`
+    ``` bash
+    npx hardhat calculate_tx_fee "gaslimit" 
+    ``` 
 #### Help Command
 ``` bash
-npx hardhat serviceprovider --help // implementation contract change // TODO
-npx hardhat gaspriceoracle --help  // implementation contract change // TODO
-npx hardhat gaspriceoracle --help  // update ratio/threshold         // TODO
+npx hardhat status --help // TODO
+npx hardhat calculate_tx_fee --help  // TODO
 ```
 ---
 
 #### Update Config Command
 perform `WRITE` data to the smart contract similar to `/POST`
 #### Example Command
+- function setImplementation(`smratcontarct:address`) → `<null>`
+    ``` bash
+    npx hardhat set_implementation "address" "contract"
+    ``` 
+- function updateThreshold(`threshold:Object<Threshold>`) → `<null>`
+    ``` bash
+    npx hardhat updateThreshold "consortium ratio" "node validator" "merchan ratio" "mobile validator"
+    ``` 
+** `"contract"` flag gas price oralce proxy contract is `0`, service provider proxy contract is `1`
 #### Help Command
 ``` bash
-npx hardhat serviceprovider --help // implementation contract change // TODO
-npx hardhat gaspriceoracle --help  // implementation contract change // TODO
-npx hardhat gaspriceoracle --help  // update ratio/threshold         // TODO
+npx hardhat set_implementation --help   // TODO
+npx hardhat updateThreshold --help      // TODO
 ```
 ---
 <!-- Proxy -->
