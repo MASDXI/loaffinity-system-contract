@@ -82,7 +82,7 @@ More detail about deployment command can found [here](./docs/deployment.md)
 2. System Smart Contract Implementaion of `GasPriceOracleProxy` and `ServiceProviderProxy` can be upgrade using proxy pattern see [interface](./docs/proxyinterface.md)
 3. System Smart Contract proposal are not rely on `block.timestamp` see [proposal behavior](./docs/proposal.md/#proposal-behavior)
 
-### Disclamer
+### Disclaimer
 
 ### TODO
 - [] refactor limit root admin valid till given block height `n`
