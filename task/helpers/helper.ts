@@ -29,6 +29,10 @@ export const loadTxFeeDistributorContract = async (hre: HardhatRuntimeEnvironmen
         "0x0000000000000000000000000000000000000fff");
 }
 
+export const loadGasPriceOracleV1Contract = async (hre: HardhatRuntimeEnvironment, ContractAddress:string ) => {
+    return await hre.ethers.getContractAt("GasPriceOracleV1", ContractAddress);
+}
+
 export const constants = { 
     // should refactor
     "TESTNET_URL":"http://localhost:8545",
