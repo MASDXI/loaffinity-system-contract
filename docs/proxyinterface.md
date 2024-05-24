@@ -13,13 +13,13 @@ interface IGasPriceOracle {
 }
 ```
 
-`function status() external view returns (bool);`  
+- `function status() external view returns (bool);`  
 return: `true` if smart contract enable, `false` if smart contract disable.
 
-`function version() external view returns (uint256);`  
+- `function version() external view returns (uint256);`  
 return: version of the smart contract for example `10000` is mean `1.00.00`
 
-`function calculate(uint256 gasUsed) external view returns (uint256);`  
+- `function calculate(uint256 gasUsed) external view returns (uint256);`  
 parameter:  `gaslimit` or `gasUsed`  
 return: calculated cost of transaction.
 
@@ -38,8 +38,17 @@ interface IServiceProvider {
 }
 ```
 
-`function version() external view returns (uint256);`  
+- `function version() external view returns (uint256);`  
 return: version of the smart contract for example `10000` is mean `1.00.00`
 
-`function getServiceProvider(address merchant) external view returns (address);`  
+- `function getServiceProvider(address merchant) external view returns (address);`  
+parameter:  `merchant` address.  
 return: service provide who onboarded merchant.
+
+- `function grantMerchant(address merchant) external;`  
+parameter:  address that onboarded as `merchant`   
+return: `null`.
+
+- `function revokeMerchant(address merchant) external;`  
+parameter:  `merchant` address.  
+return: `null`.
