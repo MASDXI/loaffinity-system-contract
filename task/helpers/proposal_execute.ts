@@ -10,7 +10,6 @@ task("execute", "execute proposal")
     const treasury = await loadTreasuryContract(hre);
     const blocknumber = String(args.blocknumber);
     const contract = Number(args.contract);
-    const signers = await hre.ethers.getSigners();
     // TODO change type any to specific type and validate signer before action.
     let res: any;
     switch (contract) {
@@ -38,8 +37,8 @@ task("execute", "execute proposal")
         }
         default: { 
           console.log(`Invalid contract type`)
-         break; 
-      } 
+          break; 
+        }
       }
   })
 
