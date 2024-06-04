@@ -38,12 +38,12 @@ export const constants = {
     "TESTNET_URL":"http://localhost:8545",
 }
 
-export const getProposerSigner = async (account: SignerWithAddress) => {
-
-    // return proposer
+export const validateSigner = async (account: SignerWithAddress) => {
+    // return true if signer can call
+    // return false if signer can't call
 }
 
-export const getCommitteeSigner = async (account: SignerWithAddress) => {
-
-    // return committee
+export const isContractInitialized = async () => {
+    // return true if contract initialized
+    // return false if contract no initialized
 }
