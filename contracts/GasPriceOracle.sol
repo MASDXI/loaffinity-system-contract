@@ -167,6 +167,11 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
         return transactionFee;
     }
 
+    /// @custom:overide
+    function gasPrice() public view returns (uint256) {
+        return calculate(1);
+    }
+
     /// @custom:override
     function version() public pure override returns (uint256) {
         return 10;
