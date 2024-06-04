@@ -18,7 +18,7 @@ task("initialize_committee", "init system contract")
         const committees = Array(args.committees);
         const proposeperiod = BigInt(args.proposeperiod);
         const admin = String(args.admin);
-        // TODO change type any to specific type
+        // TODO change type any to specific type and validate signer before action.
         let tx: ContractTransactionResponse;
         let txReceipt: TransactionResponse | null;
         try {

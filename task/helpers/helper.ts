@@ -38,12 +38,12 @@ export const constants = {
     "TESTNET_URL":"http://localhost:8545",
 }
 
-export const validateSigner = async (account: SignerWithAddress) => {
+export const validateSigner = async (hre: HardhatRuntimeEnvironment) => {
     // return true if signer can call
     // return false if signer can't call
 }
 
-export const isContractInitialized = async () => {
+export const isContractInitialized = async (hre: HardhatRuntimeEnvironment) => {
     // return true if contract initialized
     // return false if contract no initialized
 }

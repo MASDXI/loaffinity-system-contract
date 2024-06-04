@@ -11,22 +11,15 @@ task("cancel", "cancel proposal")
     const blocknumber = String(args.blocknumber);
     const contract = Number(args.contract);
     const signers = await hre.ethers.getSigners();
+    // TODO change type any to specific type and validate signer before action.
     let res: any;
     switch (contract) {
       case 0: { 
         try{
-          if(await committee.isInit()){
-            if(await committee.isAgent(signers[0].address)){
-              res = await committee.cancel(blocknumber);
-              await res.wait();
-              res = await res.getTransaction();
-              console.log(`blockNumber: ${res.blockNumber}\nblockHash: ${res.blockHash}\nhash: ${res.hash}`);
-            } else{
-              console.log("committee: onlyAgent can call")
-            }
-          }else{
-            console.log("committee: not initialized yet")
-          }
+          res = await committee.cancel(blocknumber);
+          await res.wait();
+          res = await res.getTransaction();
+          console.log(`blockNumber: ${res.blockNumber}\nblockHash: ${res.blockHash}\nhash: ${res.hash}`);
         } catch (error) {
           console.error(error);
         }
@@ -34,18 +27,10 @@ task("cancel", "cancel proposal")
       }
       case 1: {
         try{
-          if(await treasury.isInit()){
-            if(await committee.isAgent(signers[0].address)){
-              res = await treasury.cancel(blocknumber);
-              await res.wait();
-              res = await res.getTransaction();
-              console.log(`blockNumber: ${res.blockNumber}\nblockHash: ${res.blockHash}\nhash: ${res.hash}`);
-            } else{
-              console.log("committee: onlyAgent can call")
-            }
-          }else{
-            console.log("committee: not initialized yet")
-          }
+          res = await treasury.cancel(blocknumber);
+          await res.wait();
+          res = await res.getTransaction();
+          console.log(`blockNumber: ${res.blockNumber}\nblockHash: ${res.blockHash}\nhash: ${res.hash}`);
         } catch (error) {
           console.error(error);
         }
