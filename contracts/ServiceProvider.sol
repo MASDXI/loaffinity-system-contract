@@ -30,7 +30,7 @@ contract ServiceProvider is
     }
 
     /// @custom:override
-    function version() public view override returns (uint256) {
+    function version() public pure override returns (uint256) {
         return 10;
     }
 
