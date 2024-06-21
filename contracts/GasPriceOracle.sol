@@ -151,8 +151,10 @@ contract GasPriceOracleV1 is IGasPriceOracle, Initializer {
         // Carbon Emission Kg/kWh
         // uint256 carbonEmission = (_CEC * _blockPeriod /*_CO2P * *//(ONE_HOUR * 1000));
         // Calculate carbon emission
-        uint256 carbonEmission = (_config.carbonEmissionCoefficient * 
-            _blocktime) * _config.carbonCaptureCost * _constant;
+        uint256 carbonEmission = (_config.carbonEmissionCoefficient *
+            _blocktime) *
+            _config.carbonCaptureCost *
+            _constant;
         // Calculate validator contribution
         uint256 validatorContribution = (_config.idlePowerConsumption *
             _config.numberOfValidator);
