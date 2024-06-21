@@ -1,8 +1,4 @@
 import { ZeroAddress, ethers } from "ethers"
-import { deployedBytecode as CommitteeBin } from "../../artifacts/contracts/Committee.sol/Committee.json"
-import { deployedBytecode as GasPriceOracleProxyBin } from "../../artifacts/contracts/proxies/GasPriceOracleProxy.sol/GasPriceOracleProxy.json"
-import { deployedBytecode as ServiceProviderProxyBin } from "../../artifacts/contracts/proxies/ServiceProviderProxy.sol/ServiceProviderProxy.json"
-import { deployedBytecode as TreasuryBin } from "../../artifacts/contracts/TreasuryContract.sol/TreasuryContract.json"
 
 
 const constants = { 
@@ -53,10 +49,10 @@ const constants = {
     "CONSORTIUM_COMMITTEE_ROLE": "0xd8725ad0546b527f07ff9abf58639cd7f503a88de7b6b734a0035c5b0cb513cd",
     "EXECUTOR_AGENT_ROLE": "0xc134067449ddffbed769e2d3e5df17c9e61b02187dc779624a59c82dd6325496",
     // Contract Binaries
-    "COMMITEE_CONTRACT_BIN": CommitteeBin,
-    "GASPRICE_ORACLE_PROXY_CONTRACT_BIN": GasPriceOracleProxyBin,
-    "SERVICE_PROVIER_PROXY_CONTRACT_BIN": ServiceProviderProxyBin,
-    "TREASURY_CONTRACT_BIN": TreasuryBin,
+    // "COMMITEE_CONTRACT_BIN": CommitteeBin,
+    // "GASPRICE_ORACLE_PROXY_CONTRACT_BIN": GasPriceOracleProxyBin,
+    // "SERVICE_PROVIER_PROXY_CONTRACT_BIN": ServiceProviderProxyBin,
+    // "TREASURY_CONTRACT_BIN": TreasuryBin,
     "GASPRICE_CONFIG": {
         "V1": {
             "CARBON_EMISSION_COEFFICIENT": process.env.CARBON_EMISSION_COEFFICIENT ? 

@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import { ethers ,artifacts } from "hardhat";
 import {
   loadFixture,
   setBalance,
@@ -45,10 +45,10 @@ export async function setSystemContractFixture(): Promise<SystemContractsFixture
   await setBalance(constants.TREASURY_CONTRACT_ADDRESS, constants.ONE_TRILLION_TOKEN);
 
   // set contract code to pre-load contract address.
-  await setCode(constants.COMMITTEE_CONTRACT_ADDRESS, constants.COMMITEE_CONTRACT_BIN);
-  await setCode(constants.GASPRICE_ORACLE_PROXY_CONTRACT_ADDRESS, constants.GASPRICE_ORACLE_PROXY_CONTRACT_BIN);
-  await setCode(constants.SERVICE_PROVIER_PROXY_CONTRACT_ADDRESS, constants.SERVICE_PROVIER_PROXY_CONTRACT_BIN);
-  await setCode(constants.TREASURY_CONTRACT_ADDRESS, constants.TREASURY_CONTRACT_BIN);
+  await setCode(constants.COMMITTEE_CONTRACT_ADDRESS, (await (artifacts.readArtifact("contracts/Committee.sol:Committee"))).deployedBytecode);
+  await setCode(constants.GASPRICE_ORACLE_PROXY_CONTRACT_ADDRESS, (await (artifacts.readArtifact("contracts/proxies/GasPriceOracleProxy.sol:GasPriceOracleProxy"))).deployedBytecode);
+  await setCode(constants.SERVICE_PROVIER_PROXY_CONTRACT_ADDRESS, (await (artifacts.readArtifact("contracts/proxies/ServiceProviderProxy.sol:ServiceProviderProxy"))).deployedBytecode);
+  await setCode(constants.TREASURY_CONTRACT_ADDRESS, (await (artifacts.readArtifact("contract/TreasuryContract.sol:TreasuryContract"))).deployedBytecode);
 
   // load contract from to address
   const committee = await ethers.getContractAt("Committee",
