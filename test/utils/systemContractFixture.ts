@@ -48,7 +48,7 @@ export async function setSystemContractFixture(): Promise<SystemContractsFixture
   await setCode(constants.COMMITTEE_CONTRACT_ADDRESS, (await (artifacts.readArtifact("contracts/Committee.sol:Committee"))).deployedBytecode);
   await setCode(constants.GASPRICE_ORACLE_PROXY_CONTRACT_ADDRESS, (await (artifacts.readArtifact("contracts/proxies/GasPriceOracleProxy.sol:GasPriceOracleProxy"))).deployedBytecode);
   await setCode(constants.SERVICE_PROVIER_PROXY_CONTRACT_ADDRESS, (await (artifacts.readArtifact("contracts/proxies/ServiceProviderProxy.sol:ServiceProviderProxy"))).deployedBytecode);
-  await setCode(constants.TREASURY_CONTRACT_ADDRESS, (await (artifacts.readArtifact("contract/TreasuryContract.sol:TreasuryContract"))).deployedBytecode);
+  await setCode(constants.TREASURY_CONTRACT_ADDRESS, (await (artifacts.readArtifact("contracts/TreasuryContract.sol:TreasuryContract"))).deployedBytecode);
 
   // load contract from to address
   const committee = await ethers.getContractAt("Committee",

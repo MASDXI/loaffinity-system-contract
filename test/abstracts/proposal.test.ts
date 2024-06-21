@@ -60,7 +60,7 @@ describe("Abstract Proposal Contract", function () {
         it("function: propose()", async function () {
             await expect(proposalMock.connect(signers[0]).propose(activateBlock, 1))
                 .to.emit(proposalMock,"LogCreateProposal")
-                .withArgs(anyValue, anyValue, signers[0].getAddress);
+                .withArgs(anyValue, await signers[0].getAddress(), anyValue);
         });
 
         it("function: vote()", async function () {
@@ -252,7 +252,7 @@ describe("Abstract Proposal Contract", function () {
         it("revert: propose again later", async function () {
             await expect(proposalMock.connect(signers[0]).propose(activateBlock, 1))
             .to.be.emit(proposalMock,"LogCreateProposal")
-            .withArgs(anyValue, anyValue, signers[0].getAddress);
+            .withArgs(anyValue, await signers[0].getAddress(), anyValue);
             await expect(proposalMock.connect(signers[0]).propose(activateBlock + 1n, 1))
             .to.be.revertedWith(revertedMessage.proposal_propose_too_soon)
         });
